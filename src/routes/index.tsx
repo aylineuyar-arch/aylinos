@@ -546,7 +546,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 #recent-zone{
   width:100%;max-width:1240px;margin:14px auto 0;
   padding:0 24px;
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;
+  display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:14px;align-items:stretch;
 }
 .recent-main{display:flex;flex-direction:column;min-width:0}
 .recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0}
