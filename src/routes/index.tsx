@@ -657,6 +657,20 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .signal-title{font-family:var(--sans);font-size:13px;color:var(--ink);font-weight:600;line-height:1.35;letter-spacing:-.005em}
 .signal-sub{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
 
+/* Upcoming — intentionally quiet */
+.rc-upcoming{background:rgba(255,255,255,.4);border:1px dashed var(--b-2)}
+.up-row{display:flex;gap:12px;padding:8px 0;border-top:1px solid rgba(15,17,21,.05)}
+.up-row:first-of-type{border-top:none;padding-top:2px}
+.up-when{
+  font-family:var(--mono);font-size:9.5px;color:var(--ink-3);
+  text-transform:uppercase;letter-spacing:.1em;line-height:1.35;
+  width:36px;flex-shrink:0;text-align:right;padding-top:1px;
+}
+.up-when b{display:block;font-size:11px;color:var(--ink-2);font-weight:600;letter-spacing:.02em;margin-top:1px}
+.up-body{min-width:0;flex:1}
+.up-title{font-family:var(--sans);font-size:12.5px;color:var(--ink-2);font-weight:500;line-height:1.35;letter-spacing:-.003em}
+.up-sub{font-family:var(--sans);font-size:11px;color:var(--ink-4);margin-top:1px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 
 
 
