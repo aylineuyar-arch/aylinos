@@ -665,8 +665,8 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .signal-sub{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
 
 /* Upcoming — intentionally quiet */
-.rc-upcoming{background:transparent;border:1px dashed rgba(15,17,21,.1)}
-.rc-upcoming .dd-label{color:var(--ink-3)}
+.rc-upcoming{background:linear-gradient(180deg, rgba(253,242,248,.5), rgba(253,242,248,.2));border:1px solid rgba(236,72,153,.18)}
+.rc-upcoming .dd-label{color:var(--ink-2)}
 .up-row{display:flex;gap:12px;padding:8px 0;border-top:1px dashed rgba(15,17,21,.06)}
 .up-row:first-of-type{border-top:none;padding-top:2px}
 .up-when{
