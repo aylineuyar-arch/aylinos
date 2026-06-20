@@ -363,10 +363,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   width:100vw;height:100vh;display:flex;flex-direction:column;position:relative;
   background-color:var(--bg);
   background-image:
-    radial-gradient(ellipse 70% 45% at 50% -5%, rgba(99,102,241,.16) 0%, transparent 60%),
-    radial-gradient(ellipse 45% 35% at 8% 92%, rgba(16,185,129,.1) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 30% at 95% 65%, rgba(244,114,182,.1) 0%, transparent 55%),
-    radial-gradient(circle at 1px 1px, rgba(26,26,36,.06) 1px, transparent 0);
+    radial-gradient(ellipse 70% 45% at 50% -5%, rgba(245,158,11,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 35% at 8% 92%, rgba(217,119,6,.08) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 95% 65%, rgba(180,83,9,.07) 0%, transparent 55%),
+    radial-gradient(circle at 1px 1px, rgba(69,64,57,.07) 1px, transparent 0);
   background-size:auto,auto,auto,22px 22px;
 }
 /* Grain overlay — adds tactile film texture */
