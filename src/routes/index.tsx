@@ -162,10 +162,11 @@ function Home() {
         <div id="sb">
           <div className="sb-left">
             <span className="sb-brand">
-              <span className="sb-glyph">◇</span> AylinOS
+              <span className="sb-glyph">◇</span>Aylin<span className="sb-brand-os">OS</span>
             </span>
+            <span className="sb-byline">designed &amp; shipped by Aylin</span>
             <span className="sb-divider" />
-            <span className="sb-ver">v2.4.1 — “midnight oil”</span>
+            <span className="sb-ver">v2.4.1 — "midnight oil"</span>
           </div>
           <div className="sb-right">
             <div className="sb-pill">
