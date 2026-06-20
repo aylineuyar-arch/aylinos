@@ -153,9 +153,6 @@ function Home() {
         {/* Search zone */}
         <section id="search-zone">
           <div className="prompt-row">
-            <span className="prompt-eyebrow">
-              <span className="eyebrow-dot" /> {today.toUpperCase()} · session 04 · ready
-            </span>
             <h1 className="prompt-h1">
               <span className="bracket">[</span>
               {greeting}, <span className="prompt-name">Aylin</span>
