@@ -653,6 +653,14 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
 /* Dock */
 #dock-row{display:flex;justify-content:center;padding:6px 16px 8px;flex-shrink:0;overflow-x:auto}
+#dock-wrap{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.dock-label{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:0 8px;
+  font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);
+  text-transform:uppercase;letter-spacing:.16em;
+}
+.dock-label .dock-meta{color:var(--ink-3);font-weight:400;font-size:10px;letter-spacing:.04em;text-transform:none}
 #dock{
   display:flex;align-items:flex-start;gap:6px;
   padding:14px 16px 12px;
