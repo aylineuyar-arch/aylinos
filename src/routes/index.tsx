@@ -424,7 +424,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   background:rgba(255,255,255,.4);
 }
 #agent-dot{width:6px;height:6px;border-radius:50%;animation:dot-pulse 1.6s ease-in-out infinite;box-shadow:0 0 8px currentColor}
-#agent-name{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.02em}
+#agent-name{
+  font-family:var(--mono);font-size:10.5px;color:var(--ink-2);letter-spacing:.02em;
+  padding:3px 9px;border-radius:6px;
+  background:rgba(255,255,255,.7);border:1px solid var(--b);
+}
 .output-meta{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em}
 .term-cursor{
   display:inline-block;width:6px;height:11px;background:var(--accent);
