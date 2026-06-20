@@ -449,16 +449,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 .sec-label:first-child{margin-top:0}
 
-.suggest-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+.suggest-list{list-style:none;display:flex;flex-direction:column;gap:1px}
 .suggest-row{
   display:flex;align-items:center;gap:12px;
-  padding:7px 10px;margin:0 -10px;border-radius:7px;
-  cursor:pointer;transition:background 120ms;
+  padding:6px 10px;margin:0 -10px;border-radius:6px;
+  cursor:pointer;transition:background 120ms,color 120ms;
 }
 .suggest-row:hover{background:rgba(99,102,241,.06)}
 .suggest-arrow{font-family:var(--mono);font-size:11px;color:var(--ink-4);width:10px;flex-shrink:0}
 .suggest-row:hover .suggest-arrow{color:var(--accent)}
-.suggest-q{flex:1;font-family:var(--sans);font-size:13px;color:var(--ink);letter-spacing:-.005em}
+.suggest-q{flex:1;font-family:var(--sans);font-size:12.5px;font-weight:400;color:var(--ink-3);letter-spacing:-.003em}
+.suggest-row:hover .suggest-q{color:var(--ink)}
 .suggest-agent{
   font-family:var(--mono);font-size:9.5px;font-weight:600;
   padding:3px 8px;border-radius:4px;border:1px solid;
