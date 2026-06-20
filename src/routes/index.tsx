@@ -101,12 +101,53 @@ function useRotatingSuggestions(windowSize = 3, intervalMs = 5000) {
   return Array.from({ length: windowSize }, (_, i) => SUGGESTIONS[(offset + i) % SUGGESTIONS.length]);
 }
 
+// Type out a list of phrases as a live placeholder
+function useTypingPlaceholder(phrases: string[], { typeMs = 55, holdMs = 1600, eraseMs = 28 } = {}) {
+  const [text, setText] = useState("");
+  useEffect(() => {
+    let phraseIdx = 0;
+    let charIdx = 0;
+    let mode: "type" | "hold" | "erase" = "type";
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      const phrase = phrases[phraseIdx];
+      if (mode === "type") {
+        charIdx++;
+        setText(phrase.slice(0, charIdx));
+        if (charIdx >= phrase.length) { mode = "hold"; timer = setTimeout(tick, holdMs); return; }
+        timer = setTimeout(tick, typeMs);
+      } else if (mode === "hold") {
+        mode = "erase"; timer = setTimeout(tick, eraseMs);
+      } else {
+        charIdx--;
+        setText(phrase.slice(0, Math.max(0, charIdx)));
+        if (charIdx <= 0) { mode = "type"; phraseIdx = (phraseIdx + 1) % phrases.length; timer = setTimeout(tick, 280); return; }
+        timer = setTimeout(tick, eraseMs);
+      }
+    };
+    timer = setTimeout(tick, 600);
+    return () => clearTimeout(timer);
+  }, [phrases, typeMs, holdMs, eraseMs]);
+  return text;
+}
+
+
 
 function Home() {
   const clock = useClock();
   const greeting = useGreeting();
   const rotating = useRotatingSuggestions(3, 5000);
+  const ticker = useTicker();
+  const typed = useTypingPlaceholder([
+    "Ask anything, or route a task to an agent…",
+    "should I apply to Ramp?",
+    "book dinner in Soho tomorrow at 8",
+    "draft intro to Sarah at Sequoia",
+    "research Cursor's GTM motion",
+    "triage today's support inbox",
+  ]);
   const [helpOpen, setHelpOpen] = useState(false);
+
   
   
   
@@ -169,10 +210,11 @@ function Home() {
             <input
               id="search-bar"
               type="text"
-              placeholder="Ask anything, or route a task to an agent…"
+              placeholder={typed || " "}
               autoComplete="off"
               spellCheck={false}
             />
+
             <span className="search-cursor" aria-hidden />
             <button
               type="button"
@@ -213,7 +255,7 @@ function Home() {
             <div className="dd-label"><span>Recent</span></div>
             <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span></div>
             <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · scored 12 Greenhouse listings, 2 above threshold</span></div>
-            <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts queued for review (Sarah, Ben, Maya)</span></div>
+            <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts queued — Sarah (Sequoia), Ben (Stripe), Maya (Anthropic)</span></div>
             <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm, confirmed via email</span></div>
             <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated to human</span></div>
             <div className="recent-row"><span className="recent-time">2d</span><span className="recent-text"><b>Networking</b> · scored 22 LinkedIn profiles, 4 above threshold</span></div>
@@ -222,21 +264,14 @@ function Home() {
 
 
 
-        {/* Active pipeline — band between dropdown and dock */}
+        {/* Active pipeline — single rotating line */}
         <div id="pipeline-band">
-          <span className="pb-tag">
-            <span className="pb-tag-dot" /> ACTIVE PIPELINE
-          </span>
-          <div className="pb-track">
-            {LIVE_TICKER.map((t, i) => (
-              <span className="pb-chip" key={i}>
-                <span className="pb-dot" />
-                {t.text}
-              </span>
-            ))}
-          </div>
-          <span className="pb-count">{LIVE_TICKER.length} running</span>
+          <span className="pb-mini-dot" />
+          <span className="pb-mini-label">PIPELINE</span>
+          <span className="pb-mini-text" key={ticker.text}>{ticker.text}</span>
+          <span className="pb-mini-count">{LIVE_TICKER.length} running</span>
         </div>
+
 
         {/* Dock */}
         <div id="dock-row">
@@ -253,37 +288,20 @@ function Home() {
           </div>
         </div>
 
-        {/* Eval footer — the receipts */}
-        <div id="telem">
-          <div id="telem-inner">
-            <a href="/evals" className="tel-cell clickable" title="Routing F1 across all 7 agents, last 7 days">
-              <span className="tel-key">F1</span>
-              <span className="tel-val">0.87</span>
-              <span className="tel-delta up">▲ 0.04</span>
-            </a>
-            <div className="tel-cell" title="True positives / (true positives + false positives) on routing decisions">
-              <span className="tel-key">Precision</span>
-              <span className="tel-val">0.91</span>
-            </div>
-            <div className="tel-cell" title="True positives / (true positives + false negatives)">
-              <span className="tel-key">Recall</span>
-              <span className="tel-val">0.84</span>
-            </div>
-            <div className="tel-cell" title="LLM calls today across all agents">
-              <span className="tel-key">Calls 24h</span>
-              <span className="tel-val">1,247</span>
-            </div>
-            <div className="tel-cell" title="Median end-to-end latency">
-              <span className="tel-key">p50</span>
-              <span className="tel-val">820ms</span>
-            </div>
-            <div className="tel-cell" title="Active prompt version — shadow-testing v3 on 10% of traffic">
-              <span className="tel-key">Prompt</span>
-              <span className="tel-val" style={{ color: "#6366f1" }}>v2</span>
-              <span className="tel-badge">v3 shadow 10%</span>
-            </div>
-          </div>
-        </div>
+        {/* Eval footer — single line */}
+        <a id="telem" href="/evals" title="Click for full eval harness — 7-day routing metrics across all agents">
+          <span className="tel-key">EVALS</span>
+          <span className="tel-pair"><span className="tel-k">F1</span><span className="tel-v">0.87</span><span className="tel-delta">▲0.04</span></span>
+          <span className="tel-sep">·</span>
+          <span className="tel-pair"><span className="tel-k">precision</span><span className="tel-v">0.91</span></span>
+          <span className="tel-sep">·</span>
+          <span className="tel-pair"><span className="tel-k">recall</span><span className="tel-v">0.84</span></span>
+          <span className="tel-sep">·</span>
+          <span className="tel-pair"><span className="tel-k">p50</span><span className="tel-v">820ms</span></span>
+          <span className="tel-sep">·</span>
+          <span className="tel-pair"><span className="tel-k">prompt</span><span className="tel-v accent">v2</span><span className="tel-shadow">v3 shadow 10%</span></span>
+        </a>
+
       </div>
     </>
   );
@@ -429,18 +447,19 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   position:relative;z-index:1;
   width:100%;
   background:#ffffff;
-  border:1px solid var(--b-2);
-  border-radius:12px;
-  padding:16px 168px 16px 52px;
-  font-family:var(--sans);font-size:15px;color:var(--ink);outline:none;
-  transition:border-color 160ms, box-shadow 160ms;
-  box-shadow:0 1px 2px rgba(15,17,21,.04);
+  border:1.5px solid var(--accent);
+  border-radius:14px;
+  padding:18px 168px 18px 52px;
+  font-family:var(--sans);font-size:15.5px;color:var(--ink);outline:none;
+  transition:border-color 160ms, box-shadow 200ms;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 8px 22px rgba(79,70,229,.10), 0 1px 2px rgba(15,17,21,.04);
 }
 #search-bar::placeholder{color:var(--ink-3)}
 #search-bar:focus{
-  border-color:var(--ink);
-  box-shadow:0 0 0 3px rgba(15,17,21,.08);
+  border-color:var(--accent);
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(79,70,229,.16), 0 14px 32px rgba(79,70,229,.18);
 }
+
 /* Shared terminal cursor + ticker primitives */
 .term-cursor{
   display:inline-block;width:5px;height:10px;background:var(--accent);
@@ -475,15 +494,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 
 /* Recent — always visible below search */
 #recent-zone{
-  width:100%;max-width:720px;margin:14px auto 0;
-  padding:0 24px;display:flex;flex-direction:column;min-height:0;
+  flex:1;min-height:0;width:100%;max-width:720px;margin:14px auto 0;
+  padding:0 24px;display:flex;flex-direction:column;
 }
 .recent-card{
+  flex:1;min-height:0;overflow-y:auto;
   padding:14px 18px;
   background:rgba(255,255,255,.6);
   border:1px solid var(--b);border-radius:12px;
   backdrop-filter:blur(10px);
-  max-height:240px;overflow-y:auto;
 }
 .dd-label{
   display:flex;align-items:center;justify-content:space-between;
@@ -514,74 +533,48 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .recent-text{font-family:var(--sans);font-size:12px;color:var(--ink-2);line-height:1.5;letter-spacing:-.003em}
 .recent-text b{color:var(--ink);font-weight:600}
 
-/* Active pipeline — band */
+/* Active pipeline — single rotating line */
 #pipeline-band{
-  flex-shrink:0;display:flex;align-items:center;gap:14px;
-  width:100%;max-width:980px;margin:auto auto 0;padding:11px 18px;
-  background:rgba(255,255,255,.55);
-  border:1px solid var(--b);border-radius:11px;
-  backdrop-filter:blur(10px);
-  box-shadow:0 6px 18px rgba(26,26,36,.05);
+  flex-shrink:0;display:flex;align-items:center;gap:10px;
+  width:100%;max-width:720px;margin:10px auto 0;padding:0 28px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-3);
 }
-.pb-track{
-  flex:1;min-width:0;display:flex;align-items:center;gap:8px;
-  overflow-x:auto;scrollbar-width:none;
-  mask-image:linear-gradient(to right, #000 0, #000 calc(100% - 32px), transparent 100%);
-  -webkit-mask-image:linear-gradient(to right, #000 0, #000 calc(100% - 32px), transparent 100%);
+.pb-mini-dot{
+  width:6px;height:6px;border-radius:50%;background:#10b981;
+  box-shadow:0 0 6px #10b981;animation:dot-pulse 1.8s ease-in-out infinite;flex-shrink:0;
 }
-.pb-tag{
-  flex-shrink:0;display:inline-flex;align-items:center;gap:7px;
-  font-family:var(--mono);font-size:10px;font-weight:700;
-  letter-spacing:.2em;color:var(--ink-2);text-transform:uppercase;
+.pb-mini-label{
+  font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2);flex-shrink:0;
 }
-.pb-tag-dot{
-  width:7px;height:7px;border-radius:50%;background:#10b981;
-  box-shadow:0 0 0 3px rgba(16,185,129,.18), 0 0 8px #10b981;
-  animation:dot-pulse 1.6s ease-in-out infinite;
+.pb-mini-text{
+  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--ink-2);letter-spacing:.01em;animation:fadeUp .4s ease;
 }
-.pb-track::-webkit-scrollbar{display:none}
-.pb-chip{
-  flex-shrink:0;display:inline-flex;align-items:center;gap:7px;
-  font-family:var(--mono);font-size:11px;color:var(--ink-2);
-  padding:5px 11px;border-radius:999px;
-  background:rgba(255,255,255,.8);border:1px solid var(--b);
-  letter-spacing:.01em;
-}
-.pb-dot{
-  width:5px;height:5px;border-radius:50%;flex-shrink:0;
-  background:var(--ink-3);animation:dot-pulse 1.6s ease-in-out infinite;
-}
-.pb-count{
-  flex-shrink:0;font-family:var(--mono);font-size:10px;color:var(--ink-3);
-  letter-spacing:.06em;text-transform:uppercase;
+.pb-mini-count{
+  flex-shrink:0;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;font-size:10px;
 }
 
-/* Slim eval footer */
-#telem{flex-shrink:0;display:flex;justify-content:center;padding:2px 24px 8px}
-#telem-inner{
-  display:flex;align-items:center;
-  background:rgba(255,255,255,.85);
-  border:1px solid var(--b-2);
-  border-radius:7px;overflow:hidden;backdrop-filter:blur(10px);
+/* Eval footer — single line */
+#telem{
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0 10px;
+  margin:8px auto 10px;padding:0 28px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-2);
+  text-decoration:none;transition:color 140ms;
+  max-width:780px;
 }
-.tel-cell{
-  padding:4px 12px;border-right:1px solid var(--b);
-  display:inline-flex;align-items:center;gap:6px;
-  text-decoration:none;transition:background 150ms;
+#telem:hover{color:var(--ink)}
+#telem .tel-key{font-size:9.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);margin-right:4px}
+.tel-pair{display:inline-flex;align-items:baseline;gap:5px}
+.tel-k{color:var(--ink-3);font-size:10px;letter-spacing:.04em}
+.tel-v{color:var(--ink);font-weight:600;font-size:11.5px;letter-spacing:.01em}
+.tel-v.accent{color:var(--accent)}
+.tel-delta{color:#059669;font-size:9.5px;font-weight:600;margin-left:2px}
+.tel-sep{color:var(--ink-4);margin:0 1px}
+.tel-shadow{
+  margin-left:4px;padding:1px 6px;border-radius:3px;
+  font-size:8.5px;font-weight:600;letter-spacing:.05em;
+  background:rgba(79,70,229,.1);color:var(--accent);border:1px solid rgba(79,70,229,.25);
 }
-.tel-cell:last-child{border-right:none}
-.tel-cell.clickable{cursor:pointer}
-.tel-cell.clickable:hover{background:rgba(99,102,241,.08)}
-.tel-val{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink);letter-spacing:.01em}
-.tel-key{font-family:var(--mono);font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.1em}
-.tel-badge{
-  display:inline-block;padding:1px 6px;border-radius:3px;
-  font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.05em;
-  background:rgba(99,102,241,.1);color:var(--accent);border:1px solid rgba(99,102,241,.25);
-}
-.tel-delta{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.02em}
-.tel-delta.up{color:#059669}
-.tel-delta.down{color:#dc2626}
 
 /* Dock */
 #dock-row{display:flex;justify-content:center;padding:6px 16px 8px;flex-shrink:0;overflow-x:auto}
