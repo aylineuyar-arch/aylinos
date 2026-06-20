@@ -341,18 +341,19 @@ function Home() {
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f4f3ee;
-  --bg-2:#eceae3;
-  --ink:#0f1115;
-  --ink-2:rgba(15,17,21,.82);
-  --ink-3:rgba(15,17,21,.62);
-  --ink-4:rgba(15,17,21,.38);
-  --b:rgba(15,17,21,.12);
-  --b-2:rgba(15,17,21,.2);
-  --surface:rgba(255,255,255,.78);
+  --bg:#FCF9F1;
+  --bg-2:#F3F1EA;
+  --ink:#2A2620;
+  --ink-2:#454039;
+  --ink-3:#8C8579;
+  --ink-4:#A8A294;
+  --b:#E5E1D5;
+  --b-2:#D6D1C2;
+  --surface:rgba(255,255,255,.7);
   --mono:'JetBrains Mono','SF Mono','Menlo',monospace;
   --sans:'Inter',system-ui,sans-serif;
-  --accent:#4f46e5;
+  --accent:#F59E0B;
+  --accent-2:#D97706;
 }
 html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 
@@ -362,10 +363,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   width:100vw;height:100vh;display:flex;flex-direction:column;position:relative;
   background-color:var(--bg);
   background-image:
-    radial-gradient(ellipse 70% 45% at 50% -5%, rgba(99,102,241,.16) 0%, transparent 60%),
-    radial-gradient(ellipse 45% 35% at 8% 92%, rgba(16,185,129,.1) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 30% at 95% 65%, rgba(244,114,182,.1) 0%, transparent 55%),
-    radial-gradient(circle at 1px 1px, rgba(26,26,36,.06) 1px, transparent 0);
+    radial-gradient(ellipse 70% 45% at 50% -5%, rgba(245,158,11,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 35% at 8% 92%, rgba(217,119,6,.08) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 95% 65%, rgba(180,83,9,.07) 0%, transparent 55%),
+    radial-gradient(circle at 1px 1px, rgba(69,64,57,.07) 1px, transparent 0);
   background-size:auto,auto,auto,22px 22px;
 }
 /* Grain overlay — adds tactile film texture */
@@ -462,12 +463,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   padding:18px 168px 18px 52px;
   font-family:var(--sans);font-size:15.5px;color:var(--ink);outline:none;
   transition:border-color 160ms, box-shadow 200ms;
-  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 8px 22px rgba(79,70,229,.10), 0 1px 2px rgba(15,17,21,.04);
+  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 1px 2px rgba(69,64,57,.04);
 }
 #search-bar::placeholder{color:var(--ink-3)}
 #search-bar:focus{
   border-color:var(--accent);
-  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(79,70,229,.16), 0 14px 32px rgba(79,70,229,.18);
+  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(245,158,11,.18);
 }
 
 /* Shared terminal cursor + ticker primitives */
@@ -534,7 +535,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   padding:7px 8px;margin:0 -8px;border-radius:6px;
   cursor:pointer;transition:background 120ms,color 120ms;
 }
-.suggest-row:hover{background:rgba(99,102,241,.07)}
+.suggest-row:hover{background:rgba(245,158,11,.08)}
 .suggest-arrow{font-family:var(--mono);font-size:11px;color:var(--ink-4);width:10px;flex-shrink:0}
 .suggest-row:hover .suggest-arrow{color:var(--accent)}
 .suggest-q{flex:1;font-family:var(--sans);font-size:13px;color:var(--ink-2);letter-spacing:-.003em}
@@ -575,7 +576,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .tel-shadow{
   margin-left:4px;padding:1px 6px;border-radius:3px;
   font-size:8.5px;font-weight:600;letter-spacing:.05em;
-  background:rgba(79,70,229,.1);color:var(--accent);border:1px solid rgba(79,70,229,.25);
+  background:rgba(245,158,11,.12);color:var(--accent-2);border:1px solid rgba(245,158,11,.3);
 }
 
 /* Dock */
