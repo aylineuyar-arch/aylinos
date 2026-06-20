@@ -539,10 +539,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   box-shadow:0 0 0 3px rgba(16,185,129,.18), 0 0 8px #10b981;
   animation:dot-pulse 1.6s ease-in-out infinite;
 }
-.pb-track{
-  flex:1;min-width:0;display:flex;align-items:center;gap:8px;
-  overflow-x:auto;scrollbar-width:none;
-}
 .pb-track::-webkit-scrollbar{display:none}
 .pb-chip{
   flex-shrink:0;display:inline-flex;align-items:center;gap:7px;
