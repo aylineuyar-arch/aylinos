@@ -564,7 +564,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   border:1px solid var(--b-2);
   border-radius:7px;overflow:hidden;backdrop-filter:blur(10px);
 }
-}
 .tel-cell{
   padding:4px 12px;border-right:1px solid var(--b);
   display:inline-flex;align-items:center;gap:6px;
