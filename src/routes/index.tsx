@@ -252,6 +252,15 @@ function Home() {
         <section id="recent-zone">
           <div className="recent-main">
             <div className="recent-grid">
+              <div className="recent-card rc-today">
+                <div className="dd-label"><span>Today · {today}</span><span className="dd-meta">since 8:00am</span></div>
+                <div className="today-stats">
+                  <div className="stat"><span className="stat-num">14</span><span className="stat-lbl">runs</span></div>
+                  <div className="stat"><span className="stat-num">3</span><span className="stat-lbl">awaiting you</span></div>
+                  <div className="stat"><span className="stat-num">28m</span><span className="stat-lbl">saved</span></div>
+                  <div className="stat"><span className="stat-num">$0.42</span><span className="stat-lbl">spent</span></div>
+                </div>
+              </div>
               <div className="recent-card rc-searches">
                 <div className="dd-label"><span>Recent searches</span></div>
                 <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
