@@ -166,80 +166,50 @@ function Home() {
           </div>
         </section>
 
-        {/* Output / suggestions panel */}
-        <section id="output-panel">
-          <div id="output-card">
-            <header id="output-header">
-              <span id="agent-dot" style={{ background: "#10b981" }} />
-              <span id="agent-name">
-                stdin · awaiting prompt<span className="term-cursor" />
-              </span>
-              <span className="output-meta ticker" key={ticker.text}>
-                <span className="ticker-dot" style={{ background: ticker.dot }} /> {ticker.text}
-              </span>
-            </header>
+        {/* Awaiting prompt — slim terminal line */}
+        <div id="stdin-bar">
+          <span id="agent-dot" style={{ background: "#10b981" }} />
+          <span id="agent-name">
+            stdin · awaiting prompt<span className="term-cursor" />
+          </span>
+          <span className="output-meta ticker" key={ticker.text}>
+            <span className="ticker-dot" style={{ background: ticker.dot }} /> {ticker.text}
+          </span>
+        </div>
 
-            <div id="output-body">
-              <div className="sec-label">Try one of these</div>
-              <ul className="suggest-list">
-                {SUGGESTIONS.map((s) => (
-                  <li key={s.q} className="suggest-row">
-                    <span className="suggest-arrow">→</span>
-                    <span className="suggest-q">{s.q}</span>
-                    <span
-                      className="suggest-agent"
-                      style={{ color: s.accent, borderColor: `${s.accent}40`, background: `${s.accent}12` }}
-                    >
-                      {s.agent}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="sec-label">Recent</div>
-              <div className="recent-row">
-                <span className="recent-time">14m</span>
-                <span className="recent-text">
-                  <b>Research</b> · synthesized Cursor GTM brief from 3 sources → Drive
+        {/* To-dos / suggestions strip */}
+        <section id="todos">
+          <div className="todos-label">
+            <span className="todos-tag">TODOS</span>
+            <span className="todos-hint">Tap to route to an agent</span>
+            <span className="todos-recent">
+              <span className="rd" /> 14m ago · <b>Research</b> synthesized Cursor GTM brief
+            </span>
+          </div>
+          <div className="todos-grid">
+            {SUGGESTIONS.map((s) => (
+              <button
+                key={s.q}
+                className="todo-card"
+                style={{
+                  // @ts-expect-error css var
+                  "--ac": s.accent,
+                  background: `linear-gradient(180deg, ${s.accent}10 0%, ${s.accent}04 100%)`,
+                  borderColor: `${s.accent}38`,
+                }}
+              >
+                <span
+                  className="todo-agent"
+                  style={{ color: s.accent, background: `${s.accent}1a`, borderColor: `${s.accent}40` }}
+                >
+                  {s.agent}
                 </span>
-              </div>
-              <div className="recent-row">
-                <span className="recent-time">2h</span>
-                <span className="recent-text">
-                  <b>Job Search</b> · scored 12 new Greenhouse listings, 2 above threshold
-                </span>
-              </div>
-            </div>
+                <span className="todo-q">{s.q}</span>
+                <span className="todo-arrow" style={{ color: s.accent }}>→</span>
+              </button>
+            ))}
           </div>
         </section>
-
-        {/* Telemetry strip */}
-        <div id="telem">
-          <div id="telem-inner">
-            <a href="/evals" className="tel-cell clickable">
-              <div className="tel-val">
-                — <span className="tel-badge">run evals</span>
-              </div>
-              <div className="tel-key">F1</div>
-            </a>
-            <div className="tel-cell">
-              <div className="tel-val">—</div>
-              <div className="tel-key">Precision</div>
-            </div>
-            <div className="tel-cell">
-              <div className="tel-val">—</div>
-              <div className="tel-key">Recall</div>
-            </div>
-            <div className="tel-cell">
-              <div className="tel-val">0</div>
-              <div className="tel-key">Calls</div>
-            </div>
-
-            <div className="tel-cell">
-              <div className="tel-val" style={{ color: "#6366f1" }}>v2</div>
-              <div className="tel-key">Prompt</div>
-            </div>
-          </div>
-        </div>
 
         {/* Dock */}
         <div id="dock-row">
@@ -253,6 +223,30 @@ function Home() {
                 <div className="di-tag">{a.tag}</div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Slim eval footer */}
+        <div id="telem">
+          <div id="telem-inner">
+            <a href="/evals" className="tel-cell clickable">
+              <span className="tel-key">F1</span>
+              <span className="tel-val">—</span>
+              <span className="tel-badge">run evals</span>
+            </a>
+            <div className="tel-cell">
+              <span className="tel-key">Precision</span><span className="tel-val">—</span>
+            </div>
+            <div className="tel-cell">
+              <span className="tel-key">Recall</span><span className="tel-val">—</span>
+            </div>
+            <div className="tel-cell">
+              <span className="tel-key">Calls</span><span className="tel-val">0</span>
+            </div>
+            <div className="tel-cell">
+              <span className="tel-key">Prompt</span>
+              <span className="tel-val" style={{ color: "#6366f1" }}>v2</span>
+            </div>
           </div>
         </div>
       </div>
@@ -321,7 +315,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 /* Search zone */
 #search-zone{
   flex-shrink:0;display:flex;flex-direction:column;align-items:center;
-  padding:48px 24px 18px;
+  padding:38px 24px 10px;
 }
 .prompt-row{text-align:center;margin-bottom:22px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .prompt-eyebrow{
@@ -404,32 +398,18 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   pointer-events:none;letter-spacing:.04em;
 }
 
-/* Output / suggestions panel */
-#output-panel{
-  flex:1;min-height:0;width:100%;max-width:720px;
-  margin:0 auto;padding:18px 24px 14px;
-  display:flex;flex-direction:column;
+/* Awaiting prompt — slim terminal status bar */
+#stdin-bar{
+  flex-shrink:0;display:flex;align-items:center;gap:10px;
+  width:100%;max-width:720px;margin:14px auto 0;padding:9px 14px;
+  background:rgba(255,255,255,.6);border:1px solid var(--b);border-radius:10px;
+  backdrop-filter:blur(10px);
 }
-#output-card{
-  background:rgba(255,255,255,.72);
-  border:1px solid var(--b);
-  border-radius:14px;
-  overflow:hidden;flex:1;display:flex;flex-direction:column;min-height:0;
-  box-shadow:0 12px 36px rgba(26,26,36,.08), 0 1px 0 rgba(255,255,255,.8) inset;
-  backdrop-filter:blur(12px);
-}
-#output-header{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 16px;border-bottom:1px solid var(--b);flex-shrink:0;
-  background:rgba(255,255,255,.4);
-}
-#agent-dot{width:6px;height:6px;border-radius:50%;animation:dot-pulse 1.6s ease-in-out infinite;box-shadow:0 0 8px currentColor}
+#agent-dot{width:6px;height:6px;border-radius:50%;animation:dot-pulse 1.6s ease-in-out infinite;box-shadow:0 0 8px currentColor;flex-shrink:0}
 #agent-name{
   font-family:var(--mono);font-size:10.5px;color:var(--ink-2);letter-spacing:.02em;
-  padding:3px 9px;border-radius:6px;
-  background:rgba(255,255,255,.7);border:1px solid var(--b);
 }
-.output-meta{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em}
+.output-meta{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .term-cursor{
   display:inline-block;width:6px;height:11px;background:var(--accent);
   margin-left:4px;vertical-align:-1px;animation:blink 1.05s steps(2,end) infinite;
@@ -439,62 +419,86 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .ticker-dot{width:6px;height:6px;border-radius:50%;box-shadow:0 0 6px currentColor;flex-shrink:0;animation:dot-pulse 1.4s ease-in-out infinite}
 @keyframes tickerIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
-#output-body{
-  padding:14px 18px 16px;flex:1;overflow-y:auto;
-  font-family:var(--mono);font-size:12px;color:var(--ink-2);line-height:1.7;
+/* To-dos strip */
+#todos{
+  flex:1;min-height:0;width:100%;max-width:960px;margin:0 auto;
+  padding:14px 24px 8px;display:flex;flex-direction:column;gap:10px;
 }
-.sec-label{
-  display:block;font-family:var(--mono);font-size:9.5px;color:var(--ink-3);
-  text-transform:uppercase;letter-spacing:.14em;margin:14px 0 8px;
+.todos-label{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.14em;
 }
-.sec-label:first-child{margin-top:0}
+.todos-tag{
+  font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:.2em;
+  padding:3px 8px;border-radius:5px;background:rgba(99,102,241,.1);
+  border:1px solid rgba(99,102,241,.25);color:var(--accent);
+}
+.todos-hint{text-transform:uppercase}
+.todos-recent{
+  margin-left:auto;display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--mono);font-size:10px;color:var(--ink-3);text-transform:none;letter-spacing:0;
+}
+.todos-recent b{color:var(--ink);font-weight:600}
+.rd{width:5px;height:5px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981}
+.todos-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:8px;
+}
+.todo-card{
+  position:relative;text-align:left;cursor:pointer;
+  display:flex;flex-direction:column;gap:8px;
+  padding:11px 13px 12px;border-radius:11px;
+  border:1px solid;backdrop-filter:blur(6px);
+  font-family:var(--sans);
+  transition:transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+.todo-card:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 22px color-mix(in oklab, var(--ac) 25%, transparent);
+}
+.todo-agent{
+  align-self:flex-start;
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:4px;border:1px solid;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.todo-q{
+  font-size:13px;font-weight:500;color:var(--ink);letter-spacing:-.005em;line-height:1.35;
+}
+.todo-arrow{
+  position:absolute;right:11px;bottom:10px;
+  font-family:var(--mono);font-size:13px;font-weight:600;opacity:.55;
+  transition:opacity 140ms, transform 140ms;
+}
+.todo-card:hover .todo-arrow{opacity:1;transform:translateX(2px)}
 
-.suggest-list{list-style:none;display:flex;flex-direction:column;gap:1px}
-.suggest-row{
-  display:flex;align-items:center;gap:12px;
-  padding:6px 10px;margin:0 -10px;border-radius:6px;
-  cursor:pointer;transition:background 120ms,color 120ms;
-}
-.suggest-row:hover{background:rgba(99,102,241,.06)}
-.suggest-arrow{font-family:var(--mono);font-size:11px;color:var(--ink-4);width:10px;flex-shrink:0}
-.suggest-row:hover .suggest-arrow{color:var(--accent)}
-.suggest-q{flex:1;font-family:var(--sans);font-size:12.5px;font-weight:400;color:var(--ink-3);letter-spacing:-.003em}
-.suggest-row:hover .suggest-q{color:var(--ink)}
-.suggest-agent{
-  font-family:var(--mono);font-size:9.5px;font-weight:600;
-  padding:3px 8px;border-radius:4px;border:1px solid;
-  letter-spacing:.04em;text-transform:uppercase;flex-shrink:0;
-}
-.recent-row{display:flex;align-items:flex-start;gap:14px;padding:5px 0}
-.recent-time{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:34px;flex-shrink:0;padding-top:1px;letter-spacing:.02em}
-.recent-text{font-family:var(--sans);font-size:12.5px;color:var(--ink-2);line-height:1.55;letter-spacing:-.003em}
-.recent-text b{color:var(--ink);font-weight:600}
-
-/* Telemetry strip */
-#telem{flex-shrink:0;display:flex;justify-content:center;padding:4px 24px 10px}
+/* Slim eval footer */
+#telem{flex-shrink:0;display:flex;justify-content:center;padding:2px 24px 8px}
 #telem-inner{
-  display:flex;align-items:stretch;
-  background:rgba(255,255,255,.6);
+  display:flex;align-items:center;
+  background:rgba(255,255,255,.5);
   border:1px solid var(--b);
-  border-radius:9px;overflow:hidden;backdrop-filter:blur(10px);
+  border-radius:7px;overflow:hidden;backdrop-filter:blur(10px);
+  opacity:.85;
 }
 .tel-cell{
-  padding:6px 16px;border-right:1px solid var(--b);
-  text-align:center;text-decoration:none;display:block;transition:background 150ms;
+  padding:4px 12px;border-right:1px solid var(--b);
+  display:inline-flex;align-items:center;gap:6px;
+  text-decoration:none;transition:background 150ms;
 }
 .tel-cell:last-child{border-right:none}
 .tel-cell.clickable{cursor:pointer}
 .tel-cell.clickable:hover{background:rgba(99,102,241,.08)}
-.tel-val{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ink);letter-spacing:.01em}
-.tel-key{font-family:var(--mono);font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.tel-val{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink);letter-spacing:.01em}
+.tel-key{font-family:var(--mono);font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.1em}
 .tel-badge{
   display:inline-block;padding:1px 6px;border-radius:3px;
-  font-family:var(--mono);font-size:8.5px;font-weight:600;margin-left:5px;letter-spacing:.05em;
+  font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.05em;
   background:rgba(234,88,12,.1);color:#ea580c;border:1px solid rgba(234,88,12,.25);
 }
 
 /* Dock */
-#dock-row{display:flex;justify-content:center;padding:8px 16px 22px;flex-shrink:0;overflow-x:auto}
+#dock-row{display:flex;justify-content:center;padding:6px 16px 8px;flex-shrink:0;overflow-x:auto}
 #dock{
   display:flex;align-items:flex-start;gap:6px;
   padding:14px 16px 12px;
