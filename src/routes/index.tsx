@@ -161,10 +161,8 @@ function Home() {
               {greeting}, <span className="prompt-name">Aylin</span>
               <span className="bracket">]</span>
             </h1>
-            <p className="prompt-sub">
-              Route a task to an agent, or just ask. <kbd className="kbd-inline">⌘K</kbd> to focus ·{" "}
-              <kbd className="kbd-inline">⌘/</kbd> for help
-            </p>
+            <p className="prompt-sub">Route a task to an agent, or just ask.</p>
+
           </div>
 
           <div className="search-wrap">
