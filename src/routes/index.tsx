@@ -398,19 +398,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   width:78px;cursor:pointer;padding:2px 4px;
 }
 .di{
-  width:56px;height:56px;border-radius:14px;
+  width:54px;height:54px;border-radius:11px;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
-  box-shadow:0 4px 14px rgba(26,26,36,.14), 0 1px 0 rgba(255,255,255,.8) inset;
-  transition:transform 220ms cubic-bezier(.34,1.4,.64,1), box-shadow 220ms;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 1px 0 rgba(255,255,255,.18) inset, 0 -1px 0 rgba(0,0,0,.25) inset, 0 6px 16px rgba(15,17,21,.22);
+  transition:transform 180ms cubic-bezier(.34,1.3,.64,1), box-shadow 180ms;
 }
-.di img{
-  width:92%;height:92%;object-fit:contain;
-  image-rendering:-webkit-optimize-contrast;
-  image-rendering:crisp-edges;
-  -webkit-backface-visibility:hidden;backface-visibility:hidden;
-  transform:translateZ(0);
-}
-.di-cell:hover .di{transform:translateY(-6px) scale(1.08);box-shadow:0 14px 28px rgba(26,26,36,.2), 0 1px 0 rgba(255,255,255,.9) inset}
+.di svg{display:block;shape-rendering:geometricPrecision}
+.di-cell:hover .di{transform:translateY(-5px);box-shadow:0 1px 0 rgba(255,255,255,.22) inset, 0 -1px 0 rgba(0,0,0,.3) inset, 0 14px 26px rgba(15,17,21,.28)}
 .di-cell:active .di{transform:scale(.94);transition-duration:80ms}
 .di-label{
   font-family:var(--sans);font-size:10.5px;font-weight:600;
