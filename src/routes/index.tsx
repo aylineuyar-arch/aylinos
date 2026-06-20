@@ -177,25 +177,17 @@ function Home() {
               spellCheck={false}
             />
             <span className="search-cursor" aria-hidden />
-            <span className="search-cmd">⌘K</span>
+            <button
+              type="button"
+              className={`help-toggle ${helpOpen ? "is-open" : ""}`}
+              onClick={() => setHelpOpen((v) => !v)}
+              aria-expanded={helpOpen}
+              aria-controls="help-panel"
+            >
+              <span className="help-chev">{helpOpen ? "▾" : "▸"}</span>
+              <span>Help me decide</span>
+            </button>
           </div>
-        </section>
-
-        {/* Help me decide — collapsible side panel */}
-        <section id="help-zone">
-          <button
-            type="button"
-            className={`help-toggle ${helpOpen ? "is-open" : ""}`}
-            onClick={() => setHelpOpen((v) => !v)}
-            aria-expanded={helpOpen}
-            aria-controls="help-panel"
-          >
-            <span className="help-chev">{helpOpen ? "▾" : "▸"}</span>
-            <span>Help me decide</span>
-            <span className="help-meta">
-              {helpOpen ? "hide suggestions & recent" : "suggestions & recent activity"}
-            </span>
-          </button>
 
           {helpOpen && (
             <div id="help-panel" className="dd-card">
@@ -214,19 +206,23 @@ function Home() {
                   ))}
                 </ul>
               </div>
-              <div className="dd-divider" />
-              <div className="dd-section dd-recent">
-                <div className="dd-label"><span>Recent</span></div>
-                <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span></div>
-                <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · scored 12 Greenhouse listings, 2 above threshold</span></div>
-                <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts queued for review (Sarah, Ben, Maya)</span></div>
-                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm, confirmed via email</span></div>
-                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated to human</span></div>
-                <div className="recent-row"><span className="recent-time">2d</span><span className="recent-text"><b>Networking</b> · scored 22 LinkedIn profiles, 4 above threshold</span></div>
-              </div>
             </div>
           )}
         </section>
+
+        {/* Recent activity — always visible */}
+        <section id="recent-zone">
+          <div className="recent-card">
+            <div className="dd-label"><span>Recent</span></div>
+            <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span></div>
+            <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · scored 12 Greenhouse listings, 2 above threshold</span></div>
+            <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts queued for review (Sarah, Ben, Maya)</span></div>
+            <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm, confirmed via email</span></div>
+            <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated to human</span></div>
+            <div className="recent-row"><span className="recent-time">2d</span><span className="recent-text"><b>Networking</b> · scored 22 LinkedIn profiles, 4 above threshold</span></div>
+          </div>
+        </section>
+
 
 
         {/* Active pipeline — band between dropdown and dock */}
@@ -352,7 +348,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   position:absolute;inset:0;pointer-events:none;z-index:1;mix-blend-mode:multiply;opacity:.5;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
-#sb,#search-zone,#help-zone,#pipeline-band,#telem,#dock-row{position:relative;z-index:2}
+#sb,#search-zone,#recent-zone,#pipeline-band,#telem,#dock-row{position:relative;z-index:2}
 
 
 /* Status bar */
@@ -438,7 +434,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   background:#ffffff;
   border:1px solid var(--b-2);
   border-radius:12px;
-  padding:16px 60px 16px 52px;
+  padding:16px 168px 16px 52px;
   font-family:var(--sans);font-size:15px;color:var(--ink);outline:none;
   transition:border-color 160ms, box-shadow 160ms;
   box-shadow:0 1px 2px rgba(15,17,21,.04);
@@ -448,14 +444,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   border-color:var(--ink);
   box-shadow:0 0 0 3px rgba(15,17,21,.08);
 }
-.search-cmd{
-  position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:2;
-  font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink-2);
-  padding:4px 8px;border-radius:5px;
-  background:rgba(255,255,255,.9);border:1px solid var(--b-2);
-  pointer-events:none;letter-spacing:.04em;
-}
-
 /* Shared terminal cursor + ticker primitives */
 .term-cursor{
   display:inline-block;width:5px;height:10px;background:var(--accent);
@@ -463,26 +451,21 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 @keyframes blink{50%{opacity:0}}
 
-/* Help me decide — collapsible suggestions + recent */
-#help-zone{
-  flex:1;min-height:0;width:100%;max-width:720px;margin:6px auto 0;
-  padding:0 24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;
-}
+/* Help me decide — toggle lives inside the search bar */
 .help-toggle{
-  display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--mono);font-size:11px;color:var(--ink-2);
-  letter-spacing:.04em;
-  padding:6px 12px;border-radius:8px;
-  background:rgba(255,255,255,.7);border:1px solid var(--b);
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:3;
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.02em;
+  padding:6px 10px;border-radius:7px;
+  background:rgba(15,17,21,.04);border:1px solid var(--b);
   cursor:pointer;transition:background 140ms,border-color 140ms,color 140ms;
-  backdrop-filter:blur(8px);
 }
-.help-toggle:hover{background:rgba(255,255,255,.92);border-color:var(--b-2);color:var(--ink)}
-.help-toggle.is-open{background:#fff;border-color:var(--b-2);color:var(--ink)}
-.help-chev{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:10px;text-align:center}
-.help-meta{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em;padding-left:6px;border-left:1px solid var(--b)}
+.help-toggle:hover{background:rgba(15,17,21,.07);border-color:var(--b-2);color:var(--ink)}
+.help-toggle.is-open{background:var(--ink);border-color:var(--ink);color:#fff}
+.help-toggle.is-open .help-chev{color:rgba(255,255,255,.7)}
+.help-chev{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:8px;text-align:center}
 #help-panel{
-  width:100%;flex:1;min-height:0;display:flex;flex-direction:column;
+  width:100%;max-width:680px;margin:10px auto 0;
   background:rgba(255,255,255,.82);
   border:1px solid var(--b);border-radius:13px;
   box-shadow:0 10px 28px rgba(26,26,36,.07), 0 1px 0 rgba(255,255,255,.8) inset;
@@ -491,9 +474,20 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 .dd-card{display:flex;flex-direction:column}
 .dd-section{padding:12px 16px}
-.dd-section.dd-rec{flex-shrink:0}
-.dd-section.dd-recent{flex:1;min-height:0;overflow-y:auto}
 .dd-divider{height:1px;background:var(--b);margin:0}
+
+/* Recent — always visible below search */
+#recent-zone{
+  flex:1;min-height:0;width:100%;max-width:720px;margin:14px auto 0;
+  padding:0 24px;display:flex;flex-direction:column;
+}
+.recent-card{
+  flex:1;min-height:0;overflow-y:auto;
+  padding:14px 18px;
+  background:rgba(255,255,255,.6);
+  border:1px solid var(--b);border-radius:12px;
+  backdrop-filter:blur(10px);
+}
 .dd-label{
   display:flex;align-items:center;justify-content:space-between;
   font-family:var(--mono);font-size:9.5px;color:var(--ink-3);
