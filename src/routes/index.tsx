@@ -546,9 +546,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   color:var(--ink-3);background:rgba(15,17,21,.04);border:1px solid var(--b);
 }
 .recent-row{display:flex;align-items:flex-start;gap:12px;padding:4px 0}
-.recent-time{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:30px;flex-shrink:0;padding-top:1px;letter-spacing:.02em}
-.recent-text{font-family:var(--sans);font-size:12px;color:var(--ink-2);line-height:1.5;letter-spacing:-.003em}
+.recent-time{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:26px;flex-shrink:0;padding-top:1px;letter-spacing:.02em}
+.recent-text{font-family:var(--sans);font-size:12px;color:var(--ink-2);line-height:1.45;letter-spacing:-.003em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .recent-text b{color:var(--ink);font-weight:600}
+.recent-sub{color:var(--ink-3)}
+.live-dot{width:5px;height:5px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:dot-pulse 1.8s ease-in-out infinite;display:inline-block;margin-right:4px}
+
 
 /* Active pipeline — single rotating line */
 #pipeline-band{
