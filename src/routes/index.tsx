@@ -408,6 +408,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 #agent-dot{width:6px;height:6px;border-radius:50%;animation:dot-pulse 1.6s ease-in-out infinite;box-shadow:0 0 8px currentColor}
 #agent-name{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.02em}
 .output-meta{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em}
+.term-cursor{
+  display:inline-block;width:6px;height:11px;background:var(--accent);
+  margin-left:4px;vertical-align:-1px;animation:blink 1.05s steps(2,end) infinite;
+}
+@keyframes blink{50%{opacity:0}}
+.ticker{display:inline-flex;align-items:center;gap:7px;animation:tickerIn .5s ease}
+.ticker-dot{width:6px;height:6px;border-radius:50%;box-shadow:0 0 6px currentColor;flex-shrink:0;animation:dot-pulse 1.4s ease-in-out infinite}
+@keyframes tickerIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
 #output-body{
   padding:14px 18px 16px;flex:1;overflow-y:auto;
   font-family:var(--mono);font-size:12px;color:var(--ink-2);line-height:1.7;
