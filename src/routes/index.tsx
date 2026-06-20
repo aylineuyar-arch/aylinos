@@ -140,13 +140,57 @@ const TYPING_PHRASES = [
   "Try: \"close the loop on every open thread\"",
 ];
 
+const API_BASE = "https://aylinos.onrender.com";
+
 function Home() {
   const clock = useClock();
   const greeting = useGreeting();
   const rotating = useRotatingSuggestions(3, 5000);
-  
+
   const typed = useTypingPlaceholder(TYPING_PHRASES);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [activeAgent, setActiveAgent] = useState<string | null>(null);
+  const [output, setOutput] = useState("");
+  const [streaming, setStreaming] = useState(false);
+
+  async function runQuery(q: string) {
+    if (!q.trim() || streaming) return;
+    setStreaming(true);
+    setOutput("");
+    setActiveAgent(null);
+    setHelpOpen(false);
+    try {
+      const resp = await fetch(`${API_BASE}/api/stream`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: q }),
+      });
+      if (!resp.body) throw new Error("No stream");
+      const reader = resp.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const lines = buf.split("\n");
+        buf = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.startsWith("data:")) continue;
+          try {
+            const evt = JSON.parse(line.slice(5).trim());
+            if (evt.type === "route") setActiveAgent(evt.agent);
+            else if (evt.type === "token") setOutput((s) => s + evt.text);
+          } catch {}
+        }
+      }
+    } catch (e) {
+      setOutput("Connection error — make sure aylinos.onrender.com is awake.");
+    } finally {
+      setStreaming(false);
+    }
+  }
 
   
   
@@ -214,6 +258,9 @@ function Home() {
               placeholder={typed || " "}
               autoComplete="off"
               spellCheck={false}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") runQuery(query); }}
             />
 
             <span className="search-cursor" aria-hidden />
@@ -249,6 +296,18 @@ function Home() {
             </div>
           )}
         </section>
+
+        {(streaming || output) && (
+          <section id="output-zone">
+            {activeAgent && (
+              <div id="agent-label">
+                <span className="sb-dot pulse" style={{ background: "#6366f1" }} />
+                → {activeAgent}{streaming ? " · streaming…" : " · done"}
+              </div>
+            )}
+            <pre id="output-pre">{output}{streaming && <span className="term-cursor" />}</pre>
+          </section>
+        )}
 
         <section id="recent-zone">
           <div className="recent-main">
@@ -580,6 +639,27 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .dd-section{padding:12px 16px}
 .dd-divider{height:1px;background:var(--b);margin:0}
 
+#output-zone{
+  width:100%;max-width:680px;margin:0 auto 20px;
+  padding:0 24px;
+}
+#agent-label{
+  font:500 11px/1 'JetBrains Mono',monospace;
+  color:var(--ink-3);letter-spacing:.04em;
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:10px;
+}
+#output-pre{
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;
+  padding:16px 20px;
+  font:13px/1.65 'JetBrains Mono',monospace;
+  color:var(--ink-1);
+  white-space:pre-wrap;word-break:break-word;
+  max-height:340px;overflow-y:auto;
+  margin:0;
+}
 /* Recent zone — content column + inbox-signals rail */
 #recent-zone{
   width:100%;max-width:1240px;margin:14px auto 0;
@@ -746,7 +826,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   display:flex;align-items:center;justify-content:center;overflow:hidden;
   border:1px solid rgba(255,255,255,.08);
   box-shadow:0 1px 0 rgba(255,255,255,.18) inset, 0 -1px 0 rgba(0,0,0,.25) inset, 0 6px 16px rgba(15,17,21,.22);
-  transition:transform 180ms cubic-bezier(.34,1.3,.64,1), box-shadow 180ms;
+  transition:transform 180ms cubic-bezier(.22,1,.36,1), box-shadow 180ms;
 }
 .di svg{display:block;shape-rendering:geometricPrecision}
 .di-cell:hover .di{transform:translateY(-5px);box-shadow:0 1px 0 rgba(255,255,255,.22) inset, 0 -1px 0 rgba(0,0,0,.3) inset, 0 14px 26px rgba(15,17,21,.28)}
