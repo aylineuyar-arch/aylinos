@@ -532,7 +532,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 #recent-zone{
   width:100%;max-width:1240px;margin:14px auto 0;
   padding:0 24px;
-  display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;align-items:start;
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;
 }
 .recent-main{display:flex;flex-direction:column;min-width:0}
 .recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0}
@@ -540,10 +540,8 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   #recent-zone{grid-template-columns:1fr}
 }
 .recent-grid{
-  display:grid;grid-template-columns:3fr 2fr;gap:10px;
+  display:flex;flex-direction:column;gap:10px;
 }
-.rc-runs{grid-column:1 / -1}
-@media (max-width:820px){.recent-grid{grid-template-columns:1fr}.rc-runs{grid-column:auto}}
 
 
 .recent-card{
