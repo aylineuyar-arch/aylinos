@@ -494,8 +494,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 
 /* Recent — always visible below search */
 #recent-zone{
-  width:100%;max-width:720px;margin:14px auto 0;
-  padding:0 24px;display:flex;flex-direction:column;min-height:0;
+  flex:1;min-height:0;width:100%;max-width:720px;margin:14px auto 0;
+  padding:0 24px;display:flex;flex-direction:column;
 }
 .recent-card{
   flex:1;min-height:0;overflow-y:auto;
