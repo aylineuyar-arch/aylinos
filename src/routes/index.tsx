@@ -315,18 +315,22 @@ function Home() {
 
         {/* Dock */}
         <div id="dock-row">
-          <div id="dock">
-            {APPS.map((a) => (
-              <div className="di-cell" key={a.id} title={a.name}>
-                <div className="di" style={{ background: a.gradient }}>
-                  <a.Icon size={26} strokeWidth={1.75} color="#ffffff" />
+          <div id="dock-wrap">
+            <div className="dock-label"><span>Agents</span><span className="dock-meta">{APPS.length} active · click to route</span></div>
+            <div id="dock">
+              {APPS.map((a) => (
+                <div className="di-cell" key={a.id} title={a.name}>
+                  <div className="di" style={{ background: a.gradient }}>
+                    <a.Icon size={26} strokeWidth={1.75} color="#ffffff" />
+                  </div>
+                  <div className="di-label">{a.name}</div>
+                  <div className="di-tag">{a.tag}</div>
                 </div>
-                <div className="di-label">{a.name}</div>
-                <div className="di-tag">{a.tag}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
+
 
         {/* Eval footer — single line */}
         <a id="telem" href="/evals" title="Click for full eval harness — 7-day routing metrics across all agents">
