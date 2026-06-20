@@ -492,20 +492,22 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 #search-bar{
   position:relative;z-index:1;
   width:100%;
-  background:#ffffff;
+  background:#fdf2f8;
   border:2px solid var(--accent);
   border-radius:18px;
   padding:26px 172px 26px 56px;
   font-family:var(--sans);font-size:19px;color:var(--ink);outline:none;
   letter-spacing:-.005em;
-  transition:border-color 160ms, box-shadow 200ms, transform 200ms;
-  box-shadow:8px 8px 0 var(--ink), 0 1px 0 rgba(255,255,255,.9) inset, 0 12px 32px rgba(236,72,153,.22);
+  transition:border-color 160ms, box-shadow 200ms;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 12px 32px rgba(236,72,153,.18);
 }
 #search-bar::placeholder{color:var(--ink-3);opacity:.9}
 #search-bar:focus{
   border-color:var(--accent);
-  box-shadow:8px 8px 0 var(--ink), 0 1px 0 rgba(255,255,255,.9) inset, 0 14px 36px rgba(236,72,153,.3), 0 0 0 5px rgba(236,72,153,.2);
+  background:#fff;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 14px 36px rgba(236,72,153,.28), 0 0 0 5px rgba(236,72,153,.2);
 }
+
 
 
 /* Shared terminal cursor + ticker primitives */
