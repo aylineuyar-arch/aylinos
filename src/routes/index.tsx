@@ -106,6 +106,8 @@ function Home() {
   const clock = useClock();
   const greeting = useGreeting();
   const rotating = useRotatingSuggestions(3, 5000);
+  const [helpOpen, setHelpOpen] = useState(false);
+  
   
   
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
@@ -181,54 +183,53 @@ function Home() {
           </div>
         </section>
 
-        {/* Suggestions dropdown — recommended + recent */}
-        <section id="dropdown">
-          <div className="dd-card">
-            <div className="dd-section dd-rec">
-              <div className="dd-label">
-                <span>Recommended</span>
-                <span className="dd-meta">awaiting prompt<span className="term-cursor" /></span>
+        {/* Help me decide — collapsible side panel */}
+        <section id="help-zone">
+          <button
+            type="button"
+            className={`help-toggle ${helpOpen ? "is-open" : ""}`}
+            onClick={() => setHelpOpen((v) => !v)}
+            aria-expanded={helpOpen}
+            aria-controls="help-panel"
+          >
+            <span className="help-chev">{helpOpen ? "▾" : "▸"}</span>
+            <span>Help me decide</span>
+            <span className="help-meta">
+              {helpOpen ? "hide suggestions & recent" : "suggestions & recent activity"}
+            </span>
+          </button>
+
+          {helpOpen && (
+            <div id="help-panel" className="dd-card">
+              <div className="dd-section dd-rec">
+                <div className="dd-label">
+                  <span>Recommended</span>
+                  <span className="dd-meta">awaiting prompt<span className="term-cursor" /></span>
+                </div>
+                <ul className="suggest-list">
+                  {rotating.map((s) => (
+                    <li key={s.q} className="suggest-row">
+                      <span className="suggest-arrow">→</span>
+                      <span className="suggest-q">{s.q}</span>
+                      <span className="suggest-agent">{s.agent}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul className="suggest-list">
-                {rotating.map((s) => (
-                  <li key={s.q} className="suggest-row">
-                    <span className="suggest-arrow">→</span>
-                    <span className="suggest-q">{s.q}</span>
-                    <span className="suggest-agent">{s.agent}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="dd-divider" />
-            <div className="dd-section dd-recent">
-              <div className="dd-label"><span>Recent</span></div>
-              <div className="recent-row">
-                <span className="recent-time">14m</span>
-                <span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span>
-              </div>
-              <div className="recent-row">
-                <span className="recent-time">2h</span>
-                <span className="recent-text"><b>Job Search</b> · scored 12 Greenhouse listings, 2 above threshold</span>
-              </div>
-              <div className="recent-row">
-                <span className="recent-time">6h</span>
-                <span className="recent-text"><b>Outreach</b> · 3 drafts queued for review (Sarah, Ben, Maya)</span>
-              </div>
-              <div className="recent-row">
-                <span className="recent-time">1d</span>
-                <span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm, confirmed via email</span>
-              </div>
-              <div className="recent-row">
-                <span className="recent-time">1d</span>
-                <span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated to human</span>
-              </div>
-              <div className="recent-row">
-                <span className="recent-time">2d</span>
-                <span className="recent-text"><b>Networking</b> · scored 22 LinkedIn profiles, 4 above threshold</span>
+              <div className="dd-divider" />
+              <div className="dd-section dd-recent">
+                <div className="dd-label"><span>Recent</span></div>
+                <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span></div>
+                <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · scored 12 Greenhouse listings, 2 above threshold</span></div>
+                <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts queued for review (Sarah, Ben, Maya)</span></div>
+                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm, confirmed via email</span></div>
+                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated to human</span></div>
+                <div className="recent-row"><span className="recent-time">2d</span><span className="recent-text"><b>Networking</b> · scored 22 LinkedIn profiles, 4 above threshold</span></div>
               </div>
             </div>
-          </div>
+          )}
         </section>
+
 
         {/* Active pipeline — band between dropdown and dock */}
         <div id="pipeline-band">
@@ -353,7 +354,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   position:absolute;inset:0;pointer-events:none;z-index:1;mix-blend-mode:multiply;opacity:.5;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
-#sb,#search-zone,#dropdown,#pipeline-band,#telem,#dock-row{position:relative;z-index:2}
+#sb,#search-zone,#help-zone,#pipeline-band,#telem,#dock-row{position:relative;z-index:2}
 
 
 /* Status bar */
@@ -464,18 +465,33 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 @keyframes blink{50%{opacity:0}}
 
-/* Dropdown — recommended + recent */
-#dropdown{
-  flex:1;min-height:0;width:100%;max-width:720px;margin:8px auto 0;
-  padding:0 24px;display:flex;flex-direction:column;
+/* Help me decide — collapsible suggestions + recent */
+#help-zone{
+  flex:1;min-height:0;width:100%;max-width:720px;margin:6px auto 0;
+  padding:0 24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;
 }
-.dd-card{
-  flex:1;min-height:0;display:flex;flex-direction:column;
-  background:rgba(255,255,255,.78);
+.help-toggle{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-2);
+  letter-spacing:.04em;
+  padding:6px 12px;border-radius:8px;
+  background:rgba(255,255,255,.7);border:1px solid var(--b);
+  cursor:pointer;transition:background 140ms,border-color 140ms,color 140ms;
+  backdrop-filter:blur(8px);
+}
+.help-toggle:hover{background:rgba(255,255,255,.92);border-color:var(--b-2);color:var(--ink)}
+.help-toggle.is-open{background:#fff;border-color:var(--b-2);color:var(--ink)}
+.help-chev{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:10px;text-align:center}
+.help-meta{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em;padding-left:6px;border-left:1px solid var(--b)}
+#help-panel{
+  width:100%;flex:1;min-height:0;display:flex;flex-direction:column;
+  background:rgba(255,255,255,.82);
   border:1px solid var(--b);border-radius:13px;
   box-shadow:0 10px 28px rgba(26,26,36,.07), 0 1px 0 rgba(255,255,255,.8) inset;
   backdrop-filter:blur(12px);overflow:hidden;
+  animation:fadeUp .2s ease;
 }
+.dd-card{display:flex;flex-direction:column}
 .dd-section{padding:12px 16px}
 .dd-section.dd-rec{flex-shrink:0}
 .dd-section.dd-recent{flex:1;min-height:0;overflow-y:auto}
