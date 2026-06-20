@@ -303,7 +303,7 @@ function Home() {
                 <div className="signal-sub">2 match your bar · drafted notes</div>
               </div>
               <div className="signal-row">
-                <div className="signal-head"><span className="signal-tag tag-booked">BOOKED</span><span className="signal-time">7h</span></div>
+                <div className="signal-head"><span className="signal-tag tag-booked">FORK YEA</span><span className="signal-time">7h</span></div>
                 <div className="signal-title">Dinner confirmed · Friday 7:30pm</div>
                 <div className="signal-sub">Via Carota · party of 2 · OpenTable</div>
               </div>
