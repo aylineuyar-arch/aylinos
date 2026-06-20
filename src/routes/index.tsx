@@ -382,8 +382,8 @@ const CSS = `
   --surface:rgba(255,255,255,.7);
   --mono:'JetBrains Mono','SF Mono','Menlo',monospace;
   --sans:'Inter',system-ui,sans-serif;
-  --accent:#F59E0B;
-  --accent-2:#D97706;
+  --accent:#EC4899;
+  --accent-2:#DB2777;
 }
 html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 
@@ -393,7 +393,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   width:100vw;min-height:100vh;display:flex;flex-direction:column;position:relative;
   background-color:var(--bg);
   background-image:
-    radial-gradient(ellipse 70% 45% at 50% -5%, rgba(245,158,11,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 45% at 50% -5%, rgba(236,72,153,.18) 0%, transparent 60%),
     radial-gradient(ellipse 45% 35% at 8% 92%, rgba(217,119,6,.08) 0%, transparent 55%),
     radial-gradient(ellipse 40% 30% at 95% 65%, rgba(180,83,9,.07) 0%, transparent 55%),
     radial-gradient(circle at 1px 1px, rgba(69,64,57,.07) 1px, transparent 0);
@@ -498,7 +498,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 #search-bar::placeholder{color:var(--ink-3)}
 #search-bar:focus{
   border-color:var(--accent);
-  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(245,158,11,.18);
+  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(236,72,153,.18);
 }
 
 /* Shared terminal cursor + ticker primitives */
@@ -570,7 +570,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   padding:7px 8px;margin:0 -8px;border-radius:6px;
   cursor:pointer;transition:background 120ms,color 120ms;
 }
-.suggest-row:hover{background:rgba(245,158,11,.08)}
+.suggest-row:hover{background:rgba(236,72,153,.08)}
 .suggest-arrow{font-family:var(--mono);font-size:11px;color:var(--ink-4);width:10px;flex-shrink:0}
 .suggest-row:hover .suggest-arrow{color:var(--accent)}
 .suggest-q{flex:1;font-family:var(--sans);font-size:13px;color:var(--ink-2);letter-spacing:-.003em}
@@ -598,7 +598,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;
   padding:2px 6px;border-radius:3px;
 }
-.tag-job{background:rgba(245,158,11,.14);color:var(--accent-2);border:1px solid rgba(245,158,11,.3)}
+.tag-job{background:rgba(236,72,153,.14);color:var(--accent-2);border:1px solid rgba(236,72,153,.3)}
 .tag-reply{background:rgba(16,185,129,.12);color:#047857;border:1px solid rgba(16,185,129,.3)}
 .tag-booked{background:rgba(99,102,241,.12);color:#4338ca;border:1px solid rgba(99,102,241,.3)}
 .signal-time{font-family:var(--mono);font-size:10px;color:var(--ink-3)}
@@ -628,7 +628,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .tel-shadow{
   margin-left:4px;padding:1px 6px;border-radius:3px;
   font-size:8.5px;font-weight:600;letter-spacing:.05em;
-  background:rgba(245,158,11,.12);color:var(--accent-2);border:1px solid rgba(245,158,11,.3);
+  background:rgba(236,72,153,.12);color:var(--accent-2);border:1px solid rgba(236,72,153,.3);
 }
 
 /* Dock */
