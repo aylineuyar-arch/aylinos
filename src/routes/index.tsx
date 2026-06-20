@@ -465,18 +465,33 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 @keyframes blink{50%{opacity:0}}
 
-/* Dropdown — recommended + recent */
-#dropdown{
-  flex:1;min-height:0;width:100%;max-width:720px;margin:8px auto 0;
-  padding:0 24px;display:flex;flex-direction:column;
+/* Help me decide — collapsible suggestions + recent */
+#help-zone{
+  flex:1;min-height:0;width:100%;max-width:720px;margin:6px auto 0;
+  padding:0 24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;
 }
-.dd-card{
-  flex:1;min-height:0;display:flex;flex-direction:column;
-  background:rgba(255,255,255,.78);
+.help-toggle{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-2);
+  letter-spacing:.04em;
+  padding:6px 12px;border-radius:8px;
+  background:rgba(255,255,255,.7);border:1px solid var(--b);
+  cursor:pointer;transition:background 140ms,border-color 140ms,color 140ms;
+  backdrop-filter:blur(8px);
+}
+.help-toggle:hover{background:rgba(255,255,255,.92);border-color:var(--b-2);color:var(--ink)}
+.help-toggle.is-open{background:#fff;border-color:var(--b-2);color:var(--ink)}
+.help-chev{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:10px;text-align:center}
+.help-meta{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em;padding-left:6px;border-left:1px solid var(--b)}
+#help-panel{
+  width:100%;flex:1;min-height:0;display:flex;flex-direction:column;
+  background:rgba(255,255,255,.82);
   border:1px solid var(--b);border-radius:13px;
   box-shadow:0 10px 28px rgba(26,26,36,.07), 0 1px 0 rgba(255,255,255,.8) inset;
   backdrop-filter:blur(12px);overflow:hidden;
+  animation:fadeUp .2s ease;
 }
+.dd-card{display:flex;flex-direction:column}
 .dd-section{padding:12px 16px}
 .dd-section.dd-rec{flex-shrink:0}
 .dd-section.dd-recent{flex:1;min-height:0;overflow-y:auto}
