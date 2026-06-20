@@ -140,14 +140,7 @@ function Home() {
   const greeting = useGreeting();
   const rotating = useRotatingSuggestions(3, 5000);
   
-  const typed = useTypingPlaceholder([
-    "Ask anything, or route a task to an agent…",
-    "should I apply to Ramp?",
-    "book dinner in Soho tomorrow at 8",
-    "draft intro to Sarah at Sequoia",
-    "research Cursor's GTM motion",
-    "triage today's support inbox",
-  ]);
+  const typed = useTypingPlaceholder(TYPING_PHRASES);
   const [helpOpen, setHelpOpen] = useState(false);
 
   
