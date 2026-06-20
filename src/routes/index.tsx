@@ -180,13 +180,10 @@ function Home() {
               <div className="tel-key">Recall</div>
             </div>
             <div className="tel-cell">
-              <div className="tel-val">$0.000</div>
-              <div className="tel-key">API cost</div>
-            </div>
-            <div className="tel-cell">
               <div className="tel-val">0</div>
               <div className="tel-key">Calls</div>
             </div>
+
             <div className="tel-cell">
               <div className="tel-val" style={{ color: "#6366f1" }}>v2</div>
               <div className="tel-key">Prompt</div>
