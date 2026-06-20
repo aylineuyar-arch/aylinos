@@ -327,11 +327,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .prompt-eyebrow{
   position:relative;
   display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--mono);font-size:10px;color:var(--ink-2);
-  letter-spacing:.18em;text-transform:uppercase;
+  font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ink);
+  letter-spacing:.2em;text-transform:uppercase;
   padding:5px 12px;border-radius:999px;
   background:
-    linear-gradient(rgba(255,255,255,.78),rgba(255,255,255,.78)) padding-box,
+    linear-gradient(rgba(255,255,255,.85),rgba(255,255,255,.85)) padding-box,
     linear-gradient(90deg,#818cf8,#34d399,#60a5fa,#a78bfa,#f472b6) border-box;
   border:1px solid transparent;
   backdrop-filter:blur(8px);
