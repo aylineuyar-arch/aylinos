@@ -434,7 +434,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   background:#ffffff;
   border:1px solid var(--b-2);
   border-radius:12px;
-  padding:16px 60px 16px 52px;
+  padding:16px 168px 16px 52px;
   font-family:var(--sans);font-size:15px;color:var(--ink);outline:none;
   transition:border-color 160ms, box-shadow 160ms;
   box-shadow:0 1px 2px rgba(15,17,21,.04);
