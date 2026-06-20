@@ -315,7 +315,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 /* Search zone */
 #search-zone{
   flex-shrink:0;display:flex;flex-direction:column;align-items:center;
-  padding:48px 24px 18px;
+  padding:38px 24px 10px;
 }
 .prompt-row{text-align:center;margin-bottom:22px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .prompt-eyebrow{
