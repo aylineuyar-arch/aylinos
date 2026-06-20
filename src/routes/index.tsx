@@ -250,34 +250,60 @@ function Home() {
         </section>
 
         <section id="recent-zone">
-          <div className="recent-grid">
-            <div className="recent-card rc-searches">
-              <div className="dd-label"><span>Recent searches</span></div>
-              <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
-              <div className="recent-row"><span className="recent-time">1h</span><span className="recent-text">"should I apply to Ramp"</span></div>
-              <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"intro to Sarah at Sequoia"</span></div>
-              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion"</span></div>
-            </div>
-            <div className="recent-card rc-pipeline">
-              <div className="dd-label">
-                <span>Active pipeline</span>
-                <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length}</span>
+          <div className="recent-main">
+            <div className="recent-grid">
+              <div className="recent-card rc-searches">
+                <div className="dd-label"><span>Recent searches</span></div>
+                <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
+                <div className="recent-row"><span className="recent-time">1h</span><span className="recent-text">"should I apply to Ramp"</span></div>
+                <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"intro to Sarah at Sequoia"</span></div>
+                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion"</span></div>
               </div>
-              {LIVE_TICKER.slice(0, 4).map((t) => (
-                <div className="recent-row" key={t.text}>
-                  <span className="recent-time" style={{ color: t.dot }}>●</span>
-                  <span className="recent-text">{t.text.replace(/ ·.*$/, "")}<span className="recent-sub"> · {t.text.split(" · ")[1]}</span></span>
+              <div className="recent-card rc-pipeline">
+                <div className="dd-label">
+                  <span>Active pipeline</span>
+                  <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length}</span>
                 </div>
-              ))}
-            </div>
-            <div className="recent-card rc-runs">
-              <div className="dd-label"><span>Recent runs</span></div>
-              <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · Cursor brief → Drive</span></div>
-              <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · 12 listings, 2 above bar</span></div>
-              <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts (Sequoia, Stripe, Anthropic)</span></div>
-              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · 41 tickets, 2 escalated</span></div>
+                {LIVE_TICKER.slice(0, 4).map((t) => (
+                  <div className="recent-row" key={t.text}>
+                    <span className="recent-time" style={{ color: t.dot }}>●</span>
+                    <span className="recent-text">{t.text.replace(/ ·.*$/, "")}<span className="recent-sub"> · {t.text.split(" · ")[1]}</span></span>
+                  </div>
+                ))}
+              </div>
+              <div className="recent-card rc-runs">
+                <div className="dd-label"><span>Recent runs</span></div>
+                <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · Cursor brief → Drive</span></div>
+                <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · 12 listings, 2 above bar</span></div>
+                <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts (Sequoia, Stripe, Anthropic)</span></div>
+                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · 41 tickets, 2 escalated</span></div>
+              </div>
             </div>
           </div>
+
+          <aside className="recent-rail">
+            <div className="recent-card">
+              <div className="dd-label">
+                <span>Inbox signals</span>
+                <span className="dd-meta">via email tracker</span>
+              </div>
+              <div className="signal-row">
+                <div className="signal-head"><span className="signal-tag tag-job">JOB</span><span className="signal-time">2h</span></div>
+                <div className="signal-title">Ramp · Staff Engineer, Platform</div>
+                <div className="signal-sub">Greenhouse · matches 4/5 criteria</div>
+              </div>
+              <div className="signal-row">
+                <div className="signal-head"><span className="signal-tag tag-reply">REPLY</span><span className="signal-time">4h</span></div>
+                <div className="signal-title">Sarah (Sequoia) replied to your intro</div>
+                <div className="signal-sub">"happy to grab 20 min next week"</div>
+              </div>
+              <div className="signal-row">
+                <div className="signal-head"><span className="signal-tag tag-job">JOB</span><span className="signal-time">6h</span></div>
+                <div className="signal-title">Anthropic · 4 new roles posted</div>
+                <div className="signal-sub">2 match your bar · drafted notes</div>
+              </div>
+            </div>
+          </aside>
         </section>
 
 
@@ -502,10 +528,16 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .dd-section{padding:12px 16px}
 .dd-divider{height:1px;background:var(--b);margin:0}
 
-/* Recent — 3-col grid: searches · pipeline · runs */
+/* Recent zone — content column + inbox-signals rail */
 #recent-zone{
-  width:100%;max-width:1080px;margin:14px auto 0;
-  padding:0 24px;display:flex;flex-direction:column;
+  width:100%;max-width:1240px;margin:14px auto 0;
+  padding:0 24px;
+  display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;align-items:start;
+}
+.recent-main{display:flex;flex-direction:column;min-width:0}
+.recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0}
+@media (max-width:980px){
+  #recent-zone{grid-template-columns:1fr}
 }
 .recent-grid{
   display:grid;grid-template-columns:3fr 2fr;gap:10px;
@@ -515,7 +547,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 
 
 .recent-card{
-  padding:14px 16px;
+  padding:16px 18px;
   background:rgba(255,255,255,.6);
   border:1px solid var(--b);border-radius:12px;
   backdrop-filter:blur(10px);
@@ -524,10 +556,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 
 .dd-label{
   display:flex;align-items:center;justify-content:space-between;
-  font-family:var(--mono);font-size:9.5px;color:var(--ink-3);
-  text-transform:uppercase;letter-spacing:.16em;margin-bottom:6px;
+  font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);
+  text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px;
 }
-.dd-meta{display:inline-flex;align-items:center;gap:2px;color:var(--ink-3);text-transform:none;letter-spacing:.02em}
+.dd-meta{display:inline-flex;align-items:center;gap:4px;color:var(--ink-3);text-transform:none;letter-spacing:.02em;font-weight:400;font-size:10px}
 .suggest-list{list-style:none;display:flex;flex-direction:column;gap:1px;animation:fadeUp .35s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .suggest-row{
@@ -546,12 +578,28 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   letter-spacing:.06em;text-transform:uppercase;flex-shrink:0;
   color:var(--ink-3);background:rgba(15,17,21,.04);border:1px solid var(--b);
 }
-.recent-row{display:flex;align-items:flex-start;gap:12px;padding:4px 0}
-.recent-time{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:26px;flex-shrink:0;padding-top:1px;letter-spacing:.02em}
-.recent-text{font-family:var(--sans);font-size:12px;color:var(--ink-2);line-height:1.45;letter-spacing:-.003em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.recent-row{display:flex;align-items:flex-start;gap:12px;padding:5px 0}
+.recent-time{font-family:var(--mono);font-size:11px;color:var(--ink-3);width:30px;flex-shrink:0;padding-top:1px;letter-spacing:.02em}
+.recent-text{font-family:var(--sans);font-size:13.5px;color:var(--ink-2);line-height:1.45;letter-spacing:-.003em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .recent-text b{color:var(--ink);font-weight:600}
 .recent-sub{color:var(--ink-3)}
 .live-dot{width:5px;height:5px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:dot-pulse 1.8s ease-in-out infinite;display:inline-block;margin-right:4px}
+
+/* Inbox signals rail */
+.signal-row{
+  padding:10px 0;border-top:1px solid var(--b);
+}
+.signal-row:first-of-type{border-top:none;padding-top:4px}
+.signal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.signal-tag{
+  font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;
+  padding:2px 6px;border-radius:3px;
+}
+.tag-job{background:rgba(245,158,11,.14);color:var(--accent-2);border:1px solid rgba(245,158,11,.3)}
+.tag-reply{background:rgba(16,185,129,.12);color:#047857;border:1px solid rgba(16,185,129,.3)}
+.signal-time{font-family:var(--mono);font-size:10px;color:var(--ink-3)}
+.signal-title{font-family:var(--sans);font-size:13px;color:var(--ink);font-weight:600;line-height:1.35;letter-spacing:-.005em}
+.signal-sub{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
 
 
 
