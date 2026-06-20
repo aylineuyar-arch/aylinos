@@ -201,7 +201,7 @@ function Home() {
             {APPS.map((a) => (
               <div className="di-cell" key={a.id} title={a.name}>
                 <div className="di" style={{ background: a.gradient }}>
-                  <img src={a.icon} alt={a.name} width={512} height={512} loading="lazy" />
+                  <a.Icon size={26} strokeWidth={1.75} color="#ffffff" />
                 </div>
                 <div className="di-label">{a.name}</div>
                 <div className="di-tag">{a.tag}</div>
