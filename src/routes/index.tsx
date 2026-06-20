@@ -180,7 +180,7 @@ function Home() {
         {/* To-dos / suggestions strip */}
         <section id="todos">
           <div className="todos-label">
-            <span className="todos-tag">TODOS</span>
+            <span className="todos-tag">ACTIVE PIPELINE</span>
             <span className="todos-hint">Tap to route to an agent</span>
             <span className="todos-recent">
               <span className="rd" /> 14m ago · <b>Research</b> synthesized Cursor GTM brief
