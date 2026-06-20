@@ -101,6 +101,37 @@ function useRotatingSuggestions(windowSize = 3, intervalMs = 5000) {
   return Array.from({ length: windowSize }, (_, i) => SUGGESTIONS[(offset + i) % SUGGESTIONS.length]);
 }
 
+// Type out a list of phrases as a live placeholder
+function useTypingPlaceholder(phrases: string[], { typeMs = 55, holdMs = 1600, eraseMs = 28 } = {}) {
+  const [text, setText] = useState("");
+  useEffect(() => {
+    let phraseIdx = 0;
+    let charIdx = 0;
+    let mode: "type" | "hold" | "erase" = "type";
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      const phrase = phrases[phraseIdx];
+      if (mode === "type") {
+        charIdx++;
+        setText(phrase.slice(0, charIdx));
+        if (charIdx >= phrase.length) { mode = "hold"; timer = setTimeout(tick, holdMs); return; }
+        timer = setTimeout(tick, typeMs);
+      } else if (mode === "hold") {
+        mode = "erase"; timer = setTimeout(tick, eraseMs);
+      } else {
+        charIdx--;
+        setText(phrase.slice(0, Math.max(0, charIdx)));
+        if (charIdx <= 0) { mode = "type"; phraseIdx = (phraseIdx + 1) % phrases.length; timer = setTimeout(tick, 280); return; }
+        timer = setTimeout(tick, eraseMs);
+      }
+    };
+    timer = setTimeout(tick, 600);
+    return () => clearTimeout(timer);
+  }, [phrases, typeMs, holdMs, eraseMs]);
+  return text;
+}
+
+
 
 function Home() {
   const clock = useClock();
