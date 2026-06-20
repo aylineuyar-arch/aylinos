@@ -521,12 +521,12 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .help-toggle{
   position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:3;
   display:inline-flex;align-items:center;gap:6px;
-  font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.02em;
+  font-family:var(--mono);font-size:11px;color:var(--ink);letter-spacing:.02em;font-weight:600;
   padding:6px 10px;border-radius:7px;
-  background:rgba(15,17,21,.04);border:1px solid var(--b);
+  background:rgba(15,17,21,.09);border:1px solid var(--b-2);
   cursor:pointer;transition:background 140ms,border-color 140ms,color 140ms;
 }
-.help-toggle:hover{background:rgba(15,17,21,.07);border-color:var(--b-2);color:var(--ink)}
+.help-toggle:hover{background:rgba(15,17,21,.14);border-color:var(--ink-3);color:var(--ink)}
 .help-toggle.is-open{background:var(--ink);border-color:var(--ink);color:#fff}
 .help-toggle.is-open .help-chev{color:rgba(255,255,255,.7)}
 .help-chev{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:8px;text-align:center}
