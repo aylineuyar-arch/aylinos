@@ -553,26 +553,8 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .live-dot{width:5px;height:5px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:dot-pulse 1.8s ease-in-out infinite;display:inline-block;margin-right:4px}
 
 
-/* Active pipeline — single rotating line */
-#pipeline-band{
-  flex-shrink:0;display:flex;align-items:center;gap:10px;
-  width:100%;max-width:720px;margin:10px auto 0;padding:0 28px;
-  font-family:var(--mono);font-size:11px;color:var(--ink-3);
-}
-.pb-mini-dot{
-  width:6px;height:6px;border-radius:50%;background:#10b981;
-  box-shadow:0 0 6px #10b981;animation:dot-pulse 1.8s ease-in-out infinite;flex-shrink:0;
-}
-.pb-mini-label{
-  font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-2);flex-shrink:0;
-}
-.pb-mini-text{
-  flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  color:var(--ink-2);letter-spacing:.01em;animation:fadeUp .4s ease;
-}
-.pb-mini-count{
-  flex-shrink:0;color:var(--ink-3);letter-spacing:.06em;text-transform:uppercase;font-size:10px;
-}
+
+
 
 /* Eval footer — single line */
 #telem{
