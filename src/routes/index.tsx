@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import iconJobSearch from "@/assets/icon-job-search.png";
-import iconRestaurant from "@/assets/icon-restaurant.png";
-import iconCsTriage from "@/assets/icon-cs-triage.png";
-import iconNetworking from "@/assets/icon-networking.png";
-import iconOutreach from "@/assets/icon-outreach.png";
-import iconEvals from "@/assets/icon-evals.png";
-import iconResearch from "@/assets/icon-research.png";
+import { useEffect, useState, type ComponentType } from "react";
+import {
+  Briefcase,
+  UtensilsCrossed,
+  Inbox,
+  Network,
+  Send,
+  BarChart3,
+  BookOpen,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,18 +26,20 @@ type App = {
   tag: string;
   gradient: string;
   accent: string;
-  icon: string;
+  Icon: ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
 };
 
 const APPS: App[] = [
-  { id: "job-search", name: "Job Search", tag: "358 tracked",  gradient: "linear-gradient(145deg,#e0e7ff,#c7d2fe)", accent: "#6366f1", icon: iconJobSearch },
-  { id: "restaurant", name: "Fork Yeah!", tag: "8-node graph", gradient: "linear-gradient(145deg,#d1fae5,#a7f3d0)", accent: "#059669", icon: iconRestaurant },
-  { id: "cs-triage",  name: "CS Triage",  tag: "Sub-1s route", gradient: "linear-gradient(145deg,#dcfce7,#bbf7d0)", accent: "#16a34a", icon: iconCsTriage },
-  { id: "networking", name: "Networking", tag: "130 targets",  gradient: "linear-gradient(145deg,#dbeafe,#bfdbfe)", accent: "#2563eb", icon: iconNetworking },
-  { id: "outreach",   name: "Outreach",   tag: "Human-gated",  gradient: "linear-gradient(145deg,#ede9fe,#ddd6fe)", accent: "#7c3aed", icon: iconOutreach },
-  { id: "evals",      name: "Evals",      tag: "v1 → v2",      gradient: "linear-gradient(145deg,#f3e8ff,#e9d5ff)", accent: "#9333ea", icon: iconEvals },
-  { id: "research",   name: "Research",   tag: "Fan-in brief", gradient: "linear-gradient(145deg,#fce7f3,#fbcfe8)", accent: "#db2777", icon: iconResearch },
+  { id: "job-search", name: "Job Search", tag: "358 tracked",  gradient: "linear-gradient(155deg,#1e1b4b 0%,#4338ca 100%)", accent: "#818cf8", Icon: Briefcase },
+  { id: "restaurant", name: "Fork Yeah!", tag: "8-node graph", gradient: "linear-gradient(155deg,#064e3b 0%,#047857 100%)", accent: "#34d399", Icon: UtensilsCrossed },
+  { id: "cs-triage",  name: "CS Triage",  tag: "Sub-1s route", gradient: "linear-gradient(155deg,#14532d 0%,#15803d 100%)", accent: "#4ade80", Icon: Inbox },
+  { id: "networking", name: "Networking", tag: "130 targets",  gradient: "linear-gradient(155deg,#0c1a3a 0%,#1e40af 100%)", accent: "#60a5fa", Icon: Network },
+  { id: "outreach",   name: "Outreach",   tag: "Human-gated",  gradient: "linear-gradient(155deg,#2e1065 0%,#6d28d9 100%)", accent: "#a78bfa", Icon: Send },
+  { id: "evals",      name: "Evals",      tag: "v1 → v2",      gradient: "linear-gradient(155deg,#1a0530 0%,#7e22ce 100%)", accent: "#c084fc", Icon: BarChart3 },
+  { id: "research",   name: "Research",   tag: "Fan-in brief", gradient: "linear-gradient(155deg,#500724 0%,#be185d 100%)", accent: "#f472b6", Icon: BookOpen },
 ];
+
+
 
 const SUGGESTIONS = [
   { q: "should I apply to Ramp", agent: "Job Search", accent: "#6366f1" },
@@ -197,7 +201,7 @@ function Home() {
             {APPS.map((a) => (
               <div className="di-cell" key={a.id} title={a.name}>
                 <div className="di" style={{ background: a.gradient }}>
-                  <img src={a.icon} alt={a.name} width={512} height={512} loading="lazy" />
+                  <a.Icon size={26} strokeWidth={1.75} color="#ffffff" />
                 </div>
                 <div className="di-label">{a.name}</div>
                 <div className="di-tag">{a.tag}</div>
@@ -394,19 +398,14 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   width:78px;cursor:pointer;padding:2px 4px;
 }
 .di{
-  width:56px;height:56px;border-radius:14px;
+  width:54px;height:54px;border-radius:11px;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
-  box-shadow:0 4px 14px rgba(26,26,36,.14), 0 1px 0 rgba(255,255,255,.8) inset;
-  transition:transform 220ms cubic-bezier(.34,1.4,.64,1), box-shadow 220ms;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 1px 0 rgba(255,255,255,.18) inset, 0 -1px 0 rgba(0,0,0,.25) inset, 0 6px 16px rgba(15,17,21,.22);
+  transition:transform 180ms cubic-bezier(.34,1.3,.64,1), box-shadow 180ms;
 }
-.di img{
-  width:92%;height:92%;object-fit:contain;
-  image-rendering:-webkit-optimize-contrast;
-  image-rendering:crisp-edges;
-  -webkit-backface-visibility:hidden;backface-visibility:hidden;
-  transform:translateZ(0);
-}
-.di-cell:hover .di{transform:translateY(-6px) scale(1.08);box-shadow:0 14px 28px rgba(26,26,36,.2), 0 1px 0 rgba(255,255,255,.9) inset}
+.di svg{display:block;shape-rendering:geometricPrecision}
+.di-cell:hover .di{transform:translateY(-5px);box-shadow:0 1px 0 rgba(255,255,255,.22) inset, 0 -1px 0 rgba(0,0,0,.3) inset, 0 14px 26px rgba(15,17,21,.28)}
 .di-cell:active .di{transform:scale(.94);transition-duration:80ms}
 .di-label{
   font-family:var(--sans);font-size:10.5px;font-weight:600;
