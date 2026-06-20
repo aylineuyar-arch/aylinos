@@ -255,10 +255,10 @@ function Home() {
             <div className="recent-grid">
               <div className="recent-card rc-searches">
                 <div className="dd-label"><span>Recent searches</span></div>
-                <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
+                <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview — case round 2"</span></div>
                 <div className="recent-row"><span className="recent-time">1h</span><span className="recent-text">"should I apply to Ramp"</span></div>
-                <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"intro to Sarah at Sequoia"</span></div>
-                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion"</span></div>
+                <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"reach out to Sarah at Sequoia — how to best approach this?"</span></div>
+                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion — what made bottoms-up work for them?"</span></div>
               </div>
               <div className="recent-card rc-pipeline">
                 <div className="dd-label">
