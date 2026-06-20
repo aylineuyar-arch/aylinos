@@ -134,11 +134,10 @@ function useTypingPlaceholder(phrases: string[], { typeMs = 55, holdMs = 1600, e
 }
 const TYPING_PHRASES = [
   "Ask anything, or route a task to an agent…",
-  "should I apply to Ramp?",
-  "book dinner in Soho tomorrow at 8",
-  "draft intro to Sarah at Sequoia",
-  "research Cursor's GTM motion",
-  "triage today's support inbox",
+  "Type a goal — AylinOS picks the agent.",
+  "Press ⌘K to route. ⇧⏎ to chain agents.",
+  "Describe the outcome, not the steps.",
+  "Try: \"close the loop on every open thread\"",
 ];
 
 function Home() {
