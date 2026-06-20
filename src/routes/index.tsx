@@ -166,80 +166,50 @@ function Home() {
           </div>
         </section>
 
-        {/* Output / suggestions panel */}
-        <section id="output-panel">
-          <div id="output-card">
-            <header id="output-header">
-              <span id="agent-dot" style={{ background: "#10b981" }} />
-              <span id="agent-name">
-                stdin · awaiting prompt<span className="term-cursor" />
-              </span>
-              <span className="output-meta ticker" key={ticker.text}>
-                <span className="ticker-dot" style={{ background: ticker.dot }} /> {ticker.text}
-              </span>
-            </header>
+        {/* Awaiting prompt — slim terminal line */}
+        <div id="stdin-bar">
+          <span id="agent-dot" style={{ background: "#10b981" }} />
+          <span id="agent-name">
+            stdin · awaiting prompt<span className="term-cursor" />
+          </span>
+          <span className="output-meta ticker" key={ticker.text}>
+            <span className="ticker-dot" style={{ background: ticker.dot }} /> {ticker.text}
+          </span>
+        </div>
 
-            <div id="output-body">
-              <div className="sec-label">Try one of these</div>
-              <ul className="suggest-list">
-                {SUGGESTIONS.map((s) => (
-                  <li key={s.q} className="suggest-row">
-                    <span className="suggest-arrow">→</span>
-                    <span className="suggest-q">{s.q}</span>
-                    <span
-                      className="suggest-agent"
-                      style={{ color: s.accent, borderColor: `${s.accent}40`, background: `${s.accent}12` }}
-                    >
-                      {s.agent}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="sec-label">Recent</div>
-              <div className="recent-row">
-                <span className="recent-time">14m</span>
-                <span className="recent-text">
-                  <b>Research</b> · synthesized Cursor GTM brief from 3 sources → Drive
+        {/* To-dos / suggestions strip */}
+        <section id="todos">
+          <div className="todos-label">
+            <span className="todos-tag">TODOS</span>
+            <span className="todos-hint">Tap to route to an agent</span>
+            <span className="todos-recent">
+              <span className="rd" /> 14m ago · <b>Research</b> synthesized Cursor GTM brief
+            </span>
+          </div>
+          <div className="todos-grid">
+            {SUGGESTIONS.map((s) => (
+              <button
+                key={s.q}
+                className="todo-card"
+                style={{
+                  // @ts-expect-error css var
+                  "--ac": s.accent,
+                  background: `linear-gradient(180deg, ${s.accent}10 0%, ${s.accent}04 100%)`,
+                  borderColor: `${s.accent}38`,
+                }}
+              >
+                <span
+                  className="todo-agent"
+                  style={{ color: s.accent, background: `${s.accent}1a`, borderColor: `${s.accent}40` }}
+                >
+                  {s.agent}
                 </span>
-              </div>
-              <div className="recent-row">
-                <span className="recent-time">2h</span>
-                <span className="recent-text">
-                  <b>Job Search</b> · scored 12 new Greenhouse listings, 2 above threshold
-                </span>
-              </div>
-            </div>
+                <span className="todo-q">{s.q}</span>
+                <span className="todo-arrow" style={{ color: s.accent }}>→</span>
+              </button>
+            ))}
           </div>
         </section>
-
-        {/* Telemetry strip */}
-        <div id="telem">
-          <div id="telem-inner">
-            <a href="/evals" className="tel-cell clickable">
-              <div className="tel-val">
-                — <span className="tel-badge">run evals</span>
-              </div>
-              <div className="tel-key">F1</div>
-            </a>
-            <div className="tel-cell">
-              <div className="tel-val">—</div>
-              <div className="tel-key">Precision</div>
-            </div>
-            <div className="tel-cell">
-              <div className="tel-val">—</div>
-              <div className="tel-key">Recall</div>
-            </div>
-            <div className="tel-cell">
-              <div className="tel-val">0</div>
-              <div className="tel-key">Calls</div>
-            </div>
-
-            <div className="tel-cell">
-              <div className="tel-val" style={{ color: "#6366f1" }}>v2</div>
-              <div className="tel-key">Prompt</div>
-            </div>
-          </div>
-        </div>
 
         {/* Dock */}
         <div id="dock-row">
@@ -253,6 +223,30 @@ function Home() {
                 <div className="di-tag">{a.tag}</div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Slim eval footer */}
+        <div id="telem">
+          <div id="telem-inner">
+            <a href="/evals" className="tel-cell clickable">
+              <span className="tel-key">F1</span>
+              <span className="tel-val">—</span>
+              <span className="tel-badge">run evals</span>
+            </a>
+            <div className="tel-cell">
+              <span className="tel-key">Precision</span><span className="tel-val">—</span>
+            </div>
+            <div className="tel-cell">
+              <span className="tel-key">Recall</span><span className="tel-val">—</span>
+            </div>
+            <div className="tel-cell">
+              <span className="tel-key">Calls</span><span className="tel-val">0</span>
+            </div>
+            <div className="tel-cell">
+              <span className="tel-key">Prompt</span>
+              <span className="tel-val" style={{ color: "#6366f1" }}>v2</span>
+            </div>
           </div>
         </div>
       </div>
