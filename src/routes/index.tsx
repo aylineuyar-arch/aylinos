@@ -707,7 +707,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
 /* Dock */
 #dock-row{display:flex;justify-content:center;padding:6px 16px 8px;flex-shrink:0;overflow-x:auto}
-#dock-wrap{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+#dock-wrap{display:inline-flex;flex-direction:column;align-items:stretch;gap:6px}
 .dock-label{
   display:flex;align-items:baseline;justify-content:space-between;gap:12px;
   padding:0 8px;
