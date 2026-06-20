@@ -264,21 +264,14 @@ function Home() {
 
 
 
-        {/* Active pipeline — band between dropdown and dock */}
+        {/* Active pipeline — single rotating line */}
         <div id="pipeline-band">
-          <span className="pb-tag">
-            <span className="pb-tag-dot" /> ACTIVE PIPELINE
-          </span>
-          <div className="pb-track">
-            {LIVE_TICKER.map((t, i) => (
-              <span className="pb-chip" key={i}>
-                <span className="pb-dot" />
-                {t.text}
-              </span>
-            ))}
-          </div>
-          <span className="pb-count">{LIVE_TICKER.length} running</span>
+          <span className="pb-mini-dot" />
+          <span className="pb-mini-label">PIPELINE</span>
+          <span className="pb-mini-text" key={ticker.text}>{ticker.text}</span>
+          <span className="pb-mini-count">{LIVE_TICKER.length} running</span>
         </div>
+
 
         {/* Dock */}
         <div id="dock-row">
