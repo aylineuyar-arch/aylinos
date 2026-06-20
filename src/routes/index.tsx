@@ -502,18 +502,23 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .dd-section{padding:12px 16px}
 .dd-divider{height:1px;background:var(--b);margin:0}
 
-/* Recent — always visible below search */
+/* Recent — two-column grid: searches + runs */
 #recent-zone{
-  flex:1;min-height:0;width:100%;max-width:720px;margin:14px auto 0;
+  width:100%;max-width:900px;margin:14px auto 0;
   padding:0 24px;display:flex;flex-direction:column;
 }
+.recent-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+@media (max-width:640px){.recent-grid{grid-template-columns:1fr}}
 .recent-card{
-  flex:1;min-height:0;overflow-y:auto;
-  padding:14px 18px;
+  padding:14px 16px;
   background:rgba(255,255,255,.6);
   border:1px solid var(--b);border-radius:12px;
   backdrop-filter:blur(10px);
+  min-height:0;
 }
+
 .dd-label{
   display:flex;align-items:center;justify-content:space-between;
   font-family:var(--mono);font-size:9.5px;color:var(--ink-3);
