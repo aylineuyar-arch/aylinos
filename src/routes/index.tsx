@@ -94,16 +94,23 @@ function useTicker() {
 
 function Home() {
   const clock = useClock();
+  const greeting = useGreeting();
+  const ticker = useTicker();
+  const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
   return (
     <>
       <style>{CSS}</style>
       <div id="screen">
+        <div className="grain" aria-hidden />
+
         {/* Status bar */}
         <div id="sb">
           <div className="sb-left">
-            <span className="sb-brand">AylinOS</span>
+            <span className="sb-brand">
+              <span className="sb-glyph">◇</span> AylinOS
+            </span>
             <span className="sb-divider" />
-            <span className="sb-ver">v2.4.1</span>
+            <span className="sb-ver">v2.4.1 — “midnight oil”</span>
           </div>
           <div className="sb-right">
             <div className="sb-pill">
@@ -132,11 +139,18 @@ function Home() {
         {/* Search zone */}
         <section id="search-zone">
           <div className="prompt-row">
-            <span className="prompt-eyebrow">// session 04 · ready</span>
+            <span className="prompt-eyebrow">
+              <span className="eyebrow-dot" /> {today.toUpperCase()} · session 04 · ready
+            </span>
             <h1 className="prompt-h1">
-              What can I help you with, <span className="prompt-name">Aylin</span>?
+              <span className="bracket">[</span>
+              {greeting}, <span className="prompt-name">Aylin</span>
+              <span className="bracket">]</span>
             </h1>
-            <p className="prompt-sub">Route a task to an agent, or ask anything. Press ⌘K to focus.</p>
+            <p className="prompt-sub">
+              Route a task to an agent, or just ask. <kbd className="kbd-inline">⌘K</kbd> to focus ·{" "}
+              <kbd className="kbd-inline">⌘/</kbd> for help
+            </p>
           </div>
 
           <div className="search-wrap">
@@ -157,9 +171,14 @@ function Home() {
           <div id="output-card">
             <header id="output-header">
               <span id="agent-dot" style={{ background: "#10b981" }} />
-              <span id="agent-name">stdin · awaiting prompt</span>
-              <span className="output-meta">7 agents online · last run 14m ago</span>
+              <span id="agent-name">
+                stdin · awaiting prompt<span className="term-cursor" />
+              </span>
+              <span className="output-meta ticker" key={ticker.text}>
+                <span className="ticker-dot" style={{ background: ticker.dot }} /> {ticker.text}
+              </span>
             </header>
+
             <div id="output-body">
               <div className="sec-label">Try one of these</div>
               <ul className="suggest-list">
