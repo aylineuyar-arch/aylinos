@@ -341,18 +341,19 @@ function Home() {
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f4f3ee;
-  --bg-2:#eceae3;
-  --ink:#0f1115;
-  --ink-2:rgba(15,17,21,.82);
-  --ink-3:rgba(15,17,21,.62);
-  --ink-4:rgba(15,17,21,.38);
-  --b:rgba(15,17,21,.12);
-  --b-2:rgba(15,17,21,.2);
-  --surface:rgba(255,255,255,.78);
+  --bg:#FCF9F1;
+  --bg-2:#F3F1EA;
+  --ink:#2A2620;
+  --ink-2:#454039;
+  --ink-3:#8C8579;
+  --ink-4:#A8A294;
+  --b:#E5E1D5;
+  --b-2:#D6D1C2;
+  --surface:rgba(255,255,255,.7);
   --mono:'JetBrains Mono','SF Mono','Menlo',monospace;
   --sans:'Inter',system-ui,sans-serif;
-  --accent:#4f46e5;
+  --accent:#F59E0B;
+  --accent-2:#D97706;
 }
 html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 
