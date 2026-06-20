@@ -318,28 +318,28 @@ function Home() {
               <div className="up-row">
                 <span className="up-when">Mon<br/><b>10:30</b></span>
                 <div className="up-body">
-                  <div className="up-title">Coffee chat</div>
-                  <div className="up-sub">Eng leader · referral intro</div>
+                  <div className="up-title">Coffee chat · AI Strategist</div>
+                  <div className="up-sub">Referral intro · 30m</div>
                 </div>
               </div>
               <div className="up-row">
                 <span className="up-when">Tue<br/><b>14:00</b></span>
                 <div className="up-body">
-                  <div className="up-title">Interview · Staff Engineer</div>
-                  <div className="up-sub">System design loop · 45m</div>
+                  <div className="up-title">Interview · Deployment Engineer</div>
+                  <div className="up-sub">Technical loop · 45m</div>
                 </div>
               </div>
               <div className="up-row">
                 <span className="up-when">Thu<br/><b>09:00</b></span>
                 <div className="up-body">
-                  <div className="up-title">Networking call</div>
-                  <div className="up-sub">PM · warm intro · 20m</div>
+                  <div className="up-title">Networking · Forward Deployed Eng</div>
+                  <div className="up-sub">Warm intro · 20m</div>
                 </div>
               </div>
               <div className="up-row">
                 <span className="up-when">Fri<br/><b>16:00</b></span>
                 <div className="up-body">
-                  <div className="up-title">Final round · Eng Manager</div>
+                  <div className="up-title">Final round · AI Solutions Lead</div>
                   <div className="up-sub">Exec chat + values panel</div>
                 </div>
               </div>
