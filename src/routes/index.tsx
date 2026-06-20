@@ -541,7 +541,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 }
 .recent-main{display:flex;flex-direction:column;min-width:0}
 .recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0}
-@media (max-width:980px){
+@media (max-width:640px){
   #recent-zone{grid-template-columns:1fr}
 }
 .recent-grid{
