@@ -153,9 +153,6 @@ function Home() {
         {/* Search zone */}
         <section id="search-zone">
           <div className="prompt-row">
-            <span className="prompt-eyebrow">
-              <span className="eyebrow-dot" /> {today.toUpperCase()} · session 04 · ready
-            </span>
             <h1 className="prompt-h1">
               <span className="bracket">[</span>
               {greeting}, <span className="prompt-name">Aylin</span>
@@ -478,15 +475,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 
 /* Recent — always visible below search */
 #recent-zone{
-  flex:1;min-height:0;width:100%;max-width:720px;margin:14px auto 0;
-  padding:0 24px;display:flex;flex-direction:column;
+  width:100%;max-width:720px;margin:14px auto 0;
+  padding:0 24px;display:flex;flex-direction:column;min-height:0;
 }
 .recent-card{
-  flex:1;min-height:0;overflow-y:auto;
   padding:14px 18px;
   background:rgba(255,255,255,.6);
   border:1px solid var(--b);border-radius:12px;
   backdrop-filter:blur(10px);
+  max-height:240px;overflow-y:auto;
 }
 .dd-label{
   display:flex;align-items:center;justify-content:space-between;
@@ -520,11 +517,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 /* Active pipeline — band */
 #pipeline-band{
   flex-shrink:0;display:flex;align-items:center;gap:14px;
-  width:100%;max-width:980px;margin:12px auto 0;padding:11px 18px;
+  width:100%;max-width:980px;margin:auto auto 0;padding:11px 18px;
   background:rgba(255,255,255,.55);
   border:1px solid var(--b);border-radius:11px;
   backdrop-filter:blur(10px);
   box-shadow:0 6px 18px rgba(26,26,36,.05);
+}
+.pb-track{
+  flex:1;min-width:0;display:flex;align-items:center;gap:8px;
+  overflow-x:auto;scrollbar-width:none;
+  mask-image:linear-gradient(to right, #000 0, #000 calc(100% - 32px), transparent 100%);
+  -webkit-mask-image:linear-gradient(to right, #000 0, #000 calc(100% - 32px), transparent 100%);
 }
 .pb-tag{
   flex-shrink:0;display:inline-flex;align-items:center;gap:7px;
@@ -535,10 +538,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   width:7px;height:7px;border-radius:50%;background:#10b981;
   box-shadow:0 0 0 3px rgba(16,185,129,.18), 0 0 8px #10b981;
   animation:dot-pulse 1.6s ease-in-out infinite;
-}
-.pb-track{
-  flex:1;min-width:0;display:flex;align-items:center;gap:8px;
-  overflow-x:auto;scrollbar-width:none;
 }
 .pb-track::-webkit-scrollbar{display:none}
 .pb-chip{
@@ -561,10 +560,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 #telem{flex-shrink:0;display:flex;justify-content:center;padding:2px 24px 8px}
 #telem-inner{
   display:flex;align-items:center;
-  background:rgba(255,255,255,.5);
-  border:1px solid var(--b);
+  background:rgba(255,255,255,.85);
+  border:1px solid var(--b-2);
   border-radius:7px;overflow:hidden;backdrop-filter:blur(10px);
-  opacity:.85;
 }
 .tel-cell{
   padding:4px 12px;border-right:1px solid var(--b);
