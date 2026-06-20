@@ -280,6 +280,8 @@ function Home() {
                 <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · 12 listings, 2 above bar</span></div>
                 <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts (Sequoia, Stripe, Anthropic)</span></div>
                 <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · 41 tickets, 2 escalated</span></div>
+                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>Networking</b> · 22 profiles scored, 4 worth a ping</span></div>
+                <div className="recent-row"><span className="recent-time">2d</span><span className="recent-text"><b>Evals</b> · v3 shadow: F1 0.89 (+0.02)</span></div>
               </div>
             </div>
           </div>
