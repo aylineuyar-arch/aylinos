@@ -184,28 +184,23 @@ function Home() {
         {/* Suggestions dropdown — recommended + recent */}
         <section id="dropdown">
           <div className="dd-card">
-            <div className="dd-section">
+            <div className="dd-section dd-rec">
               <div className="dd-label">
                 <span>Recommended</span>
                 <span className="dd-meta">awaiting prompt<span className="term-cursor" /></span>
               </div>
               <ul className="suggest-list">
-                {SUGGESTIONS.map((s) => (
+                {rotating.map((s) => (
                   <li key={s.q} className="suggest-row">
                     <span className="suggest-arrow">→</span>
                     <span className="suggest-q">{s.q}</span>
-                    <span
-                      className="suggest-agent"
-                      style={{ color: s.accent, borderColor: `${s.accent}40`, background: `${s.accent}14` }}
-                    >
-                      {s.agent}
-                    </span>
+                    <span className="suggest-agent">{s.agent}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div className="dd-divider" />
-            <div className="dd-section">
+            <div className="dd-section dd-recent">
               <div className="dd-label"><span>Recent</span></div>
               <div className="recent-row">
                 <span className="recent-time">14m</span>
@@ -215,17 +210,35 @@ function Home() {
                 <span className="recent-time">2h</span>
                 <span className="recent-text"><b>Job Search</b> · scored 12 Greenhouse listings, 2 above threshold</span>
               </div>
+              <div className="recent-row">
+                <span className="recent-time">6h</span>
+                <span className="recent-text"><b>Outreach</b> · 3 drafts queued for review (Sarah, Ben, Maya)</span>
+              </div>
+              <div className="recent-row">
+                <span className="recent-time">1d</span>
+                <span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm, confirmed via email</span>
+              </div>
+              <div className="recent-row">
+                <span className="recent-time">1d</span>
+                <span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated to human</span>
+              </div>
+              <div className="recent-row">
+                <span className="recent-time">2d</span>
+                <span className="recent-text"><b>Networking</b> · scored 22 LinkedIn profiles, 4 above threshold</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Active pipeline — slim band between dropdown and dock */}
+        {/* Active pipeline — band between dropdown and dock */}
         <div id="pipeline-band">
-          <span className="pb-tag">ACTIVE PIPELINE</span>
+          <span className="pb-tag">
+            <span className="pb-tag-dot" /> ACTIVE PIPELINE
+          </span>
           <div className="pb-track">
             {LIVE_TICKER.map((t, i) => (
               <span className="pb-chip" key={i}>
-                <span className="pb-dot" style={{ background: t.dot, boxShadow: `0 0 6px ${t.dot}` }} />
+                <span className="pb-dot" />
                 {t.text}
               </span>
             ))}
