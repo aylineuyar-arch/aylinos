@@ -475,15 +475,15 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 
 /* Recent — always visible below search */
 #recent-zone{
-  flex:1;min-height:0;width:100%;max-width:720px;margin:14px auto 0;
-  padding:0 24px;display:flex;flex-direction:column;
+  width:100%;max-width:720px;margin:14px auto 0;
+  padding:0 24px;display:flex;flex-direction:column;min-height:0;
 }
 .recent-card{
-  flex:1;min-height:0;overflow-y:auto;
   padding:14px 18px;
   background:rgba(255,255,255,.6);
   border:1px solid var(--b);border-radius:12px;
   backdrop-filter:blur(10px);
+  max-height:240px;overflow-y:auto;
 }
 .dd-label{
   display:flex;align-items:center;justify-content:space-between;
