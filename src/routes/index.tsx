@@ -91,10 +91,22 @@ function useTicker() {
   return LIVE_TICKER[i];
 }
 
+// Rotate a 3-item window through SUGGESTIONS every ~5s
+function useRotatingSuggestions(windowSize = 3, intervalMs = 5000) {
+  const [offset, setOffset] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setOffset((x) => (x + 1) % SUGGESTIONS.length), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return Array.from({ length: windowSize }, (_, i) => SUGGESTIONS[(offset + i) % SUGGESTIONS.length]);
+}
+
 
 function Home() {
   const clock = useClock();
   const greeting = useGreeting();
+  const rotating = useRotatingSuggestions(3, 5000);
+  
   
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
   return (
