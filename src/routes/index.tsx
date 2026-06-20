@@ -17,7 +17,7 @@ type App = {
   tag: string;
   gradient: string;
   accent: string;
-  svg: JSX.Element;
+  svg: ReactNode;
 };
 
 const APPS: App[] = [
