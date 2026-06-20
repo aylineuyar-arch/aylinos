@@ -380,12 +380,12 @@ const CSS = `
   --accent:#F59E0B;
   --accent-2:#D97706;
 }
-html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 
 @keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
 #screen{
-  width:100vw;height:100vh;display:flex;flex-direction:column;position:relative;
+  width:100vw;min-height:100vh;display:flex;flex-direction:column;position:relative;
   background-color:var(--bg);
   background-image:
     radial-gradient(ellipse 70% 45% at 50% -5%, rgba(245,158,11,.18) 0%, transparent 60%),
