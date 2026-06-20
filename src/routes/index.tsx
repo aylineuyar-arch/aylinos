@@ -261,13 +261,18 @@ function Home() {
               <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"research Cursor's GTM motion"</span></div>
             </div>
             <div className="recent-card">
-              <div className="dd-label"><span>Recent runs</span></div>
-              <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span></div>
-              <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · scored 12 listings, 2 above threshold</span></div>
-              <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts — Sarah (Sequoia), Ben (Stripe), Maya (Anthropic)</span></div>
-              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm</span></div>
-              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated</span></div>
+              <div className="dd-label">
+                <span>Active pipeline</span>
+                <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length} running</span>
+              </div>
+              {LIVE_TICKER.map((t) => (
+                <div className="recent-row" key={t.text}>
+                  <span className="recent-time" style={{ color: t.dot }}>●</span>
+                  <span className="recent-text">{t.text}</span>
+                </div>
+              ))}
             </div>
+
           </div>
         </section>
 
