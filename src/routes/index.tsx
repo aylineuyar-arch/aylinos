@@ -255,7 +255,7 @@ function Home() {
             <div className="dd-label"><span>Recent</span></div>
             <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span></div>
             <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · scored 12 Greenhouse listings, 2 above threshold</span></div>
-            <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts queued for review (Sarah, Ben, Maya)</span></div>
+            <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts queued — Sarah (Sequoia), Ben (Stripe), Maya (Anthropic)</span></div>
             <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm, confirmed via email</span></div>
             <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated to human</span></div>
             <div className="recent-row"><span className="recent-time">2d</span><span className="recent-text"><b>Networking</b> · scored 22 LinkedIn profiles, 4 above threshold</span></div>
