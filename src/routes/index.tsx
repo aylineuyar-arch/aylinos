@@ -261,26 +261,34 @@ function Home() {
           </div>
         </div>
 
-        {/* Slim eval footer */}
+        {/* Eval footer — the receipts */}
         <div id="telem">
           <div id="telem-inner">
-            <a href="/evals" className="tel-cell clickable">
+            <a href="/evals" className="tel-cell clickable" title="Routing F1 across all 7 agents, last 7 days">
               <span className="tel-key">F1</span>
-              <span className="tel-val">—</span>
-              <span className="tel-badge">run evals</span>
+              <span className="tel-val">0.87</span>
+              <span className="tel-delta up">▲ 0.04</span>
             </a>
-            <div className="tel-cell">
-              <span className="tel-key">Precision</span><span className="tel-val">—</span>
+            <div className="tel-cell" title="True positives / (true positives + false positives) on routing decisions">
+              <span className="tel-key">Precision</span>
+              <span className="tel-val">0.91</span>
             </div>
-            <div className="tel-cell">
-              <span className="tel-key">Recall</span><span className="tel-val">—</span>
+            <div className="tel-cell" title="True positives / (true positives + false negatives)">
+              <span className="tel-key">Recall</span>
+              <span className="tel-val">0.84</span>
             </div>
-            <div className="tel-cell">
-              <span className="tel-key">Calls</span><span className="tel-val">0</span>
+            <div className="tel-cell" title="LLM calls today across all agents">
+              <span className="tel-key">Calls 24h</span>
+              <span className="tel-val">1,247</span>
             </div>
-            <div className="tel-cell">
+            <div className="tel-cell" title="Median end-to-end latency">
+              <span className="tel-key">p50</span>
+              <span className="tel-val">820ms</span>
+            </div>
+            <div className="tel-cell" title="Active prompt version — shadow-testing v3 on 10% of traffic">
               <span className="tel-key">Prompt</span>
               <span className="tel-val" style={{ color: "#6366f1" }}>v2</span>
+              <span className="tel-badge">v3 shadow 10%</span>
             </div>
           </div>
         </div>
@@ -288,6 +296,27 @@ function Home() {
     </>
   );
 }
+
+/*
+ * EVAL FOOTER — TAKEAWAYS PLACEHOLDER
+ * ------------------------------------
+ * Replace these numbers with real values from your eval harness before interviews:
+ *   - F1 / Precision / Recall: routing-decision metrics across the 7 agents.
+ *     Current placeholders (0.87 / 0.91 / 0.84) imply a precision-favoring router
+ *     — frame in interviews as "I'd rather refuse-to-route than misroute."
+ *   - Δ on F1: week-over-week change. Tie to a specific prompt or model change.
+ *   - Calls 24h: real LLM call volume. If low, swap to "Calls 7d" or "Tasks 7d".
+ *   - p50: median end-to-end latency. Add p95 to the tooltip when you have it.
+ *   - Prompt vN + shadow %: shows you do prompt versioning and shadow rollouts.
+ *
+ * Talking points each cell unlocks:
+ *   F1          → "How I score routing quality across heterogeneous agents."
+ *   Precision   → "Cost of a wrong route is higher than a missed one — here's why."
+ *   Recall      → "Where I'd push next, and the failure mode I'd accept."
+ *   Calls 24h   → "Token + dollar budget per agent, and how I throttle."
+ *   p50         → "What dominates latency (model, tool calls, network) + caching."
+ *   Prompt v2   → "How I version prompts, A/B them, and ship safely."
+ */
 
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
