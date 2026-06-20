@@ -508,9 +508,9 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   padding:0 24px;display:flex;flex-direction:column;
 }
 .recent-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  display:grid;grid-template-columns:1fr;gap:10px;
 }
-@media (max-width:640px){.recent-grid{grid-template-columns:1fr}}
+
 .recent-card{
   padding:14px 16px;
   background:rgba(255,255,255,.6);
