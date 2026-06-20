@@ -250,34 +250,60 @@ function Home() {
         </section>
 
         <section id="recent-zone">
-          <div className="recent-grid">
-            <div className="recent-card rc-searches">
-              <div className="dd-label"><span>Recent searches</span></div>
-              <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
-              <div className="recent-row"><span className="recent-time">1h</span><span className="recent-text">"should I apply to Ramp"</span></div>
-              <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"intro to Sarah at Sequoia"</span></div>
-              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion"</span></div>
-            </div>
-            <div className="recent-card rc-pipeline">
-              <div className="dd-label">
-                <span>Active pipeline</span>
-                <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length}</span>
+          <div className="recent-main">
+            <div className="recent-grid">
+              <div className="recent-card rc-searches">
+                <div className="dd-label"><span>Recent searches</span></div>
+                <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
+                <div className="recent-row"><span className="recent-time">1h</span><span className="recent-text">"should I apply to Ramp"</span></div>
+                <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"intro to Sarah at Sequoia"</span></div>
+                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion"</span></div>
               </div>
-              {LIVE_TICKER.slice(0, 4).map((t) => (
-                <div className="recent-row" key={t.text}>
-                  <span className="recent-time" style={{ color: t.dot }}>●</span>
-                  <span className="recent-text">{t.text.replace(/ ·.*$/, "")}<span className="recent-sub"> · {t.text.split(" · ")[1]}</span></span>
+              <div className="recent-card rc-pipeline">
+                <div className="dd-label">
+                  <span>Active pipeline</span>
+                  <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length}</span>
                 </div>
-              ))}
-            </div>
-            <div className="recent-card rc-runs">
-              <div className="dd-label"><span>Recent runs</span></div>
-              <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · Cursor brief → Drive</span></div>
-              <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · 12 listings, 2 above bar</span></div>
-              <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts (Sequoia, Stripe, Anthropic)</span></div>
-              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · 41 tickets, 2 escalated</span></div>
+                {LIVE_TICKER.slice(0, 4).map((t) => (
+                  <div className="recent-row" key={t.text}>
+                    <span className="recent-time" style={{ color: t.dot }}>●</span>
+                    <span className="recent-text">{t.text.replace(/ ·.*$/, "")}<span className="recent-sub"> · {t.text.split(" · ")[1]}</span></span>
+                  </div>
+                ))}
+              </div>
+              <div className="recent-card rc-runs">
+                <div className="dd-label"><span>Recent runs</span></div>
+                <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · Cursor brief → Drive</span></div>
+                <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · 12 listings, 2 above bar</span></div>
+                <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts (Sequoia, Stripe, Anthropic)</span></div>
+                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · 41 tickets, 2 escalated</span></div>
+              </div>
             </div>
           </div>
+
+          <aside className="recent-rail">
+            <div className="recent-card">
+              <div className="dd-label">
+                <span>Inbox signals</span>
+                <span className="dd-meta">via email tracker</span>
+              </div>
+              <div className="signal-row">
+                <div className="signal-head"><span className="signal-tag tag-job">JOB</span><span className="signal-time">2h</span></div>
+                <div className="signal-title">Ramp · Staff Engineer, Platform</div>
+                <div className="signal-sub">Greenhouse · matches 4/5 criteria</div>
+              </div>
+              <div className="signal-row">
+                <div className="signal-head"><span className="signal-tag tag-reply">REPLY</span><span className="signal-time">4h</span></div>
+                <div className="signal-title">Sarah (Sequoia) replied to your intro</div>
+                <div className="signal-sub">"happy to grab 20 min next week"</div>
+              </div>
+              <div className="signal-row">
+                <div className="signal-head"><span className="signal-tag tag-job">JOB</span><span className="signal-time">6h</span></div>
+                <div className="signal-title">Anthropic · 4 new roles posted</div>
+                <div className="signal-sub">2 match your bar · drafted notes</div>
+              </div>
+            </div>
+          </aside>
         </section>
 
 
