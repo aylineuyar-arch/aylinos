@@ -598,6 +598,11 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .recent-sub{color:var(--ink-3)}
 .live-dot{width:5px;height:5px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:dot-pulse 1.8s ease-in-out infinite;display:inline-block;margin-right:4px}
 
+.today-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:2px}
+.stat{display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:rgba(255,255,255,.5);border:1px solid var(--b);border-radius:8px}
+.stat-num{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.stat-lbl{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em}
+
 /* Inbox signals rail */
 .rc-inbox{
   background:linear-gradient(180deg, rgba(252,231,243,.55) 0%, rgba(255,255,255,.65) 100%);
