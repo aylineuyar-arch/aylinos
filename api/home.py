@@ -724,10 +724,6 @@ html, body {{
         <div class="sb-dot" style="background:#34d399"></div>
         <span>{m.get('applied', 358)} tracked &nbsp;·&nbsp; {m.get('interviewing', 0)} active &nbsp;·&nbsp; 7 agents</span>
       </div>
-      <div class="sb-pill">
-        <div class="sb-dot" style="background:{ACTION};opacity:.7"></div>
-        <span>${am.get('total_cost_usd', 0):.2f} &nbsp;·&nbsp; {am.get('total_calls', 0)} calls</span>
-      </div>
       <span id="sb-clock">{now}</span>
     </div>
   </div>
