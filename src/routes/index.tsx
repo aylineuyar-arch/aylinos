@@ -213,18 +213,18 @@ function Home() {
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f6f5f1;
-  --bg-2:#eeede7;
-  --ink:#1a1a24;
-  --ink-2:rgba(26,26,36,.66);
-  --ink-3:rgba(26,26,36,.42);
-  --ink-4:rgba(26,26,36,.22);
-  --b:rgba(26,26,36,.08);
-  --b-2:rgba(26,26,36,.14);
-  --surface:rgba(255,255,255,.7);
+  --bg:#f4f3ee;
+  --bg-2:#eceae3;
+  --ink:#0f1115;
+  --ink-2:rgba(15,17,21,.82);
+  --ink-3:rgba(15,17,21,.62);
+  --ink-4:rgba(15,17,21,.38);
+  --b:rgba(15,17,21,.12);
+  --b-2:rgba(15,17,21,.2);
+  --surface:rgba(255,255,255,.78);
   --mono:'JetBrains Mono','SF Mono','Menlo',monospace;
   --sans:'Inter',system-ui,sans-serif;
-  --accent:#6366f1;
+  --accent:#4f46e5;
 }
 html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 
