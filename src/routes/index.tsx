@@ -255,10 +255,10 @@ function Home() {
             <div className="recent-grid">
               <div className="recent-card rc-searches">
                 <div className="dd-label"><span>Recent searches</span></div>
-                <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
+                <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview — case round 2"</span></div>
                 <div className="recent-row"><span className="recent-time">1h</span><span className="recent-text">"should I apply to Ramp"</span></div>
-                <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"intro to Sarah at Sequoia"</span></div>
-                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion"</span></div>
+                <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"reach out to Sarah at Sequoia — how to best approach this?"</span></div>
+                <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion — what made bottoms-up work for them?"</span></div>
               </div>
               <div className="recent-card rc-pipeline">
                 <div className="dd-label">
@@ -582,18 +582,17 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 #recent-zone{
   width:100%;max-width:1240px;margin:14px auto 0;
   padding:0 24px;
-  display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:14px;align-items:stretch;
+  display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:14px;align-items:start;
 }
-.recent-main{display:flex;flex-direction:column;min-width:0;flex:1}
-.recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0;flex:1}
-.recent-rail > .rc-upcoming{flex:1;display:flex;flex-direction:column}
+.recent-main{display:flex;flex-direction:column;min-width:0}
+.recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0}
 @media (max-width:640px){
   #recent-zone{grid-template-columns:1fr}
 }
 .recent-grid{
-  display:flex;flex-direction:column;gap:10px;flex:1;
+  display:flex;flex-direction:column;gap:10px;
 }
-.recent-grid > :last-child{flex:1}
+
 
 
 
@@ -708,7 +707,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
 /* Dock */
 #dock-row{display:flex;justify-content:center;padding:6px 16px 8px;flex-shrink:0;overflow-x:auto}
-#dock-wrap{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+#dock-wrap{display:inline-flex;flex-direction:column;align-items:stretch;gap:6px}
 .dock-label{
   display:flex;align-items:baseline;justify-content:space-between;gap:12px;
   padding:0 8px;
