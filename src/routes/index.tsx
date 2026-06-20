@@ -162,10 +162,11 @@ function Home() {
         <div id="sb">
           <div className="sb-left">
             <span className="sb-brand">
-              <span className="sb-glyph">◇</span> AylinOS
+              <span className="sb-glyph">◇</span>Aylin<span className="sb-brand-os">OS</span>
             </span>
+            <span className="sb-byline">designed &amp; shipped by Aylin</span>
             <span className="sb-divider" />
-            <span className="sb-ver">v2.4.1 — “midnight oil”</span>
+            <span className="sb-ver">v2.4.1 — "midnight oil"</span>
           </div>
           <div className="sb-right">
             <div className="sb-pill">
@@ -453,7 +454,9 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   border-bottom:1px solid var(--b);
 }
 .sb-left{display:flex;align-items:center;gap:12px}
-.sb-brand{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--ink)}
+.sb-brand{font-family:var(--mono);font-size:15px;font-weight:800;letter-spacing:-.005em;color:var(--ink);display:inline-flex;align-items:baseline;gap:1px}
+.sb-brand-os{color:var(--accent);font-weight:800}
+.sb-byline{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.04em;font-style:italic}
 .sb-ver{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em}
 .sb-divider{width:1px;height:14px;background:var(--b-2)}
 .sb-right{display:flex;align-items:center;gap:14px}
