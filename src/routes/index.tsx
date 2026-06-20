@@ -590,8 +590,12 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .live-dot{width:5px;height:5px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:dot-pulse 1.8s ease-in-out infinite;display:inline-block;margin-right:4px}
 
 /* Inbox signals rail */
+.rc-inbox{
+  background:linear-gradient(180deg, rgba(252,231,243,.55) 0%, rgba(255,255,255,.65) 100%);
+  border-left:3px solid var(--accent);
+}
 .signal-row{
-  padding:10px 0;border-top:1px solid var(--b);
+  padding:11px 0;border-top:1px solid rgba(15,17,21,.06);
 }
 .signal-row:first-of-type{border-top:none;padding-top:4px}
 .signal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
@@ -599,9 +603,10 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;
   padding:2px 6px;border-radius:3px;
 }
-.tag-job{background:rgba(236,72,153,.14);color:var(--accent-2);border:1px solid rgba(236,72,153,.3)}
-.tag-reply{background:rgba(16,185,129,.12);color:#047857;border:1px solid rgba(16,185,129,.3)}
-.tag-booked{background:rgba(99,102,241,.12);color:#4338ca;border:1px solid rgba(99,102,241,.3)}
+/* Agent-aligned tag colors: matches dock + Running Now dots */
+.tag-job{background:rgba(129,140,248,.14);color:#4338ca;border:1px solid rgba(129,140,248,.35)}
+.tag-reply{background:rgba(167,139,250,.14);color:#6d28d9;border:1px solid rgba(167,139,250,.35)}
+.tag-booked{background:rgba(52,211,153,.14);color:#047857;border:1px solid rgba(52,211,153,.35)}
 .signal-time{font-family:var(--mono);font-size:10px;color:var(--ink-3)}
 .signal-title{font-family:var(--sans);font-size:13px;color:var(--ink);font-weight:600;line-height:1.35;letter-spacing:-.005em}
 .signal-sub{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
