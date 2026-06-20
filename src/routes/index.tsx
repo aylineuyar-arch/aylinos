@@ -261,7 +261,7 @@ function Home() {
               </div>
               <div className="recent-card rc-pipeline">
                 <div className="dd-label">
-                  <span>Active pipeline</span>
+                  <span>Running now</span>
                   <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length}</span>
                 </div>
                 {LIVE_TICKER.slice(0, 4).map((t) => (
