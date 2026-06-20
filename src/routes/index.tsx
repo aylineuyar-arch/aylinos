@@ -484,11 +484,12 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   width:14px;height:14px;
 }
 .ss-dot{
-  width:7px;height:7px;border-radius:50%;background:var(--ink-3);
+  width:8px;height:8px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 10px rgba(236,72,153,.6);animation:dot-pulse 1.8s ease-in-out infinite;
 }
 .search-cursor{
-  position:absolute;left:42px;top:50%;transform:translateY(-50%);z-index:2;
-  width:2px;height:18px;background:var(--ink-4);opacity:.7;
+  position:absolute;left:44px;top:50%;transform:translateY(-50%);z-index:2;
+  width:2px;height:20px;background:var(--accent);opacity:.85;
   animation:blink 1.05s steps(2,end) infinite;pointer-events:none;
 }
 #search-bar:not(:placeholder-shown) ~ .search-cursor,
@@ -497,19 +498,20 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   position:relative;z-index:1;
   width:100%;
   background:#ffffff;
-  border:1.5px solid var(--accent);
-  border-radius:16px;
-  padding:22px 168px 22px 52px;
-  font-family:var(--sans);font-size:17px;color:var(--ink);outline:none;
+  border:2px solid var(--accent);
+  border-radius:18px;
+  padding:26px 172px 26px 56px;
+  font-family:var(--sans);font-size:19px;color:var(--ink);outline:none;
   letter-spacing:-.005em;
-  transition:border-color 160ms, box-shadow 200ms;
-  box-shadow:6px 6px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 2px 8px rgba(236,72,153,.08);
+  transition:border-color 160ms, box-shadow 200ms, transform 200ms;
+  box-shadow:8px 8px 0 var(--ink), 0 1px 0 rgba(255,255,255,.9) inset, 0 12px 32px rgba(236,72,153,.22);
 }
-#search-bar::placeholder{color:var(--ink-3);opacity:.85}
+#search-bar::placeholder{color:var(--ink-3);opacity:.9}
 #search-bar:focus{
   border-color:var(--accent);
-  box-shadow:6px 6px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(236,72,153,.18);
+  box-shadow:8px 8px 0 var(--ink), 0 1px 0 rgba(255,255,255,.9) inset, 0 14px 36px rgba(236,72,153,.3), 0 0 0 5px rgba(236,72,153,.2);
 }
+
 
 /* Shared terminal cursor + ticker primitives */
 .term-cursor{
@@ -605,9 +607,10 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
 /* Inbox signals rail */
 .rc-inbox{
-  background:linear-gradient(180deg, rgba(252,231,243,.55) 0%, rgba(255,255,255,.65) 100%);
-  border-left:3px solid var(--accent);
+  background:rgba(255,255,255,.55);
+  border-left:2px solid rgba(236,72,153,.35);
 }
+
 .signal-row{
   padding:11px 0;border-top:1px solid rgba(15,17,21,.06);
 }
