@@ -249,18 +249,28 @@ function Home() {
           )}
         </section>
 
-        {/* Recent activity — always visible */}
+        {/* Recent — split into searches + pipeline runs */}
         <section id="recent-zone">
-          <div className="recent-card">
-            <div className="dd-label"><span>Recent</span></div>
-            <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span></div>
-            <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · scored 12 Greenhouse listings, 2 above threshold</span></div>
-            <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts queued — Sarah (Sequoia), Ben (Stripe), Maya (Anthropic)</span></div>
-            <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm, confirmed via email</span></div>
-            <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated to human</span></div>
-            <div className="recent-row"><span className="recent-time">2d</span><span className="recent-text"><b>Networking</b> · scored 22 LinkedIn profiles, 4 above threshold</span></div>
+          <div className="recent-grid">
+            <div className="recent-card">
+              <div className="dd-label"><span>Recent searches</span></div>
+              <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep me for Hebbia interview"</span></div>
+              <div className="recent-row"><span className="recent-time">1h</span><span className="recent-text">"should I apply to Ramp"</span></div>
+              <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"draft intro to Sarah at Sequoia"</span></div>
+              <div className="recent-row"><span className="recent-time">5h</span><span className="recent-text">"book dinner in Soho tomorrow at 8"</span></div>
+              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"research Cursor's GTM motion"</span></div>
+            </div>
+            <div className="recent-card">
+              <div className="dd-label"><span>Recent runs</span></div>
+              <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span></div>
+              <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · scored 12 listings, 2 above threshold</span></div>
+              <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts — Sarah (Sequoia), Ben (Stripe), Maya (Anthropic)</span></div>
+              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>Fork Yeah!</b> · booked Lodi for Sat 8pm</span></div>
+              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · routed 41 tickets, 2 escalated</span></div>
+            </div>
           </div>
         </section>
+
 
 
 
@@ -492,18 +502,23 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .dd-section{padding:12px 16px}
 .dd-divider{height:1px;background:var(--b);margin:0}
 
-/* Recent — always visible below search */
+/* Recent — two-column grid: searches + runs */
 #recent-zone{
-  flex:1;min-height:0;width:100%;max-width:720px;margin:14px auto 0;
+  width:100%;max-width:900px;margin:14px auto 0;
   padding:0 24px;display:flex;flex-direction:column;
 }
+.recent-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+@media (max-width:640px){.recent-grid{grid-template-columns:1fr}}
 .recent-card{
-  flex:1;min-height:0;overflow-y:auto;
-  padding:14px 18px;
+  padding:14px 16px;
   background:rgba(255,255,255,.6);
   border:1px solid var(--b);border-radius:12px;
   backdrop-filter:blur(10px);
+  min-height:0;
 }
+
 .dd-label{
   display:flex;align-items:center;justify-content:space-between;
   font-family:var(--mono);font-size:9.5px;color:var(--ink-3);
