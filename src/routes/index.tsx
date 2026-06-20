@@ -314,32 +314,33 @@ function Home() {
               <div className="up-row">
                 <span className="up-when">Mon<br/><b>10:30</b></span>
                 <div className="up-body">
-                  <div className="up-title">Intro · Priya Raman</div>
-                  <div className="up-sub">Head of Eng, Linder — coffee, Blue Bottle Mint Plaza</div>
+                  <div className="up-title">Coffee chat</div>
+                  <div className="up-sub">Eng leader · referral intro</div>
                 </div>
               </div>
               <div className="up-row">
                 <span className="up-when">Tue<br/><b>14:00</b></span>
                 <div className="up-body">
-                  <div className="up-title">Interview · Staff Eng, Platform</div>
-                  <div className="up-sub">Quill — sys design w/ Marcus Oduya (45m)</div>
+                  <div className="up-title">Interview · Staff Engineer</div>
+                  <div className="up-sub">System design loop · 45m</div>
                 </div>
               </div>
               <div className="up-row">
                 <span className="up-when">Thu<br/><b>09:00</b></span>
                 <div className="up-body">
-                  <div className="up-title">Networking · Dani Kessler</div>
-                  <div className="up-sub">PM @ Northwind — Sequoia intro, 20m phone</div>
+                  <div className="up-title">Networking call</div>
+                  <div className="up-sub">PM · warm intro · 20m</div>
                 </div>
               </div>
               <div className="up-row">
                 <span className="up-when">Fri<br/><b>16:00</b></span>
                 <div className="up-body">
                   <div className="up-title">Final round · Eng Manager</div>
-                  <div className="up-sub">Bramble — exec chat w/ CTO + values panel</div>
+                  <div className="up-sub">Exec chat + values panel</div>
                 </div>
               </div>
             </div>
+
           </aside>
 
         </section>
@@ -585,6 +586,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 }
 .recent-main{display:flex;flex-direction:column;min-width:0}
 .recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0}
+.recent-rail > .rc-upcoming{flex:1;display:flex;flex-direction:column}
 @media (max-width:640px){
   #recent-zone{grid-template-columns:1fr}
 }
@@ -661,18 +663,20 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .signal-sub{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
 
 /* Upcoming — intentionally quiet */
-.rc-upcoming{background:rgba(255,255,255,.4);border:1px dashed var(--b-2)}
-.up-row{display:flex;gap:12px;padding:8px 0;border-top:1px solid rgba(15,17,21,.05)}
+.rc-upcoming{background:transparent;border:1px dashed rgba(15,17,21,.1)}
+.rc-upcoming .dd-label{color:var(--ink-3)}
+.up-row{display:flex;gap:12px;padding:8px 0;border-top:1px dashed rgba(15,17,21,.06)}
 .up-row:first-of-type{border-top:none;padding-top:2px}
 .up-when{
-  font-family:var(--mono);font-size:9.5px;color:var(--ink-3);
+  font-family:var(--mono);font-size:9.5px;color:var(--ink-4);
   text-transform:uppercase;letter-spacing:.1em;line-height:1.35;
   width:36px;flex-shrink:0;text-align:right;padding-top:1px;
 }
-.up-when b{display:block;font-size:11px;color:var(--ink-2);font-weight:600;letter-spacing:.02em;margin-top:1px}
+.up-when b{display:block;font-size:11px;color:var(--ink-3);font-weight:500;letter-spacing:.02em;margin-top:1px}
 .up-body{min-width:0;flex:1}
-.up-title{font-family:var(--sans);font-size:12.5px;color:var(--ink-2);font-weight:500;line-height:1.35;letter-spacing:-.003em}
+.up-title{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);font-weight:500;line-height:1.35;letter-spacing:-.003em}
 .up-sub{font-family:var(--sans);font-size:11px;color:var(--ink-4);margin-top:1px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 
 
 
