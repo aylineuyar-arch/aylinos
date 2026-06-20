@@ -576,7 +576,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .tel-shadow{
   margin-left:4px;padding:1px 6px;border-radius:3px;
   font-size:8.5px;font-weight:600;letter-spacing:.05em;
-  background:rgba(79,70,229,.1);color:var(--accent);border:1px solid rgba(79,70,229,.25);
+  background:rgba(245,158,11,.12);color:var(--accent-2);border:1px solid rgba(245,158,11,.3);
 }
 
 /* Dock */
