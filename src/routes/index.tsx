@@ -288,37 +288,20 @@ function Home() {
           </div>
         </div>
 
-        {/* Eval footer — the receipts */}
-        <div id="telem">
-          <div id="telem-inner">
-            <a href="/evals" className="tel-cell clickable" title="Routing F1 across all 7 agents, last 7 days">
-              <span className="tel-key">F1</span>
-              <span className="tel-val">0.87</span>
-              <span className="tel-delta up">▲ 0.04</span>
-            </a>
-            <div className="tel-cell" title="True positives / (true positives + false positives) on routing decisions">
-              <span className="tel-key">Precision</span>
-              <span className="tel-val">0.91</span>
-            </div>
-            <div className="tel-cell" title="True positives / (true positives + false negatives)">
-              <span className="tel-key">Recall</span>
-              <span className="tel-val">0.84</span>
-            </div>
-            <div className="tel-cell" title="LLM calls today across all agents">
-              <span className="tel-key">Calls 24h</span>
-              <span className="tel-val">1,247</span>
-            </div>
-            <div className="tel-cell" title="Median end-to-end latency">
-              <span className="tel-key">p50</span>
-              <span className="tel-val">820ms</span>
-            </div>
-            <div className="tel-cell" title="Active prompt version — shadow-testing v3 on 10% of traffic">
-              <span className="tel-key">Prompt</span>
-              <span className="tel-val" style={{ color: "#6366f1" }}>v2</span>
-              <span className="tel-badge">v3 shadow 10%</span>
-            </div>
-          </div>
-        </div>
+        {/* Eval footer — single line */}
+        <a id="telem" href="/evals" title="Click for full eval harness — 7-day routing metrics across all agents">
+          <span className="tel-key">EVALS</span>
+          <span className="tel-pair"><span className="tel-k">F1</span><span className="tel-v">0.87</span><span className="tel-delta">▲0.04</span></span>
+          <span className="tel-sep">·</span>
+          <span className="tel-pair"><span className="tel-k">precision</span><span className="tel-v">0.91</span></span>
+          <span className="tel-sep">·</span>
+          <span className="tel-pair"><span className="tel-k">recall</span><span className="tel-v">0.84</span></span>
+          <span className="tel-sep">·</span>
+          <span className="tel-pair"><span className="tel-k">p50</span><span className="tel-v">820ms</span></span>
+          <span className="tel-sep">·</span>
+          <span className="tel-pair"><span className="tel-k">prompt</span><span className="tel-v accent">v2</span><span className="tel-shadow">v3 shadow 10%</span></span>
+        </a>
+
       </div>
     </>
   );
