@@ -180,13 +180,10 @@ function Home() {
               <div className="tel-key">Recall</div>
             </div>
             <div className="tel-cell">
-              <div className="tel-val">$0.000</div>
-              <div className="tel-key">API cost</div>
-            </div>
-            <div className="tel-cell">
               <div className="tel-val">0</div>
               <div className="tel-key">Calls</div>
             </div>
+
             <div className="tel-cell">
               <div className="tel-val" style={{ color: "#6366f1" }}>v2</div>
               <div className="tel-key">Prompt</div>
@@ -216,18 +213,18 @@ function Home() {
 const CSS = `
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f6f5f1;
-  --bg-2:#eeede7;
-  --ink:#1a1a24;
-  --ink-2:rgba(26,26,36,.66);
-  --ink-3:rgba(26,26,36,.42);
-  --ink-4:rgba(26,26,36,.22);
-  --b:rgba(26,26,36,.08);
-  --b-2:rgba(26,26,36,.14);
-  --surface:rgba(255,255,255,.7);
+  --bg:#f4f3ee;
+  --bg-2:#eceae3;
+  --ink:#0f1115;
+  --ink-2:rgba(15,17,21,.82);
+  --ink-3:rgba(15,17,21,.62);
+  --ink-4:rgba(15,17,21,.38);
+  --b:rgba(15,17,21,.12);
+  --b-2:rgba(15,17,21,.2);
+  --surface:rgba(255,255,255,.78);
   --mono:'JetBrains Mono','SF Mono','Menlo',monospace;
   --sans:'Inter',system-ui,sans-serif;
-  --accent:#6366f1;
+  --accent:#4f46e5;
 }
 html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 
@@ -273,8 +270,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .prompt-eyebrow{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.18em;text-transform:uppercase}
 .prompt-h1{font-size:28px;font-weight:600;letter-spacing:-.025em;line-height:1.15;color:var(--ink);margin-top:2px}
 .prompt-name{
-  background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
+  color:var(--accent);
 }
 .prompt-sub{font-size:13px;color:var(--ink-3);margin-top:2px}
 
