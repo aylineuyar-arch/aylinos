@@ -252,6 +252,15 @@ function Home() {
         <section id="recent-zone">
           <div className="recent-main">
             <div className="recent-grid">
+              <div className="recent-card rc-today">
+                <div className="dd-label"><span>Today · {today}</span><span className="dd-meta">since 8:00am</span></div>
+                <div className="today-stats">
+                  <div className="stat"><span className="stat-num">14</span><span className="stat-lbl">runs</span></div>
+                  <div className="stat"><span className="stat-num">3</span><span className="stat-lbl">awaiting you</span></div>
+                  <div className="stat"><span className="stat-num">28m</span><span className="stat-lbl">saved</span></div>
+                  <div className="stat"><span className="stat-num">$0.42</span><span className="stat-lbl">spent</span></div>
+                </div>
+              </div>
               <div className="recent-card rc-searches">
                 <div className="dd-label"><span>Recent searches</span></div>
                 <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
@@ -282,7 +291,7 @@ function Home() {
           </div>
 
           <aside className="recent-rail">
-            <div className="recent-card">
+            <div className="recent-card rc-inbox">
               <div className="dd-label">
                 <span>New in your inbox</span>
                 <span className="dd-meta">via email tracker</span>
@@ -489,16 +498,17 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   width:100%;
   background:#ffffff;
   border:1.5px solid var(--accent);
-  border-radius:14px;
-  padding:18px 168px 18px 52px;
-  font-family:var(--sans);font-size:15.5px;color:var(--ink);outline:none;
+  border-radius:16px;
+  padding:22px 168px 22px 52px;
+  font-family:var(--sans);font-size:17px;color:var(--ink);outline:none;
+  letter-spacing:-.005em;
   transition:border-color 160ms, box-shadow 200ms;
-  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 1px 2px rgba(69,64,57,.04);
+  box-shadow:6px 6px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 2px 8px rgba(236,72,153,.08);
 }
-#search-bar::placeholder{color:var(--ink-3)}
+#search-bar::placeholder{color:var(--ink-3);opacity:.85}
 #search-bar:focus{
   border-color:var(--accent);
-  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(236,72,153,.18);
+  box-shadow:6px 6px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(236,72,153,.18);
 }
 
 /* Shared terminal cursor + ticker primitives */
@@ -588,9 +598,18 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 .recent-sub{color:var(--ink-3)}
 .live-dot{width:5px;height:5px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;animation:dot-pulse 1.8s ease-in-out infinite;display:inline-block;margin-right:4px}
 
+.today-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:2px}
+.stat{display:flex;flex-direction:column;gap:2px;padding:8px 10px;background:rgba(255,255,255,.5);border:1px solid var(--b);border-radius:8px}
+.stat-num{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--ink);letter-spacing:-.01em}
+.stat-lbl{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em}
+
 /* Inbox signals rail */
+.rc-inbox{
+  background:linear-gradient(180deg, rgba(252,231,243,.55) 0%, rgba(255,255,255,.65) 100%);
+  border-left:3px solid var(--accent);
+}
 .signal-row{
-  padding:10px 0;border-top:1px solid var(--b);
+  padding:11px 0;border-top:1px solid rgba(15,17,21,.06);
 }
 .signal-row:first-of-type{border-top:none;padding-top:4px}
 .signal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
@@ -598,9 +617,10 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;
   padding:2px 6px;border-radius:3px;
 }
-.tag-job{background:rgba(236,72,153,.14);color:var(--accent-2);border:1px solid rgba(236,72,153,.3)}
-.tag-reply{background:rgba(16,185,129,.12);color:#047857;border:1px solid rgba(16,185,129,.3)}
-.tag-booked{background:rgba(99,102,241,.12);color:#4338ca;border:1px solid rgba(99,102,241,.3)}
+/* Agent-aligned tag colors: matches dock + Running Now dots */
+.tag-job{background:rgba(129,140,248,.14);color:#4338ca;border:1px solid rgba(129,140,248,.35)}
+.tag-reply{background:rgba(167,139,250,.14);color:#6d28d9;border:1px solid rgba(167,139,250,.35)}
+.tag-booked{background:rgba(52,211,153,.14);color:#047857;border:1px solid rgba(52,211,153,.35)}
 .signal-time{font-family:var(--mono);font-size:10px;color:var(--ink-3)}
 .signal-title{font-family:var(--sans);font-size:13px;color:var(--ink);font-weight:600;line-height:1.35;letter-spacing:-.005em}
 .signal-sub{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
