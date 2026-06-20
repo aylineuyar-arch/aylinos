@@ -284,7 +284,7 @@ function Home() {
           <aside className="recent-rail">
             <div className="recent-card">
               <div className="dd-label">
-                <span>Inbox signals</span>
+                <span>New in your inbox</span>
                 <span className="dd-meta">via email tracker</span>
               </div>
               <div className="signal-row">
