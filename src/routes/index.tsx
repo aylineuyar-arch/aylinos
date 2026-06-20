@@ -517,11 +517,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 /* Active pipeline — band */
 #pipeline-band{
   flex-shrink:0;display:flex;align-items:center;gap:14px;
-  width:100%;max-width:980px;margin:12px auto 0;padding:11px 18px;
+  width:100%;max-width:980px;margin:auto auto 0;padding:11px 18px;
   background:rgba(255,255,255,.55);
   border:1px solid var(--b);border-radius:11px;
   backdrop-filter:blur(10px);
   box-shadow:0 6px 18px rgba(26,26,36,.05);
+}
+.pb-track{
+  flex:1;min-width:0;display:flex;align-items:center;gap:8px;
+  overflow-x:auto;scrollbar-width:none;
+  mask-image:linear-gradient(to right, #000 0, #000 calc(100% - 32px), transparent 100%);
+  -webkit-mask-image:linear-gradient(to right, #000 0, #000 calc(100% - 32px), transparent 100%);
 }
 .pb-tag{
   flex-shrink:0;display:inline-flex;align-items:center;gap:7px;
