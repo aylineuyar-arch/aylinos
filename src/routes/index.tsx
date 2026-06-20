@@ -287,8 +287,8 @@ function Home() {
           <aside className="recent-rail">
             <div className="recent-card rc-inbox">
               <div className="dd-label">
-                <span>New in your inbox</span>
-                <span className="dd-meta">via email tracker</span>
+                <span style={{whiteSpace:"nowrap"}}>New in your inbox</span>
+                <span className="dd-meta">via email</span>
               </div>
               <div className="signal-row">
                 <div className="signal-head"><span className="signal-tag tag-job">JOB</span><span className="signal-time">2h</span></div>
