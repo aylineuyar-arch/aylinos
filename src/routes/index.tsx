@@ -560,10 +560,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 #telem{flex-shrink:0;display:flex;justify-content:center;padding:2px 24px 8px}
 #telem-inner{
   display:flex;align-items:center;
-  background:rgba(255,255,255,.5);
-  border:1px solid var(--b);
+  background:rgba(255,255,255,.85);
+  border:1px solid var(--b-2);
   border-radius:7px;overflow:hidden;backdrop-filter:blur(10px);
-  opacity:.85;
+}
 }
 .tel-cell{
   padding:4px 12px;border-right:1px solid var(--b);
