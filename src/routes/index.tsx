@@ -489,16 +489,17 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   width:100%;
   background:#ffffff;
   border:1.5px solid var(--accent);
-  border-radius:14px;
-  padding:18px 168px 18px 52px;
-  font-family:var(--sans);font-size:15.5px;color:var(--ink);outline:none;
+  border-radius:16px;
+  padding:22px 168px 22px 52px;
+  font-family:var(--sans);font-size:17px;color:var(--ink);outline:none;
+  letter-spacing:-.005em;
   transition:border-color 160ms, box-shadow 200ms;
-  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 1px 2px rgba(69,64,57,.04);
+  box-shadow:6px 6px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 2px 8px rgba(236,72,153,.08);
 }
-#search-bar::placeholder{color:var(--ink-3)}
+#search-bar::placeholder{color:var(--ink-3);opacity:.85}
 #search-bar:focus{
   border-color:var(--accent);
-  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(236,72,153,.18);
+  box-shadow:6px 6px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(236,72,153,.18);
 }
 
 /* Shared terminal cursor + ticker primitives */
