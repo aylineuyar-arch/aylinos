@@ -249,43 +249,38 @@ function Home() {
           )}
         </section>
 
-        {/* Recent — split into searches + pipeline runs */}
+        {/* Recent — 3 cols: searches · pipeline · runs */}
         <section id="recent-zone">
           <div className="recent-grid">
             <div className="recent-card">
               <div className="dd-label"><span>Recent searches</span></div>
-              <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep me for Hebbia interview"</span></div>
+              <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
               <div className="recent-row"><span className="recent-time">1h</span><span className="recent-text">"should I apply to Ramp"</span></div>
-              <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"draft intro to Sarah at Sequoia"</span></div>
-              <div className="recent-row"><span className="recent-time">5h</span><span className="recent-text">"book dinner in Soho tomorrow at 8"</span></div>
-              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"research Cursor's GTM motion"</span></div>
+              <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"intro to Sarah at Sequoia"</span></div>
+              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion"</span></div>
             </div>
             <div className="recent-card">
               <div className="dd-label">
                 <span>Active pipeline</span>
-                <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length} running</span>
+                <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length}</span>
               </div>
-              {LIVE_TICKER.map((t) => (
+              {LIVE_TICKER.slice(0, 4).map((t) => (
                 <div className="recent-row" key={t.text}>
                   <span className="recent-time" style={{ color: t.dot }}>●</span>
-                  <span className="recent-text">{t.text}</span>
+                  <span className="recent-text">{t.text.replace(/ ·.*$/, "")}<span className="recent-sub"> · {t.text.split(" · ")[1]}</span></span>
                 </div>
               ))}
             </div>
-
+            <div className="recent-card">
+              <div className="dd-label"><span>Recent runs</span></div>
+              <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · Cursor brief → Drive</span></div>
+              <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · 12 listings, 2 above</span></div>
+              <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts (Sequoia, Stripe, Anthropic)</span></div>
+              <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · 41 tickets, 2 escalated</span></div>
+            </div>
           </div>
         </section>
 
-
-
-
-        {/* Active pipeline — single rotating line */}
-        <div id="pipeline-band">
-          <span className="pb-mini-dot" />
-          <span className="pb-mini-label">PIPELINE</span>
-          <span className="pb-mini-text" key={ticker.text}>{ticker.text}</span>
-          <span className="pb-mini-count">{LIVE_TICKER.length} running</span>
-        </div>
 
 
         {/* Dock */}
