@@ -154,62 +154,72 @@ function Home() {
           </div>
 
           <div className="search-wrap">
-            <span className="search-caret">›</span>
+            <span className="search-status" title="awaiting prompt">
+              <span className="ss-dot" />
+            </span>
             <input
               id="search-bar"
               type="text"
-              placeholder="should I apply to Ramp · prep me for Hebbia interview · book dinner in Soho…"
+              placeholder="Ask anything, or route a task to an agent…"
               autoComplete="off"
               spellCheck={false}
             />
+            <span className="search-cursor" aria-hidden />
             <span className="search-cmd">⌘K</span>
           </div>
         </section>
 
-        {/* Awaiting prompt — slim terminal line */}
-        <div id="stdin-bar">
-          <span id="agent-dot" style={{ background: "#10b981" }} />
-          <span id="agent-name">
-            stdin · awaiting prompt<span className="term-cursor" />
-          </span>
-          <span className="output-meta ticker" key={ticker.text}>
-            <span className="ticker-dot" style={{ background: ticker.dot }} /> {ticker.text}
-          </span>
-        </div>
-
-        {/* To-dos / suggestions strip */}
-        <section id="todos">
-          <div className="todos-label">
-            <span className="todos-tag">ACTIVE PIPELINE</span>
-            <span className="todos-hint">Tap to route to an agent</span>
-            <span className="todos-recent">
-              <span className="rd" /> 14m ago · <b>Research</b> synthesized Cursor GTM brief
-            </span>
-          </div>
-          <div className="todos-grid">
-            {SUGGESTIONS.map((s) => (
-              <button
-                key={s.q}
-                className="todo-card"
-                style={{
-                  // @ts-expect-error css var
-                  "--ac": s.accent,
-                  background: `linear-gradient(180deg, ${s.accent}10 0%, ${s.accent}04 100%)`,
-                  borderColor: `${s.accent}38`,
-                }}
-              >
-                <span
-                  className="todo-agent"
-                  style={{ color: s.accent, background: `${s.accent}1a`, borderColor: `${s.accent}40` }}
-                >
-                  {s.agent}
-                </span>
-                <span className="todo-q">{s.q}</span>
-                <span className="todo-arrow" style={{ color: s.accent }}>→</span>
-              </button>
-            ))}
+        {/* Suggestions dropdown — recommended + recent */}
+        <section id="dropdown">
+          <div className="dd-card">
+            <div className="dd-section">
+              <div className="dd-label">
+                <span>Recommended</span>
+                <span className="dd-meta">awaiting prompt<span className="term-cursor" /></span>
+              </div>
+              <ul className="suggest-list">
+                {SUGGESTIONS.map((s) => (
+                  <li key={s.q} className="suggest-row">
+                    <span className="suggest-arrow">→</span>
+                    <span className="suggest-q">{s.q}</span>
+                    <span
+                      className="suggest-agent"
+                      style={{ color: s.accent, borderColor: `${s.accent}40`, background: `${s.accent}14` }}
+                    >
+                      {s.agent}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="dd-divider" />
+            <div className="dd-section">
+              <div className="dd-label"><span>Recent</span></div>
+              <div className="recent-row">
+                <span className="recent-time">14m</span>
+                <span className="recent-text"><b>Research</b> · synthesized Cursor GTM brief → Drive</span>
+              </div>
+              <div className="recent-row">
+                <span className="recent-time">2h</span>
+                <span className="recent-text"><b>Job Search</b> · scored 12 Greenhouse listings, 2 above threshold</span>
+              </div>
+            </div>
           </div>
         </section>
+
+        {/* Active pipeline — slim band between dropdown and dock */}
+        <div id="pipeline-band">
+          <span className="pb-tag">ACTIVE PIPELINE</span>
+          <div className="pb-track">
+            {LIVE_TICKER.map((t, i) => (
+              <span className="pb-chip" key={i}>
+                <span className="pb-dot" style={{ background: t.dot, boxShadow: `0 0 6px ${t.dot}` }} />
+                {t.text}
+              </span>
+            ))}
+          </div>
+          <span className="pb-count">{LIVE_TICKER.length} running</span>
+        </div>
 
         {/* Dock */}
         <div id="dock-row">
