@@ -447,18 +447,19 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   position:relative;z-index:1;
   width:100%;
   background:#ffffff;
-  border:1px solid var(--b-2);
-  border-radius:12px;
-  padding:16px 168px 16px 52px;
-  font-family:var(--sans);font-size:15px;color:var(--ink);outline:none;
-  transition:border-color 160ms, box-shadow 160ms;
-  box-shadow:0 1px 2px rgba(15,17,21,.04);
+  border:1.5px solid var(--accent);
+  border-radius:14px;
+  padding:18px 168px 18px 52px;
+  font-family:var(--sans);font-size:15.5px;color:var(--ink);outline:none;
+  transition:border-color 160ms, box-shadow 200ms;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 8px 22px rgba(79,70,229,.10), 0 1px 2px rgba(15,17,21,.04);
 }
 #search-bar::placeholder{color:var(--ink-3)}
 #search-bar:focus{
-  border-color:var(--ink);
-  box-shadow:0 0 0 3px rgba(15,17,21,.08);
+  border-color:var(--accent);
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(79,70,229,.16), 0 14px 32px rgba(79,70,229,.18);
 }
+
 /* Shared terminal cursor + ticker primitives */
 .term-cursor{
   display:inline-block;width:5px;height:10px;background:var(--accent);
