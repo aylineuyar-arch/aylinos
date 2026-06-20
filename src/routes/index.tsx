@@ -302,6 +302,11 @@ function Home() {
                 <div className="signal-title">Anthropic · 4 new roles posted</div>
                 <div className="signal-sub">2 match your bar · drafted notes</div>
               </div>
+              <div className="signal-row">
+                <div className="signal-head"><span className="signal-tag tag-booked">BOOKED</span><span className="signal-time">7h</span></div>
+                <div className="signal-title">Dinner confirmed · Friday 7:30pm</div>
+                <div className="signal-sub">Via Carota · party of 2 · OpenTable</div>
+              </div>
             </div>
           </aside>
         </section>
@@ -595,6 +600,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 }
 .tag-job{background:rgba(245,158,11,.14);color:var(--accent-2);border:1px solid rgba(245,158,11,.3)}
 .tag-reply{background:rgba(16,185,129,.12);color:#047857;border:1px solid rgba(16,185,129,.3)}
+.tag-booked{background:rgba(99,102,241,.12);color:#4338ca;border:1px solid rgba(99,102,241,.3)}
 .signal-time{font-family:var(--mono);font-size:10px;color:var(--ink-3)}
 .signal-title{font-family:var(--sans);font-size:13px;color:var(--ink);font-weight:600;line-height:1.35;letter-spacing:-.005em}
 .signal-sub{font-family:var(--sans);font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
