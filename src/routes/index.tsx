@@ -249,17 +249,16 @@ function Home() {
           )}
         </section>
 
-        {/* Recent — 3 cols: searches · pipeline · runs */}
         <section id="recent-zone">
           <div className="recent-grid">
-            <div className="recent-card">
+            <div className="recent-card rc-searches">
               <div className="dd-label"><span>Recent searches</span></div>
               <div className="recent-row"><span className="recent-time">8m</span><span className="recent-text">"prep Hebbia interview"</span></div>
               <div className="recent-row"><span className="recent-time">1h</span><span className="recent-text">"should I apply to Ramp"</span></div>
               <div className="recent-row"><span className="recent-time">3h</span><span className="recent-text">"intro to Sarah at Sequoia"</span></div>
               <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text">"Cursor GTM motion"</span></div>
             </div>
-            <div className="recent-card">
+            <div className="recent-card rc-pipeline">
               <div className="dd-label">
                 <span>Active pipeline</span>
                 <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length}</span>
@@ -271,10 +270,10 @@ function Home() {
                 </div>
               ))}
             </div>
-            <div className="recent-card">
+            <div className="recent-card rc-runs">
               <div className="dd-label"><span>Recent runs</span></div>
               <div className="recent-row"><span className="recent-time">14m</span><span className="recent-text"><b>Research</b> · Cursor brief → Drive</span></div>
-              <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · 12 listings, 2 above</span></div>
+              <div className="recent-row"><span className="recent-time">2h</span><span className="recent-text"><b>Job Search</b> · 12 listings, 2 above bar</span></div>
               <div className="recent-row"><span className="recent-time">6h</span><span className="recent-text"><b>Outreach</b> · 3 drafts (Sequoia, Stripe, Anthropic)</span></div>
               <div className="recent-row"><span className="recent-time">1d</span><span className="recent-text"><b>CS Triage</b> · 41 tickets, 2 escalated</span></div>
             </div>
@@ -509,9 +508,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   padding:0 24px;display:flex;flex-direction:column;
 }
 .recent-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  display:grid;grid-template-columns:3fr 2fr;gap:10px;
 }
-@media (max-width:820px){.recent-grid{grid-template-columns:1fr}}
+.rc-runs{grid-column:1 / -1}
+@media (max-width:820px){.recent-grid{grid-template-columns:1fr}.rc-runs{grid-column:auto}}
 
 
 .recent-card{
