@@ -327,11 +327,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .prompt-eyebrow{
   position:relative;
   display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--mono);font-size:10px;color:var(--ink-2);
-  letter-spacing:.18em;text-transform:uppercase;
+  font-family:var(--mono);font-size:10.5px;font-weight:700;color:var(--ink);
+  letter-spacing:.2em;text-transform:uppercase;
   padding:5px 12px;border-radius:999px;
   background:
-    linear-gradient(rgba(255,255,255,.78),rgba(255,255,255,.78)) padding-box,
+    linear-gradient(rgba(255,255,255,.85),rgba(255,255,255,.85)) padding-box,
     linear-gradient(90deg,#818cf8,#34d399,#60a5fa,#a78bfa,#f472b6) border-box;
   border:1px solid transparent;
   backdrop-filter:blur(8px);
@@ -424,7 +424,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   background:rgba(255,255,255,.4);
 }
 #agent-dot{width:6px;height:6px;border-radius:50%;animation:dot-pulse 1.6s ease-in-out infinite;box-shadow:0 0 8px currentColor}
-#agent-name{font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.02em}
+#agent-name{
+  font-family:var(--mono);font-size:10.5px;color:var(--ink-2);letter-spacing:.02em;
+  padding:3px 9px;border-radius:6px;
+  background:rgba(255,255,255,.7);border:1px solid var(--b);
+}
 .output-meta{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em}
 .term-cursor{
   display:inline-block;width:6px;height:11px;background:var(--accent);
@@ -445,16 +449,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 .sec-label:first-child{margin-top:0}
 
-.suggest-list{list-style:none;display:flex;flex-direction:column;gap:2px}
+.suggest-list{list-style:none;display:flex;flex-direction:column;gap:1px}
 .suggest-row{
   display:flex;align-items:center;gap:12px;
-  padding:7px 10px;margin:0 -10px;border-radius:7px;
-  cursor:pointer;transition:background 120ms;
+  padding:6px 10px;margin:0 -10px;border-radius:6px;
+  cursor:pointer;transition:background 120ms,color 120ms;
 }
 .suggest-row:hover{background:rgba(99,102,241,.06)}
 .suggest-arrow{font-family:var(--mono);font-size:11px;color:var(--ink-4);width:10px;flex-shrink:0}
 .suggest-row:hover .suggest-arrow{color:var(--accent)}
-.suggest-q{flex:1;font-family:var(--sans);font-size:13px;color:var(--ink);letter-spacing:-.005em}
+.suggest-q{flex:1;font-family:var(--sans);font-size:12.5px;font-weight:400;color:var(--ink-3);letter-spacing:-.003em}
+.suggest-row:hover .suggest-q{color:var(--ink)}
 .suggest-agent{
   font-family:var(--mono);font-size:9.5px;font-weight:600;
   padding:3px 8px;border-radius:4px;border:1px solid;
