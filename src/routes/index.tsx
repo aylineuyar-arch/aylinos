@@ -573,8 +573,11 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .tel-badge{
   display:inline-block;padding:1px 6px;border-radius:3px;
   font-family:var(--mono);font-size:8.5px;font-weight:600;letter-spacing:.05em;
-  background:rgba(234,88,12,.1);color:#ea580c;border:1px solid rgba(234,88,12,.25);
+  background:rgba(99,102,241,.1);color:var(--accent);border:1px solid rgba(99,102,241,.25);
 }
+.tel-delta{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:.02em}
+.tel-delta.up{color:#059669}
+.tel-delta.down{color:#dc2626}
 
 /* Dock */
 #dock-row{display:flex;justify-content:center;padding:6px 16px 8px;flex-shrink:0;overflow-x:auto}
