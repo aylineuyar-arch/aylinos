@@ -56,6 +56,8 @@ const LIVE_TICKER = [
   { dot: "#f472b6", text: "Research · Tavily returned 12 sources, distilling…" },
   { dot: "#a78bfa", text: "Outreach · 3 drafts pending your approval" },
   { dot: "#60a5fa", text: "Networking · scored 22 LinkedIn profiles overnight" },
+  { dot: "#4ade80", text: "CS Triage · routed 18 tickets, 2 awaiting human" },
+  { dot: "#c084fc", text: "Evals · v3 shadow run, 412 traces scored" },
 ];
 
 function useClock() {
@@ -265,7 +267,7 @@ function Home() {
                   <span>Running now</span>
                   <span className="dd-meta"><span className="live-dot" /> {LIVE_TICKER.length}</span>
                 </div>
-                {LIVE_TICKER.slice(0, 4).map((t) => (
+                {LIVE_TICKER.slice(0, 6).map((t) => (
                   <div className="recent-row" key={t.text}>
                     <span className="recent-time" style={{ color: t.dot }}>●</span>
                     <span className="recent-text">{t.text.replace(/ ·.*$/, "")}<span className="recent-sub"> · {t.text.split(" · ")[1]}</span></span>
@@ -603,7 +605,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   background:rgba(255,255,255,.6);
   border:1px solid var(--b);border-radius:12px;
   backdrop-filter:blur(10px);
-  min-height:0;
+  min-height:0;height:100%;
 }
 
 .dd-label{
