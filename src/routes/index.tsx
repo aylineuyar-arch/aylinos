@@ -610,10 +610,19 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
 .dd-label{
   display:flex;align-items:center;justify-content:space-between;
-  font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);
-  text-transform:uppercase;letter-spacing:.16em;margin-bottom:10px;
+  font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--ink);
+  text-transform:uppercase;letter-spacing:.18em;margin-bottom:12px;
+  padding-bottom:8px;border-bottom:1px solid var(--b);
 }
-.dd-meta{display:inline-flex;align-items:center;gap:4px;color:var(--ink-3);text-transform:none;letter-spacing:.02em;font-weight:400;font-size:10px}
+.dd-label > span:first-child{
+  position:relative;padding-left:14px;
+}
+.dd-label > span:first-child::before{
+  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:6px;height:6px;border-radius:2px;background:var(--accent);
+  box-shadow:0 0 8px rgba(236,72,153,.55);
+}
+.dd-meta{display:inline-flex;align-items:center;gap:4px;color:var(--ink-3);text-transform:none;letter-spacing:.02em;font-weight:500;font-size:10.5px}
 .suggest-list{list-style:none;display:flex;flex-direction:column;gap:1px;animation:fadeUp .35s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .suggest-row{
