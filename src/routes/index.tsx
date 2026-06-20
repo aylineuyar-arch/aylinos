@@ -50,6 +50,14 @@ const SUGGESTIONS = [
   { q: "triage today's support inbox", agent: "CS Triage", accent: "#16a34a" },
 ];
 
+const LIVE_TICKER = [
+  { dot: "#818cf8", text: "Job Search · polling Greenhouse… 14 new postings" },
+  { dot: "#34d399", text: "Fork Yeah! · indexed 38 venues in SoHo for tomorrow" },
+  { dot: "#f472b6", text: "Research · Tavily returned 12 sources, distilling…" },
+  { dot: "#a78bfa", text: "Outreach · 3 drafts pending your approval" },
+  { dot: "#60a5fa", text: "Networking · scored 22 LinkedIn profiles overnight" },
+];
+
 function useClock() {
   const [t, setT] = useState(() => {
     const d = new Date();
@@ -64,6 +72,25 @@ function useClock() {
   }, []);
   return t;
 }
+
+function useGreeting() {
+  const h = new Date().getHours();
+  if (h < 5) return "Burning the midnight oil";
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  if (h < 22) return "Good evening";
+  return "Working late";
+}
+
+function useTicker() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((x) => (x + 1) % LIVE_TICKER.length), 3800);
+    return () => clearInterval(id);
+  }, []);
+  return LIVE_TICKER[i];
+}
+
 
 function Home() {
   const clock = useClock();
