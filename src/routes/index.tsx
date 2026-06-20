@@ -281,15 +281,22 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 @keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
 #screen{
-  width:100vw;height:100vh;display:flex;flex-direction:column;
+  width:100vw;height:100vh;display:flex;flex-direction:column;position:relative;
   background-color:var(--bg);
   background-image:
-    radial-gradient(ellipse 70% 45% at 50% -5%, rgba(99,102,241,.14) 0%, transparent 60%),
-    radial-gradient(ellipse 45% 35% at 8% 92%, rgba(16,185,129,.08) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 30% at 95% 65%, rgba(244,114,182,.08) 0%, transparent 55%),
-    radial-gradient(circle at 1px 1px, rgba(26,26,36,.045) 1px, transparent 0);
-  background-size:auto,auto,auto,24px 24px;
+    radial-gradient(ellipse 70% 45% at 50% -5%, rgba(99,102,241,.16) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 35% at 8% 92%, rgba(16,185,129,.1) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 95% 65%, rgba(244,114,182,.1) 0%, transparent 55%),
+    radial-gradient(circle at 1px 1px, rgba(26,26,36,.06) 1px, transparent 0);
+  background-size:auto,auto,auto,22px 22px;
 }
+/* Grain overlay — adds tactile film texture */
+.grain{
+  position:absolute;inset:0;pointer-events:none;z-index:1;mix-blend-mode:multiply;opacity:.5;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+#sb,#search-zone,#output-panel,#telem,#dock-row{position:relative;z-index:2}
+
 
 /* Status bar */
 #sb{
