@@ -325,12 +325,17 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 .prompt-row{text-align:center;margin-bottom:22px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .prompt-eyebrow{
+  position:relative;
   display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--mono);font-size:10px;color:var(--ink-3);
+  font-family:var(--mono);font-size:10px;color:var(--ink-2);
   letter-spacing:.18em;text-transform:uppercase;
   padding:5px 12px;border-radius:999px;
-  background:rgba(255,255,255,.55);border:1px solid var(--b);
+  background:
+    linear-gradient(rgba(255,255,255,.78),rgba(255,255,255,.78)) padding-box,
+    linear-gradient(90deg,#818cf8,#34d399,#60a5fa,#a78bfa,#f472b6) border-box;
+  border:1px solid transparent;
   backdrop-filter:blur(8px);
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 4px 14px rgba(99,102,241,.08);
 }
 .eyebrow-dot{
   width:6px;height:6px;border-radius:50%;background:#10b981;
