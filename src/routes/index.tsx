@@ -444,14 +444,6 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   border-color:var(--ink);
   box-shadow:0 0 0 3px rgba(15,17,21,.08);
 }
-.search-cmd{
-  position:absolute;right:14px;top:50%;transform:translateY(-50%);z-index:2;
-  font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink-2);
-  padding:4px 8px;border-radius:5px;
-  background:rgba(255,255,255,.9);border:1px solid var(--b-2);
-  pointer-events:none;letter-spacing:.04em;
-}
-
 /* Shared terminal cursor + ticker primitives */
 .term-cursor{
   display:inline-block;width:5px;height:10px;background:var(--accent);
@@ -459,26 +451,21 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 @keyframes blink{50%{opacity:0}}
 
-/* Help me decide — collapsible suggestions + recent */
-#help-zone{
-  flex:1;min-height:0;width:100%;max-width:720px;margin:6px auto 0;
-  padding:0 24px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;
-}
+/* Help me decide — toggle lives inside the search bar */
 .help-toggle{
-  display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--mono);font-size:11px;color:var(--ink-2);
-  letter-spacing:.04em;
-  padding:6px 12px;border-radius:8px;
-  background:rgba(255,255,255,.7);border:1px solid var(--b);
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:3;
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:11px;color:var(--ink-2);letter-spacing:.02em;
+  padding:6px 10px;border-radius:7px;
+  background:rgba(15,17,21,.04);border:1px solid var(--b);
   cursor:pointer;transition:background 140ms,border-color 140ms,color 140ms;
-  backdrop-filter:blur(8px);
 }
-.help-toggle:hover{background:rgba(255,255,255,.92);border-color:var(--b-2);color:var(--ink)}
-.help-toggle.is-open{background:#fff;border-color:var(--b-2);color:var(--ink)}
-.help-chev{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:10px;text-align:center}
-.help-meta{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em;padding-left:6px;border-left:1px solid var(--b)}
+.help-toggle:hover{background:rgba(15,17,21,.07);border-color:var(--b-2);color:var(--ink)}
+.help-toggle.is-open{background:var(--ink);border-color:var(--ink);color:#fff}
+.help-toggle.is-open .help-chev{color:rgba(255,255,255,.7)}
+.help-chev{font-family:var(--mono);font-size:10px;color:var(--ink-3);width:8px;text-align:center}
 #help-panel{
-  width:100%;flex:1;min-height:0;display:flex;flex-direction:column;
+  width:100%;max-width:680px;margin:10px auto 0;
   background:rgba(255,255,255,.82);
   border:1px solid var(--b);border-radius:13px;
   box-shadow:0 10px 28px rgba(26,26,36,.07), 0 1px 0 rgba(255,255,255,.8) inset;
@@ -487,9 +474,20 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 .dd-card{display:flex;flex-direction:column}
 .dd-section{padding:12px 16px}
-.dd-section.dd-rec{flex-shrink:0}
-.dd-section.dd-recent{flex:1;min-height:0;overflow-y:auto}
 .dd-divider{height:1px;background:var(--b);margin:0}
+
+/* Recent — always visible below search */
+#recent-zone{
+  flex:1;min-height:0;width:100%;max-width:720px;margin:14px auto 0;
+  padding:0 24px;display:flex;flex-direction:column;
+}
+.recent-card{
+  flex:1;min-height:0;overflow-y:auto;
+  padding:14px 18px;
+  background:rgba(255,255,255,.6);
+  border:1px solid var(--b);border-radius:12px;
+  backdrop-filter:blur(10px);
+}
 .dd-label{
   display:flex;align-items:center;justify-content:space-between;
   font-family:var(--mono);font-size:9.5px;color:var(--ink-3);
