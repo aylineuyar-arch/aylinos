@@ -607,9 +607,10 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
 /* Inbox signals rail */
 .rc-inbox{
-  background:linear-gradient(180deg, rgba(252,231,243,.55) 0%, rgba(255,255,255,.65) 100%);
-  border-left:3px solid var(--accent);
+  background:rgba(255,255,255,.55);
+  border-left:2px solid rgba(236,72,153,.35);
 }
+
 .signal-row{
   padding:11px 0;border-top:1px solid rgba(15,17,21,.06);
 }
