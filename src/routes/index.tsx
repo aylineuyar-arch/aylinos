@@ -210,10 +210,11 @@ function Home() {
             <input
               id="search-bar"
               type="text"
-              placeholder="Ask anything, or route a task to an agent…"
+              placeholder={typed || " "}
               autoComplete="off"
               spellCheck={false}
             />
+
             <span className="search-cursor" aria-hidden />
             <button
               type="button"
