@@ -308,7 +308,39 @@ function Home() {
                 <div className="signal-sub">Via Carota · party of 2 · OpenTable</div>
               </div>
             </div>
+            <div className="recent-card rc-upcoming">
+              <div className="dd-label"><span>Upcoming</span><span className="dd-meta">next 7 days</span></div>
+              <div className="up-row">
+                <span className="up-when">Mon<br/><b>10:30</b></span>
+                <div className="up-body">
+                  <div className="up-title">Intro · Priya Raman</div>
+                  <div className="up-sub">Head of Eng, Linder — coffee, Blue Bottle Mint Plaza</div>
+                </div>
+              </div>
+              <div className="up-row">
+                <span className="up-when">Tue<br/><b>14:00</b></span>
+                <div className="up-body">
+                  <div className="up-title">Interview · Staff Eng, Platform</div>
+                  <div className="up-sub">Quill — sys design w/ Marcus Oduya (45m)</div>
+                </div>
+              </div>
+              <div className="up-row">
+                <span className="up-when">Thu<br/><b>09:00</b></span>
+                <div className="up-body">
+                  <div className="up-title">Networking · Dani Kessler</div>
+                  <div className="up-sub">PM @ Northwind — Sequoia intro, 20m phone</div>
+                </div>
+              </div>
+              <div className="up-row">
+                <span className="up-when">Fri<br/><b>16:00</b></span>
+                <div className="up-body">
+                  <div className="up-title">Final round · Eng Manager</div>
+                  <div className="up-sub">Bramble — exec chat w/ CTO + values panel</div>
+                </div>
+              </div>
+            </div>
           </aside>
+
         </section>
 
 
