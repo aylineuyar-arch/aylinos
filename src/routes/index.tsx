@@ -535,7 +535,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   padding:7px 8px;margin:0 -8px;border-radius:6px;
   cursor:pointer;transition:background 120ms,color 120ms;
 }
-.suggest-row:hover{background:rgba(99,102,241,.07)}
+.suggest-row:hover{background:rgba(245,158,11,.08)}
 .suggest-arrow{font-family:var(--mono);font-size:11px;color:var(--ink-4);width:10px;flex-shrink:0}
 .suggest-row:hover .suggest-arrow{color:var(--accent)}
 .suggest-q{flex:1;font-family:var(--sans);font-size:13px;color:var(--ink-2);letter-spacing:-.003em}
