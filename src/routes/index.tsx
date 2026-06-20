@@ -463,12 +463,12 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   padding:18px 168px 18px 52px;
   font-family:var(--sans);font-size:15.5px;color:var(--ink);outline:none;
   transition:border-color 160ms, box-shadow 200ms;
-  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 8px 22px rgba(79,70,229,.10), 0 1px 2px rgba(15,17,21,.04);
+  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 1px 2px rgba(69,64,57,.04);
 }
 #search-bar::placeholder{color:var(--ink-3)}
 #search-bar:focus{
   border-color:var(--accent);
-  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(79,70,229,.16), 0 14px 32px rgba(79,70,229,.18);
+  box-shadow:4px 4px 0 var(--b), 0 1px 0 rgba(255,255,255,.9) inset, 0 0 0 4px rgba(245,158,11,.18);
 }
 
 /* Shared terminal cursor + ticker primitives */
