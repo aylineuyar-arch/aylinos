@@ -508,9 +508,10 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   padding:0 24px;display:flex;flex-direction:column;
 }
 .recent-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  display:grid;grid-template-columns:3fr 2fr;gap:10px;
 }
-@media (max-width:820px){.recent-grid{grid-template-columns:1fr}}
+.rc-runs{grid-column:1 / -1}
+@media (max-width:820px){.recent-grid{grid-template-columns:1fr}.rc-runs{grid-column:auto}}
 
 
 .recent-card{
