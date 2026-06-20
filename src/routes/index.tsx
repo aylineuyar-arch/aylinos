@@ -270,8 +270,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .prompt-eyebrow{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.18em;text-transform:uppercase}
 .prompt-h1{font-size:28px;font-weight:600;letter-spacing:-.025em;line-height:1.15;color:var(--ink);margin-top:2px}
 .prompt-name{
-  background:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
+  color:var(--accent);
 }
 .prompt-sub{font-size:13px;color:var(--ink-3);margin-top:2px}
 
