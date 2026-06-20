@@ -95,7 +95,7 @@ function useTicker() {
 function Home() {
   const clock = useClock();
   const greeting = useGreeting();
-  void useTicker;
+  
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
   return (
     <>
