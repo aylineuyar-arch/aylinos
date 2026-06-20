@@ -106,6 +106,8 @@ function Home() {
   const clock = useClock();
   const greeting = useGreeting();
   const rotating = useRotatingSuggestions(3, 5000);
+  const [helpOpen, setHelpOpen] = useState(false);
+  
   
   
   const today = new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
