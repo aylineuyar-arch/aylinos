@@ -502,14 +502,16 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 .dd-section{padding:12px 16px}
 .dd-divider{height:1px;background:var(--b);margin:0}
 
-/* Recent — two-column grid: searches + runs */
+/* Recent — 3-col grid: searches · pipeline · runs */
 #recent-zone{
-  width:100%;max-width:720px;margin:14px auto 0;
+  width:100%;max-width:1080px;margin:14px auto 0;
   padding:0 24px;display:flex;flex-direction:column;
 }
 .recent-grid{
-  display:grid;grid-template-columns:1fr;gap:10px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
 }
+@media (max-width:820px){.recent-grid{grid-template-columns:1fr}}
+
 
 .recent-card{
   padding:14px 16px;
