@@ -399,7 +399,13 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
   box-shadow:0 4px 14px rgba(26,26,36,.14), 0 1px 0 rgba(255,255,255,.8) inset;
   transition:transform 220ms cubic-bezier(.34,1.4,.64,1), box-shadow 220ms;
 }
-.di img{width:78%;height:78%;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,.12))}
+.di img{
+  width:92%;height:92%;object-fit:contain;
+  image-rendering:-webkit-optimize-contrast;
+  image-rendering:crisp-edges;
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;
+  transform:translateZ(0);
+}
 .di-cell:hover .di{transform:translateY(-6px) scale(1.08);box-shadow:0 14px 28px rgba(26,26,36,.2), 0 1px 0 rgba(255,255,255,.9) inset}
 .di-cell:active .di{transform:scale(.94);transition-duration:80ms}
 .di-label{
