@@ -380,7 +380,7 @@ const CSS = `
   --accent:#F59E0B;
   --accent-2:#D97706;
 }
-html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 
 @keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
