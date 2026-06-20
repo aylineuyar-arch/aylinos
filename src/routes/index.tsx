@@ -315,18 +315,22 @@ function Home() {
 
         {/* Dock */}
         <div id="dock-row">
-          <div id="dock">
-            {APPS.map((a) => (
-              <div className="di-cell" key={a.id} title={a.name}>
-                <div className="di" style={{ background: a.gradient }}>
-                  <a.Icon size={26} strokeWidth={1.75} color="#ffffff" />
+          <div id="dock-wrap">
+            <div className="dock-label"><span>Agents</span><span className="dock-meta">{APPS.length} active · click to route</span></div>
+            <div id="dock">
+              {APPS.map((a) => (
+                <div className="di-cell" key={a.id} title={a.name}>
+                  <div className="di" style={{ background: a.gradient }}>
+                    <a.Icon size={26} strokeWidth={1.75} color="#ffffff" />
+                  </div>
+                  <div className="di-label">{a.name}</div>
+                  <div className="di-tag">{a.tag}</div>
                 </div>
-                <div className="di-label">{a.name}</div>
-                <div className="di-tag">{a.tag}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
+
 
         {/* Eval footer — single line */}
         <a id="telem" href="/evals" title="Click for full eval harness — 7-day routing metrics across all agents">
@@ -488,20 +492,22 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 #search-bar{
   position:relative;z-index:1;
   width:100%;
-  background:#ffffff;
+  background:#fdf2f8;
   border:2px solid var(--accent);
   border-radius:18px;
   padding:26px 172px 26px 56px;
   font-family:var(--sans);font-size:19px;color:var(--ink);outline:none;
   letter-spacing:-.005em;
-  transition:border-color 160ms, box-shadow 200ms, transform 200ms;
-  box-shadow:8px 8px 0 var(--ink), 0 1px 0 rgba(255,255,255,.9) inset, 0 12px 32px rgba(236,72,153,.22);
+  transition:border-color 160ms, box-shadow 200ms;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 12px 32px rgba(236,72,153,.18);
 }
 #search-bar::placeholder{color:var(--ink-3);opacity:.9}
 #search-bar:focus{
   border-color:var(--accent);
-  box-shadow:8px 8px 0 var(--ink), 0 1px 0 rgba(255,255,255,.9) inset, 0 14px 36px rgba(236,72,153,.3), 0 0 0 5px rgba(236,72,153,.2);
+  background:#fff;
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 14px 36px rgba(236,72,153,.28), 0 0 0 5px rgba(236,72,153,.2);
 }
+
 
 
 /* Shared terminal cursor + ticker primitives */
@@ -540,7 +546,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 #recent-zone{
   width:100%;max-width:1240px;margin:14px auto 0;
   padding:0 24px;
-  display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;
+  display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:14px;align-items:stretch;
 }
 .recent-main{display:flex;flex-direction:column;min-width:0}
 .recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0}
@@ -647,6 +653,14 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 
 /* Dock */
 #dock-row{display:flex;justify-content:center;padding:6px 16px 8px;flex-shrink:0;overflow-x:auto}
+#dock-wrap{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.dock-label{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:0 8px;
+  font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink);
+  text-transform:uppercase;letter-spacing:.16em;
+}
+.dock-label .dock-meta{color:var(--ink-3);font-weight:400;font-size:10px;letter-spacing:.04em;text-transform:none}
 #dock{
   display:flex;align-items:flex-start;gap:6px;
   padding:14px 16px 12px;
