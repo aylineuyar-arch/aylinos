@@ -1,0 +1,16 @@
+.env
+*.db
+*.db-shm
+*.db-wal
+__pycache__/
+*.pyc
+.DS_Store
+venv/
+.venv/
+credentials.json
+token.json
+*.db
+*.db-shm  
+*.db-wal
+chroma_db/
+.impeccable/
