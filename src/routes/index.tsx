@@ -498,7 +498,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 }
 
 /* Dock */
-#dock-row{display:flex;justify-content:center;padding:8px 16px 22px;flex-shrink:0;overflow-x:auto}
+#dock-row{display:flex;justify-content:center;padding:6px 16px 8px;flex-shrink:0;overflow-x:auto}
 #dock{
   display:flex;align-items:flex-start;gap:6px;
   padding:14px 16px 12px;
