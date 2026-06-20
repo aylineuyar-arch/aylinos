@@ -584,15 +584,17 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   padding:0 24px;
   display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:14px;align-items:stretch;
 }
-.recent-main{display:flex;flex-direction:column;min-width:0}
-.recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0}
+.recent-main{display:flex;flex-direction:column;min-width:0;flex:1}
+.recent-rail{display:flex;flex-direction:column;gap:10px;min-width:0;flex:1}
 .recent-rail > .rc-upcoming{flex:1;display:flex;flex-direction:column}
 @media (max-width:640px){
   #recent-zone{grid-template-columns:1fr}
 }
 .recent-grid{
-  display:flex;flex-direction:column;gap:10px;
+  display:flex;flex-direction:column;gap:10px;flex:1;
 }
+.recent-grid > :last-child{flex:1}
+
 
 
 .recent-card{
