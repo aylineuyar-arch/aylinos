@@ -504,7 +504,7 @@ html,body{height:100%;overflow:hidden;font-family:var(--sans);background:var(--b
 
 /* Recent — two-column grid: searches + runs */
 #recent-zone{
-  width:100%;max-width:900px;margin:14px auto 0;
+  width:100%;max-width:720px;margin:14px auto 0;
   padding:0 24px;display:flex;flex-direction:column;
 }
 .recent-grid{
