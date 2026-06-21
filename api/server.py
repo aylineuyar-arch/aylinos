@@ -120,6 +120,42 @@ class RefreshRequest(BaseModel):
     confirmed: bool = False
 
 
+class JobSeedPayload(BaseModel):
+    id: str
+    title: str = ""
+    company: str = ""
+    location: str = ""
+    url: str = ""
+    source: str = "seed"
+    company_type: str = ""
+    fit_score: float = None
+    apply_flag: int = 0
+    posted_date: str = ""
+    status: str = "no_reply"
+    applied_at: str = ""
+    notes: str = ""
+
+@app.post("/api/jobs/seed")
+def seed_job(body: JobSeedPayload):
+    """Seed a single job row from local DB into Render DB."""
+    conn = db.get_conn()
+    try:
+        conn.execute("""
+            INSERT OR IGNORE INTO jobs
+            (id, title, company, location, url, source, company_type,
+             fit_score, apply_flag, posted_date, status, applied_at, notes)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """, (body.id, body.title, body.company, body.location, body.url,
+              body.source, body.company_type, body.fit_score, body.apply_flag,
+              body.posted_date, body.status, body.applied_at, body.notes))
+        conn.commit()
+        return {"status": "ok", "id": body.id}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+    finally:
+        conn.close()
+
+
 @app.post("/api/jobs/refresh")
 def refresh_jobs(body: RefreshRequest):
     """
