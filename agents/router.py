@@ -22,6 +22,7 @@ SSE event format:
 """
 
 import json
+import os
 import time
 import anthropic
 
@@ -42,6 +43,9 @@ AGENTS:
 - cs_triage: classifying or triaging a support ticket or customer complaint
 - restaurant: booking or finding a restaurant, food, dinner reservations
 - job_search: questions about Aylin's own job pipeline, application stats, "how many applications", "show my pipeline"
+- gtm_tool: GTM strategy, pricing models, revenue forecasting, ARR, NRR, LTV, CAC, go-to-market
+- email_agent: AI email pipeline, job search emails, daily digest, ATS scraping, email automation
+- compliance_rag: compliance questions, financial regulations, policy documents, RAG chatbot
 - general: anything else — answer directly
 
 USER QUERY: {query}
@@ -234,7 +238,12 @@ ESCALATE:
     yield _sse({"type": "done"})
 
 
-FORK_YEAH_URL = "http://localhost:5173"
+FORK_YEAH_URL = os.environ.get("FORK_YEAH_URL", "http://localhost:5173")
+
+# Live app URLs for portfolio projects
+GTM_TOOL_URL = "https://web-production-b4e0ad.up.railway.app"
+EMAIL_AGENT_URL = "https://muse-agent-transfer.lovable.app"
+COMPLIANCE_RAG_URL = "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streamlit.app"
 
 def stream_restaurant(query: str, client: anthropic.Anthropic):
     """
@@ -357,6 +366,96 @@ then give 2-3 sentences of insight or recommendation. Use sections if helpful.""
     yield _sse({"type": "done"})
 
 
+def stream_gtm_tool(query: str, client: anthropic.Anthropic):
+    """Stream GTM / pricing intelligence, with link to live tool."""
+    prompt = f"""You are AylinOS GTM Intelligence, connected to a live GTM Pricing Tool.
+
+USER QUERY: {query}
+
+Respond with these sections:
+
+ROUTING TO:
+[GTM Pricing Tool — {GTM_TOOL_URL}]
+
+QUICK ANSWER:
+[2-3 sentences directly answering the question using GTM/pricing expertise]
+
+KEY METRICS TO MODEL:
+[3-4 bullet points of the most relevant metrics for this question: ARR, NRR, LTV:CAC, payback period, etc.]
+
+TRY IT LIVE:
+[Direct the user to open {GTM_TOOL_URL} to model this scenario interactively with real inputs and revenue forecasts]"""
+
+    with client.messages.stream(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=350,
+        messages=[{"role": "user", "content": prompt}]
+    ) as stream:
+        for text in stream.text_stream:
+            yield _sse({"type": "token", "text": text})
+    yield _sse({"type": "done"})
+
+
+def stream_email_agent(query: str, client: anthropic.Anthropic):
+    """Stream email agent intelligence, with link to live agent."""
+    prompt = f"""You are AylinOS Email Intelligence, connected to a live Agentic Email Generator.
+
+USER QUERY: {query}
+
+Respond with these sections:
+
+ROUTING TO:
+[Agentic Email Generator — {EMAIL_AGENT_URL}]
+
+WHAT THE AGENT DOES:
+[2-3 sentences: scrapes 130+ ATS feeds daily, scores fit + conversion likelihood with Claude, emails a ranked digest at 8am ET]
+
+FOR YOUR QUERY:
+[Direct answer to what they asked about AI email pipelines or job search automation]
+
+TRY IT LIVE:
+[Direct the user to {EMAIL_AGENT_URL} to see the live agent in action]"""
+
+    with client.messages.stream(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=300,
+        messages=[{"role": "user", "content": prompt}]
+    ) as stream:
+        for text in stream.text_stream:
+            yield _sse({"type": "token", "text": text})
+    yield _sse({"type": "done"})
+
+
+def stream_compliance_rag(query: str, client: anthropic.Anthropic):
+    """Stream compliance RAG response, with link to live chatbot."""
+    prompt = f"""You are AylinOS Compliance Intelligence, connected to a live Compliance RAG Chatbot.
+
+USER QUERY: {query}
+
+Respond with these sections:
+
+ROUTING TO:
+[Compliance RAG Chatbot — {COMPLIANCE_RAG_URL}]
+
+QUICK ANSWER:
+[2-3 sentences on the compliance/regulatory topic, drawing on financial services knowledge]
+
+HOW THE RAG WORKS:
+[One sentence: policy documents ingested into vector store, Claude answers grounded in source docs with citations]
+
+TRY IT LIVE:
+[Direct the user to {COMPLIANCE_RAG_URL} for full policy Q&A with source citations]"""
+
+    with client.messages.stream(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=300,
+        messages=[{"role": "user", "content": prompt}]
+    ) as stream:
+        for text in stream.text_stream:
+            yield _sse({"type": "token", "text": text})
+    yield _sse({"type": "done"})
+
+
 def stream_general(query: str, client: anthropic.Anthropic):
     """General Claude response for anything that doesn't fit another agent."""
     prompt = f"""You are AylinOS, a personal AI operating system built by Aylin Uyar.
@@ -419,6 +518,12 @@ def stream_query(query: str):
             yield from stream_restaurant(query, client)
         elif agent == "job_search":
             yield from stream_job_search(query, client)
+        elif agent == "gtm_tool":
+            yield from stream_gtm_tool(query, client)
+        elif agent == "email_agent":
+            yield from stream_email_agent(query, client)
+        elif agent == "compliance_rag":
+            yield from stream_compliance_rag(query, client)
         else:
             yield from stream_general(query, client)
 
