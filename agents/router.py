@@ -98,26 +98,25 @@ LIVE INTEL: {live_intel[:1000] if live_intel else "Use your knowledge."}
 CONTACT RESEARCH: {contact_intel[:600] if contact_intel else "Use your knowledge of typical leadership at this company."}
 USER QUERY: {query}
 
-Write a structured intelligence brief with these exact sections, in order.
-For each section write the label on its own line in ALL CAPS followed by a colon, then the content.
+Be extremely concise. Each section is 1-2 lines max — digestible, scannable. No paragraphs.
 
 FIT SCORE:
-[just the number 0-100, nothing else]
+[number 0-100 only]
 
 STRATEGY:
-[one of: APPLY NOW / NETWORK FIRST / RESEARCH MORE / SKIP — then one sentence why]
+[APPLY NOW / NETWORK FIRST / RESEARCH MORE / SKIP — one short phrase why, max 15 words]
 
 AI ANGLE:
-[2-3 sentences on what this company is actually doing with AI in production]
+[One sentence on what they're doing with AI. Nothing more.]
 
 ROLE FIT:
-[2-3 sentences on why Aylin specifically fits — reference her Deloitte/Skild AI background]
+[One sentence connecting Aylin's Deloitte/Skild background to this specific company.]
 
 OUTREACH:
-[Name a SPECIFIC real person at this company — VP Product, Head of GTM, Chief of Staff, or similar operator role. Use the live intel to find their actual name. Format: "Name (Title) — [exact angle for first message in one sentence, referencing something specific about their work or the company's current focus]". If no specific name found, name the function and explain why that person specifically.]
+[One specific named person (Title) — one-line angle for the first message.]
 
 VERDICT:
-[one bold bottom-line sentence]"""
+[One punchy sentence. Bottom line only.]"""
 
     with client.messages.stream(
         model="claude-opus-4-6",
@@ -139,22 +138,22 @@ def stream_interview_prep(query: str, company: str, client: anthropic.Anthropic)
 COMPANY: {company}
 USER QUERY: {query}
 
-Write structured prep with these exact sections:
+Be concise — 1-2 lines per section, scannable, no paragraphs.
 
 COMPANY BRIEF:
-[3-4 sentences: what they do, stage, why it matters for this interview]
+[One sentence: what they do and why it matters for this interview]
 
 TOP STAR STORY:
-[Which of Aylin's stories to lead with and exactly how to frame it for this company. Be specific.]
+[Which story to lead with + one-line framing for this company]
 
 LIKELY Q1:
-[Most likely behavioral question + one line on what they're testing]
+[Question — what they're testing, in 8 words or less]
 
 LIKELY Q2:
-[Second most likely question + what they're testing]
+[Question — what they're testing, in 8 words or less]
 
 QUESTIONS TO ASK:
-[2 sharp questions Aylin should ask that show she's done her homework]"""
+[Two sharp questions, one line each]"""
 
     with client.messages.stream(
         model="claude-opus-4-6",
@@ -180,22 +179,22 @@ def stream_research(query: str, company: str, client: anthropic.Anthropic):
 COMPANY: {company}
 LIVE INTEL: {live_intel[:1200] if live_intel else "Use your knowledge."}
 
-Write with these sections:
+Be concise — 1 line per section, scannable.
 
 WHAT THEY DO:
-[2-3 sentences: business model, product, customer]
+[One sentence: product, customer, business model]
 
 STAGE & FUNDING:
-[Series, investors, valuation if known]
+[Series, lead investors, valuation — one line]
 
 AI ANGLE:
-[What they're actually doing with AI — specific, not generic]
+[One sentence: what they're specifically doing with AI]
 
-LEADERSHIP:
-[CEO + 1-2 key execs relevant to AI/strategy]
+KEY CONTACT:
+[Name (Title) — one line]
 
-HIRING SIGNALS:
-[What roles they're hiring for, what it signals about priorities]"""
+HIRING SIGNAL:
+[One role they're hiring for + what it signals]"""
 
     with client.messages.stream(
         model="claude-opus-4-6",
