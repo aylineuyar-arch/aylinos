@@ -79,18 +79,23 @@ def _sse(data: dict) -> str:
 
 def stream_advisor(query: str, company: str, client: anthropic.Anthropic):
     """Stream career intelligence brief for a company."""
-    from integrations.tavily import research_company as tavily_research
+    from integrations.tavily import research_company as tavily_research, find_hiring_manager
     try:
         live_intel = tavily_research(company)
     except Exception:
         live_intel = ""
+    try:
+        contact_intel = find_hiring_manager(company, "VP Product GTM Strategy Operations Chief of Staff")
+    except Exception:
+        contact_intel = ""
 
     prompt = f"""You are AylinOS Career Intelligence. Generate a brief intelligence report.
 
 {AYLIN_PROFILE}
 
 COMPANY: {company}
-LIVE INTEL: {live_intel[:1200] if live_intel else "Use your knowledge."}
+LIVE INTEL: {live_intel[:1000] if live_intel else "Use your knowledge."}
+CONTACT RESEARCH: {contact_intel[:600] if contact_intel else "Use your knowledge of typical leadership at this company."}
 USER QUERY: {query}
 
 Write a structured intelligence brief with these exact sections, in order.
@@ -109,7 +114,7 @@ ROLE FIT:
 [2-3 sentences on why Aylin specifically fits — reference her Deloitte/Skild AI background]
 
 OUTREACH:
-[who to contact and exactly what angle to use in the first message]
+[Name a SPECIFIC real person at this company — VP Product, Head of GTM, Chief of Staff, or similar operator role. Use the live intel to find their actual name. Format: "Name (Title) — [exact angle for first message in one sentence, referencing something specific about their work or the company's current focus]". If no specific name found, name the function and explain why that person specifically.]
 
 VERDICT:
 [one bold bottom-line sentence]"""

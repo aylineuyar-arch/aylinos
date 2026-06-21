@@ -81,28 +81,34 @@ def research_company(company: str) -> str:
 
 def find_hiring_manager(company: str, role: str) -> str:
     """
-    Search for hiring manager / relevant contact at a company.
-    Returns structured text for Claude to parse.
+    Search for a specific named contact at a company — VP Product, GTM, CoS, Strategy.
+    Targets operator roles at the product/commercial intersection.
+    Returns structured text for Claude to parse into a named outreach target.
     """
-    results = search(
-        f"{company} hiring manager {role} LinkedIn site:linkedin.com",
-        max_results=3,
-        search_depth="basic"
-    )
+    queries = [
+        f"{company} VP Product OR Head of GTM OR Chief of Staff OR Head of Strategy site:linkedin.com",
+        f"{company} leadership team product strategy operations 2025 2026",
+        f'"{company}" "VP" OR "Head of" product revenue GTM operations',
+    ]
 
-    if not results:
-        results = search(
-            f"{company} {role} team leader head of operations",
-            max_results=3,
-            search_depth="basic"
-        )
+    all_results = []
+    for q in queries:
+        results = search(q, max_results=3, search_depth="basic")
+        all_results.extend(results)
+        if all_results:
+            break  # stop after first query that returns results
 
-    if not results:
+    if not all_results:
         return ""
 
-    formatted = f"CONTACT RESEARCH — {company} / {role}\n\n"
-    for r in results:
-        formatted += f"{r.get('title', '')}\n{r.get('content', '')[:300]}\n\n"
+    formatted = f"CONTACT RESEARCH — {company}\n\n"
+    seen = set()
+    for r in all_results:
+        url = r.get("url", "")
+        if url in seen:
+            continue
+        seen.add(url)
+        formatted += f"{r.get('title', '')}\n{r.get('content', '')[:350]}\n\n"
     return formatted.strip()
 
 
