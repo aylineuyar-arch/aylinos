@@ -95,9 +95,9 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
 <style>
 *{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
-  --bg:#0c0c10;--surface:#111116;--border:rgba(255,255,255,.07);
-  --border2:rgba(255,255,255,.12);--ink:#e2e8f0;--ink-2:#94a3b8;--ink-3:#475569;
-  --accent:#818cf8;--mono:'JetBrains Mono',monospace;
+  --bg:#f8f7f4;--surface:#ffffff;--border:rgba(0,0,0,.08);
+  --border2:rgba(0,0,0,.14);--ink:#111116;--ink-2:#4a5568;--ink-3:#94a3b8;
+  --accent:#6366f1;--mono:'JetBrains Mono',monospace;
 }}
 body{{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,sans-serif;min-height:100vh}}
 .topbar{{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);}}
@@ -106,7 +106,8 @@ body{{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,sans
 nav a{{font-size:12px;color:var(--ink-3);text-decoration:none;margin-left:20px;font-family:var(--mono)}}
 nav a:hover{{color:var(--ink)}}
 .stats{{display:flex;gap:1px;border-bottom:1px solid var(--border);background:var(--border)}}
-.stat{{background:var(--surface);flex:1;padding:20px 24px}}
+.stat{{background:var(--surface);flex:1;padding:20px 24px;}}
+.topbar{{background:var(--surface);border-bottom:1px solid var(--border);}}
 .stat-val{{font-size:28px;font-weight:700;color:var(--ink);font-family:var(--mono)}}
 .stat-label{{font-size:11px;color:var(--ink-3);margin-top:4px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase}}
 .main{{max-width:860px;margin:0 auto;padding:28px 24px}}
