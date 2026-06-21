@@ -245,6 +245,20 @@ GTM_TOOL_URL = "https://web-production-b4e0ad.up.railway.app"
 EMAIL_AGENT_URL = "https://muse-agent-transfer.lovable.app"
 COMPLIANCE_RAG_URL = "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streamlit.app"
 
+# Map each agent to its next-step apps
+AGENT_NEXT_STEPS = {
+    "advisor":       [{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com"}],
+    "interview_prep":[{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com"}],
+    "research":      [{"label": "Compliance RAG Chatbot", "url": COMPLIANCE_RAG_URL}],
+    "cs_triage":     [{"label": "CS Triage Agent", "url": "https://github.com/aylineuyar-arch/ai-cs-triage"}],
+    "restaurant":    [{"label": "Fork Yeah! Live Booking", "url": "https://github.com/aylineuyar-arch/restaurant-agent"}],
+    "job_search":    [{"label": "Agentic Email Generator", "url": EMAIL_AGENT_URL}, {"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com"}],
+    "gtm_tool":      [{"label": "GTM Pricing Tool", "url": GTM_TOOL_URL}],
+    "email_agent":   [{"label": "Agentic Email Generator", "url": EMAIL_AGENT_URL}],
+    "compliance_rag":[{"label": "Compliance RAG Chatbot", "url": COMPLIANCE_RAG_URL}],
+    "general":       [],
+}
+
 def stream_restaurant(query: str, client: anthropic.Anthropic):
     """
     Stream restaurant results. Tries to proxy through Fork Yeah! LangGraph agent
@@ -526,6 +540,11 @@ def stream_query(query: str):
             yield from stream_compliance_rag(query, client)
         else:
             yield from stream_general(query, client)
+
+        # Emit next steps so the frontend can render clickable app cards
+        steps = AGENT_NEXT_STEPS.get(agent, [])
+        if steps:
+            yield _sse({"type": "next_steps", "steps": steps})
 
     except Exception as e:
         yield _sse({"type": "error", "message": str(e)})
