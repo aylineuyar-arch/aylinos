@@ -73,6 +73,11 @@ def init_db():
                 investors    TEXT,
                 leadership   TEXT,
                 sponsorship  TEXT,
+                contact_name TEXT,
+                contact_title TEXT,
+                contact_angle TEXT,
+                fit_score    INTEGER,
+                strategy     TEXT,
                 researched_at TEXT NOT NULL
             );
 
@@ -348,6 +353,41 @@ def save_company_research(company: str, brief: str, investors: str,
             INSERT INTO company_research (company,brief,investors,leadership,sponsorship,researched_at)
             VALUES (?,?,?,?,?,?)
         """, (company, brief, investors, leadership, sponsorship, now))
+
+
+def save_advisor_result(company: str, fit_score: int, strategy: str,
+                        contact_name: str, contact_title: str, contact_angle: str) -> None:
+    """Save structured advisor output so job cards can show OS-found contacts."""
+    now = datetime.utcnow().isoformat()
+    with get_conn() as conn:
+        existing = conn.execute(
+            "SELECT id FROM company_research WHERE company=? ORDER BY researched_at DESC LIMIT 1",
+            (company,)
+        ).fetchone()
+        if existing:
+            conn.execute("""
+                UPDATE company_research
+                SET fit_score=?, strategy=?, contact_name=?, contact_title=?, contact_angle=?, researched_at=?
+                WHERE id=?
+            """, (fit_score, strategy, contact_name, contact_title, contact_angle, now, existing["id"]))
+        else:
+            conn.execute("""
+                INSERT INTO company_research
+                (company, fit_score, strategy, contact_name, contact_title, contact_angle, researched_at)
+                VALUES (?,?,?,?,?,?,?)
+            """, (company, fit_score, strategy, contact_name, contact_title, contact_angle, now))
+
+
+def get_companies_with_contacts() -> list:
+    """Return companies where the OS found a specific contact."""
+    with get_conn() as conn:
+        rows = conn.execute("""
+            SELECT company, fit_score, strategy, contact_name, contact_title, contact_angle, researched_at
+            FROM company_research
+            WHERE contact_name IS NOT NULL AND contact_name != ''
+            ORDER BY fit_score DESC, researched_at DESC
+        """).fetchall()
+        return [dict(r) for r in rows]
 
 
 init_db()

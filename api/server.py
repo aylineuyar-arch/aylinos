@@ -36,6 +36,48 @@ from api.evals_html import render_evals
 
 app = FastAPI(title="AylinOS", version="1.0.0")
 
+
+@app.on_event("startup")
+def seed_on_startup():
+    """Seed jobs from CSV on startup if DB is empty — survives Render redeploys."""
+    import csv, os
+    from datetime import datetime
+    conn = db.get_conn()
+    count = conn.execute("SELECT COUNT(*) FROM jobs").fetchone()[0]
+    if count > 0:
+        conn.close()
+        return
+    csv_path = os.path.join(os.path.dirname(__file__), "..", "data", "jobs_seed.csv")
+    if not os.path.exists(csv_path):
+        conn.close()
+        return
+    now = datetime.utcnow().isoformat()
+    seeded = 0
+    with open(csv_path, newline="") as f:
+        for row in csv.DictReader(f):
+            try:
+                conn.execute("""
+                    INSERT OR IGNORE INTO jobs
+                    (id, title, company, location, url, source, company_type,
+                     fit_score, apply_flag, posted_date, fetched_at, raw_json)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+                """, (row["id"], row["title"], row["company"], row["location"],
+                      row["url"], row["source"], row["company_type"],
+                      float(row["fit_score"]) if row["fit_score"] else None,
+                      int(row["apply_flag"] or 0), row["posted_date"], now, "{}"))
+                conn.execute("""
+                    INSERT OR IGNORE INTO applications (job_id, status, applied_at, notes, updated_at)
+                    VALUES (?,?,?,?,?)
+                """, (row["id"], row["status"] or "no_reply",
+                      row["applied_at"] or None, row["notes"] or "", now))
+                seeded += 1
+            except Exception:
+                pass
+    conn.commit()
+    conn.close()
+    print(f"[startup] Seeded {seeded} jobs from CSV")
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

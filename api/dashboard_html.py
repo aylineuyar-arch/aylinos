@@ -159,8 +159,30 @@ def _mini_card(job: dict) -> str:
 </div>"""
 
 
+def _contact_card(c: dict) -> str:
+    """Card for OS-found contacts — shown prominently."""
+    strat = c.get("strategy", "")
+    strat_color = "#34d399" if "APPLY NOW" in strat else "#fbbf24" if "NETWORK" in strat else "#9ca3af"
+    return f"""<div class="kcard contact-card">
+  <div class="kcard-top">
+    <span class="kcard-company">{c['company']}</span>
+    {"<span class='kbadge' style='background:rgba(52,211,153,0.12);color:#34d399'>{}</span>".format(c['fit_score']) if c.get('fit_score') else ""}
+  </div>
+  <div class="contact-row">
+    <span class="contact-name">{c.get('contact_name','')}</span>
+    <span class="contact-title">{c.get('contact_title','')}</span>
+  </div>
+  <div class="contact-angle">{c.get('contact_angle','')[:120]}</div>
+  <div class="contact-strat" style="color:{strat_color}">{strat[:60]}</div>
+</div>"""
+
+
 def render_dashboard(jobs: list, metrics: dict) -> str:
+    import db as _db
     m = metrics
+
+    # OS-found contacts (from advisor runs)
+    os_contacts = _db.get_companies_with_contacts()
 
     interviewing = [j for j in jobs if j.get("status") == "interviewing"]
     eliminated   = [j for j in jobs if j.get("status") == "rejected_interview"]
@@ -190,6 +212,31 @@ def render_dashboard(jobs: list, metrics: dict) -> str:
         return f"""<div class="stat-cell">
   <span class="stat-value" style="color:{color}">{value}</span>
   <span class="stat-label">{label}</span>
+</div>"""
+
+    # OS contacts section — shown at top if any exist
+    if os_contacts:
+        contact_cards = "".join(_contact_card(c) for c in os_contacts)
+        os_section = f"""<div class="lane">
+  <div class="lane-header" style="--lane-accent:#818cf8">
+    <div class="lane-left">
+      <span class="lane-caret">▾</span>
+      <span class="lane-title">⚡ AylinOS Found — Contacts Identified</span>
+    </div>
+    <span class="lane-count" style="color:#818cf8">{len(os_contacts)}</span>
+  </div>
+  <div class="lane-body">{contact_cards}</div>
+</div>"""
+    else:
+        os_section = f"""<div class="lane">
+  <div class="lane-header" style="--lane-accent:#818cf8">
+    <div class="lane-left">
+      <span class="lane-caret">▾</span>
+      <span class="lane-title">⚡ AylinOS Found — Contacts Identified</span>
+    </div>
+    <span class="lane-count" style="color:#818cf8">0</span>
+  </div>
+  <div class="lane-body"><div class="lane-empty">Ask the OS "should I apply to [company]?" to populate contacts here</div></div>
 </div>"""
 
     offer_lane     = lane("Offers", offers, "#34d399") if offers else ""
@@ -322,6 +369,12 @@ def render_dashboard(jobs: list, metrics: dict) -> str:
   transition: border-color 150ms;
 }}
 .kcard:hover {{ border-color: var(--border2); }}
+.contact-card {{ border-color: rgba(129,140,248,0.25); }}
+.contact-row {{ display:flex; gap:8px; align-items:baseline; margin:6px 0 4px; }}
+.contact-name {{ font-size:13px; font-weight:600; color:#818cf8; }}
+.contact-title {{ font-size:11px; color:var(--ink-3); font-family:var(--mono); }}
+.contact-angle {{ font-size:12px; color:var(--ink-2); line-height:1.5; margin-bottom:6px; }}
+.contact-strat {{ font-size:10px; font-family:var(--mono); letter-spacing:.04em; }}
 .kcard-top {{
   display: flex;
   justify-content: space-between;
@@ -400,6 +453,7 @@ def render_dashboard(jobs: list, metrics: dict) -> str:
 </div>
 
 <div class="pipeline" id="pipeline">
+  {os_section}
   {offer_lane}
   {interview_lane}
   {elim_lane}

@@ -118,13 +118,33 @@ OUTREACH:
 VERDICT:
 [One punchy sentence. Bottom line only.]"""
 
+    full_text = ""
     with client.messages.stream(
         model="claude-opus-4-6",
         max_tokens=600,
         messages=[{"role": "user", "content": prompt}]
     ) as stream:
         for text in stream.text_stream:
+            full_text += text
             yield _sse({"type": "token", "text": text})
+
+    # Parse and save structured contact + fit data for job dashboard
+    try:
+        import re, db as _db
+        score_m = re.search(r'FIT SCORE:\s*(\d+)', full_text)
+        strat_m = re.search(r'STRATEGY:\s*(.+)', full_text)
+        out_m   = re.search(r'OUTREACH:\s*(.+?)(?:\n|$)', full_text)
+        fit_score = int(score_m.group(1)) if score_m else None
+        strategy  = strat_m.group(1).strip() if strat_m else ""
+        outreach  = out_m.group(1).strip() if out_m else ""
+        contact_m = re.match(r'^([^(]+)\(([^)]+)\)\s*[—\-]\s*(.+)$', outreach)
+        if contact_m:
+            c_name, c_title, c_angle = [x.strip() for x in contact_m.groups()]
+        else:
+            c_name, c_title, c_angle = "", "", outreach
+        _db.save_advisor_result(company, fit_score, strategy, c_name, c_title, c_angle)
+    except Exception:
+        pass
 
     yield _sse({"type": "done"})
 
@@ -251,12 +271,12 @@ COMPLIANCE_RAG_URL = "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streaml
 
 # Map each agent to its next-step apps
 AGENT_NEXT_STEPS = {
-    "advisor":       [{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com"}],
-    "interview_prep":[{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com"}],
-    "research":      [{"label": "Compliance RAG Chatbot", "url": COMPLIANCE_RAG_URL}],
+    "advisor":       [{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}, {"label": "Networking Operator", "url": "https://github.com/aylineuyar-arch/ai-networking-operator-workflow"}],
+    "interview_prep":[{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}],
+    "research":      [{"label": "Compliance RAG Chatbot", "url": COMPLIANCE_RAG_URL}, {"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}],
     "cs_triage":     [{"label": "CS Triage Agent", "url": "https://github.com/aylineuyar-arch/ai-cs-triage"}],
     "restaurant":    [{"label": "Fork Yeah! Live Booking", "url": "https://github.com/aylineuyar-arch/restaurant-agent"}],
-    "job_search":    [{"label": "Agentic Email Generator", "url": EMAIL_AGENT_URL}, {"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com"}],
+    "job_search":    [{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}, {"label": "Agentic Email Generator", "url": EMAIL_AGENT_URL}],
     "gtm_tool":      [{"label": "GTM Pricing Tool", "url": GTM_TOOL_URL}],
     "email_agent":   [{"label": "Agentic Email Generator", "url": EMAIL_AGENT_URL}],
     "compliance_rag":[{"label": "Compliance RAG Chatbot", "url": COMPLIANCE_RAG_URL}],
