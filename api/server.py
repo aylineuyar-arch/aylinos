@@ -138,16 +138,23 @@ class JobSeedPayload(BaseModel):
 @app.post("/api/jobs/seed")
 def seed_job(body: JobSeedPayload):
     """Seed a single job row from local DB into Render DB."""
+    from datetime import datetime
+    now = datetime.utcnow().isoformat()
     conn = db.get_conn()
     try:
         conn.execute("""
             INSERT OR IGNORE INTO jobs
             (id, title, company, location, url, source, company_type,
-             fit_score, apply_flag, posted_date, status, applied_at, notes)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
+             fit_score, apply_flag, posted_date, fetched_at, raw_json)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
         """, (body.id, body.title, body.company, body.location, body.url,
               body.source, body.company_type, body.fit_score, body.apply_flag,
-              body.posted_date, body.status, body.applied_at, body.notes))
+              body.posted_date, now, "{}"))
+        # Insert application status row
+        conn.execute("""
+            INSERT OR IGNORE INTO applications (job_id, status, applied_at, notes, updated_at)
+            VALUES (?,?,?,?,?)
+        """, (body.id, body.status, body.applied_at or None, body.notes, now))
         conn.commit()
         return {"status": "ok", "id": body.id}
     except Exception as e:
