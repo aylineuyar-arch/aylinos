@@ -318,8 +318,32 @@ def cs_triage():
 @app.get("/networking", response_class=HTMLResponse)
 def networking():
     from api.networking_html import render_networking
-    contacts = db.get_companies_with_contacts()
-    return render_networking(contacts)
+    os_contacts = db.get_companies_with_contacts()
+    # Pull live from Airtable if keys are set
+    airtable_contacts = []
+    try:
+        import os as _os
+        from pyairtable import Api
+        at_key = _os.environ.get("AIRTABLE_API_KEY", "")
+        at_base = _os.environ.get("AIRTABLE_BASE_ID", "")
+        if at_key and at_base:
+            api = Api(at_key)
+            table = api.table(at_base, "JPM Contacts")
+            for rec in table.all():
+                f = rec["fields"]
+                airtable_contacts.append({
+                    "company":       f.get("Division / Team", "JPMorgan"),
+                    "contact_name":  f.get("Name", ""),
+                    "contact_title": f.get("Title", ""),
+                    "contact_angle": f.get("Notes", "") or f.get("Intel — Role", ""),
+                    "fit_score":     None,
+                    "strategy":      f.get("Warm Path", ""),
+                    "status":        f.get("Outreach Status", "queued").lower().replace(" ", "-"),
+                    "source":        "Airtable",
+                })
+    except Exception as e:
+        print(f"[Airtable] fetch failed: {e}")
+    return render_networking(os_contacts, airtable_contacts)
 
 
 @app.get("/outreach", response_class=HTMLResponse)

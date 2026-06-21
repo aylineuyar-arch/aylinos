@@ -4,7 +4,8 @@ Shows OS-found contacts, scoring, outreach queue, and pipeline stats.
 """
 
 
-def render_networking(contacts: list) -> str:
+def render_networking(contacts: list, airtable_contacts: list = None) -> str:
+    airtable_contacts = airtable_contacts or []
     # Seed demo targets if no OS-found contacts yet
     demo_targets = [
         {"company": "Ramp", "contact_name": "Geoff Charles", "contact_title": "VP Product", "fit_score": 88,
@@ -21,22 +22,32 @@ def render_networking(contacts: list) -> str:
          "strategy": "RESEARCH MORE", "contact_angle": "GTM motion for developer tools — reference bottoms-up growth question", "status": "researching"},
     ]
 
-    # Merge OS-found contacts on top
+    # Merge: OS-found first, then Airtable, then demo seeds
     all_targets = []
     os_companies = {c["company"] for c in contacts}
+    at_companies = {c["company"] for c in airtable_contacts}
+
     for c in contacts:
         all_targets.append({**c, "status": "os-found", "source": "AylinOS"})
+    for c in airtable_contacts:
+        all_targets.append({**c})
     for t in demo_targets:
-        if t["company"] not in os_companies:
+        if t["company"] not in os_companies and t["company"] not in at_companies:
             all_targets.append({**t, "source": "seed"})
 
     def status_badge(status):
         colors = {
-            "os-found":   ("#818cf8", "rgba(129,140,248,0.12)", "⚡ OS Found"),
-            "sent":       ("#34d399", "rgba(52,211,153,0.12)",  "✓ Sent"),
-            "drafted":    ("#fbbf24", "rgba(251,191,36,0.12)",  "✎ Drafted"),
-            "queued":     ("#60a5fa", "rgba(96,165,250,0.12)",  "◎ Queued"),
-            "researching":("#f472b6", "rgba(244,114,182,0.12)", "⟳ Researching"),
+            "os-found":        ("#818cf8", "rgba(129,140,248,0.12)", "⚡ OS Found"),
+            "sent":            ("#34d399", "rgba(52,211,153,0.12)",  "✓ Sent"),
+            "message-sent":    ("#34d399", "rgba(52,211,153,0.12)",  "✓ Sent"),
+            "responded":       ("#34d399", "rgba(52,211,153,0.12)",  "✓ Responded"),
+            "call-scheduled":  ("#34d399", "rgba(52,211,153,0.12)",  "✓ Call Scheduled"),
+            "drafted":         ("#fbbf24", "rgba(251,191,36,0.12)",  "✎ Drafted"),
+            "connected":       ("#fbbf24", "rgba(251,191,36,0.12)",  "✓ Connected"),
+            "queued":          ("#60a5fa", "rgba(96,165,250,0.12)",  "◎ Queued"),
+            "not-started":     ("#60a5fa", "rgba(96,165,250,0.12)",  "◎ Queued"),
+            "connection-sent": ("#60a5fa", "rgba(96,165,250,0.12)",  "↑ Sent Request"),
+            "researching":     ("#f472b6", "rgba(244,114,182,0.12)", "⟳ Researching"),
         }
         color, bg, label = colors.get(status, ("#9ca3af", "rgba(156,163,175,0.1)", status))
         return f'<span class="badge" style="color:{color};background:{bg}">{label}</span>'
