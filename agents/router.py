@@ -271,7 +271,7 @@ COMPLIANCE_RAG_URL = "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streaml
 
 # Map each agent to its next-step apps
 AGENT_NEXT_STEPS = {
-    "advisor":       [{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}, {"label": "Networking Operator", "url": "https://github.com/aylineuyar-arch/ai-networking-operator-workflow"}],
+    "advisor":       [{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}, {"label": "Networking Operator", "url": "https://aylinos.onrender.com/networking"}],
     "interview_prep":[{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}],
     "research":      [{"label": "Compliance RAG Chatbot", "url": COMPLIANCE_RAG_URL}, {"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}],
     "cs_triage":     [{"label": "CS Triage Agent", "url": "https://github.com/aylineuyar-arch/ai-cs-triage"}],

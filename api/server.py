@@ -317,21 +317,9 @@ def cs_triage():
 
 @app.get("/networking", response_class=HTMLResponse)
 def networking():
-    return render_app_page(
-        title="Networking Operator",
-        icon="🤝",
-        color="#3b82f6",
-        desc="Research contacts, score fit, draft outreach, and track 130+ target companies via Airtable CRM.",
-        tech=["Claude", "Airtable", "Playwright", "BeautifulSoup"],
-        details=[
-            ("Target Companies", "130+ AI-first firms"),
-            ("CRM", "Airtable (auto-synced)"),
-            ("Outreach", "Claude-drafted, human-approved"),
-            ("Research", "Playwright scraping + Claude synthesis"),
-        ],
-        repo_note="Run via: <code>python3 finance-ai-role-outreach/main.py</code>",
-        back_url="/"
-    )
+    from api.networking_html import render_networking
+    contacts = db.get_companies_with_contacts()
+    return render_networking(contacts)
 
 
 @app.get("/outreach", response_class=HTMLResponse)
