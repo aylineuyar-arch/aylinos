@@ -108,8 +108,7 @@ nav a:hover{{color:var(--ink)}}
 .stats{{display:flex;gap:1px;border-bottom:1px solid var(--border);background:var(--border)}}
 .stat{{background:var(--surface);flex:1;padding:20px 24px;}}
 .topbar{{background:var(--surface);border-bottom:1px solid var(--border);}}
-.stat-val{{font-size:28px;font-weight:700;color:var(--ink);font-family:var(--mono)}}
-.stat-label{{font-size:11px;color:var(--ink-3);margin-top:4px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase}}
+
 .main{{max-width:860px;margin:0 auto;padding:28px 24px}}
 .section-header{{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}}
 .section-title{{font-size:11px;font-weight:500;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono)}}
@@ -119,14 +118,18 @@ nav a:hover{{color:var(--ink)}}
 .os-row{{border-color:rgba(129,140,248,.3);background:rgba(129,140,248,.04)}}
 .target-main{{flex:1;min-width:0}}
 .target-top{{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}}
-.company{{font-size:14px;font-weight:600;color:var(--ink)}}
+
 .badge{{font-size:10px;font-weight:500;padding:2px 8px;border-radius:20px;font-family:var(--mono)}}
 .os-tag{{font-size:10px;color:var(--accent);font-family:var(--mono)}}
 .contact-line{{display:flex;gap:8px;align-items:baseline;margin-bottom:6px}}
-.cname{{font-size:13px;font-weight:500;color:#818cf8}}
-.ctitle{{font-size:11px;color:var(--ink-3);font-family:var(--mono)}}
-.angle{{font-size:12px;color:var(--ink-2);line-height:1.6;margin-bottom:6px}}
-.strat{{font-size:10px;font-family:var(--mono);letter-spacing:.04em}}
+
+.angle{{font-size:12px;color:var(--ink-2);line-height:1.6;margin-bottom:6px;font-weight:500}}
+.strat{{font-size:10px;font-family:var(--mono);letter-spacing:.04em;font-weight:600}}
+.company{{font-size:14px;font-weight:700;color:var(--ink)}}
+.cname{{font-size:13px;font-weight:700;color:#6366f1}}
+.ctitle{{font-size:11px;color:var(--ink-3);font-family:var(--mono);font-weight:500}}
+.stat-val{{font-size:28px;font-weight:800;font-family:var(--mono)}}
+.stat-label{{font-size:11px;color:var(--ink-3);margin-top:4px;font-family:var(--mono);letter-spacing:.04em;text-transform:uppercase;font-weight:600}}
 .score-col{{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:40px}}
 .score{{font-size:22px;font-weight:700;font-family:var(--mono)}}
 .score-label{{font-size:9px;color:var(--ink-3);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}}
