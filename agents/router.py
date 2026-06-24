@@ -246,6 +246,10 @@ VERDICT:
     except Exception:
         pass
 
+    # Emit fit_score event so stream_query can trigger agentic chaining
+    if fit_score is not None:
+        yield _sse({"type": "fit_score", "score": fit_score})
+
     yield _sse({"type": "done"})
 
 
@@ -678,12 +682,41 @@ def stream_query(query: str):
     })
 
     try:
+        auto_chained = False
         for i, agent in enumerate(agents_selected):
             label = INTERNAL_TO_FRONTEND.get(agent, agent.replace("_", " ").title())
             # Divider between agents (not before the first)
             if i > 0:
                 yield _sse({"type": "section", "label": label, "color": color})
-            yield from _dispatch(agent, query, extract, client)
+
+            if agent == "advisor":
+                # Intercept advisor stream to capture fit_score for agentic chaining
+                fit_score_captured = None
+                for sse_str in _dispatch(agent, query, extract, client):
+                    if '"type": "fit_score"' in sse_str:
+                        try:
+                            data = json.loads(sse_str[6:].strip())
+                            fit_score_captured = data.get("score")
+                        except Exception:
+                            pass
+                    yield sse_str
+                # Auto-trigger interview_prep if score >= 75 and not already queued
+                if (
+                    fit_score_captured is not None
+                    and fit_score_captured >= 75
+                    and "interview_prep" not in agents_selected
+                    and not auto_chained
+                ):
+                    auto_chained = True
+                    yield _sse({
+                        "type": "section",
+                        "label": f"AUTO-TRIGGERED → Interview Prep  (fit {fit_score_captured}/100)",
+                        "color": color,
+                        "auto": True,
+                    })
+                    yield from _dispatch("interview_prep", query, extract, client)
+            else:
+                yield from _dispatch(agent, query, extract, client)
 
         # Emit pipeline steps + next-step cards for the cluster
         next_step_items = CLUSTER_NEXT_STEPS.get(cluster, [])
