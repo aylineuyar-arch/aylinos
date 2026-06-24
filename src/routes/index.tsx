@@ -8,6 +8,9 @@ import {
   Send,
   BarChart3,
   BookOpen,
+  TrendingUp,
+  Building2,
+  Scale,
 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
@@ -40,6 +43,65 @@ const APPS: App[] = [
 ];
 
 
+
+const OS_BASE = "https://aylinos.onrender.com";
+
+const AGENT_LINKS = [
+  {
+    name: "Job Scout",
+    desc: "286 roles ranked · 8am digest",
+    cta: "VIEW PIPELINE →",
+    url: `${OS_BASE}/job-search`,
+    gradient: "linear-gradient(155deg,#1e1b4b 0%,#4338ca 100%)",
+    accent: "#818cf8",
+    Icon: Briefcase,
+  },
+  {
+    name: "Outreach Engine",
+    desc: "130 targets · drafts held for approval",
+    cta: "REVIEW DRAFTS →",
+    url: `${OS_BASE}/networking`,
+    gradient: "linear-gradient(155deg,#2e1065 0%,#6d28d9 100%)",
+    accent: "#a78bfa",
+    Icon: Send,
+  },
+  {
+    name: "Company Intel",
+    desc: "3 parallel queries · Opus brief cached",
+    cta: "OPEN RESEARCH HUB →",
+    url: `${OS_BASE}/research`,
+    gradient: "linear-gradient(155deg,#500724 0%,#be185d 100%)",
+    accent: "#f472b6",
+    Icon: Building2,
+  },
+  {
+    name: "GTM Modeler",
+    desc: "8 industries · 3-step pricing wizard",
+    cta: "OPEN PRICING TOOL →",
+    url: `${OS_BASE}/gtm`,
+    gradient: "linear-gradient(155deg,#064e3b 0%,#047857 100%)",
+    accent: "#34d399",
+    Icon: TrendingUp,
+  },
+  {
+    name: "Policy Desk",
+    desc: "$0 embedding · cited answers",
+    cta: "OPEN POLICY DESK →",
+    url: "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streamlit.app",
+    gradient: "linear-gradient(155deg,#431407 0%,#c2410c 100%)",
+    accent: "#fb923c",
+    Icon: Scale,
+  },
+  {
+    name: "Inbox & Reservations",
+    desc: "<640ms triage · 8-node booking graph",
+    cta: "SEE LIVE AGENT →",
+    url: `${OS_BASE}/cs-triage`,
+    gradient: "linear-gradient(155deg,#14532d 0%,#15803d 100%)",
+    accent: "#4ade80",
+    Icon: Inbox,
+  },
+];
 
 const SUGGESTIONS = [
   { q: "should I apply to Ramp", agent: "Job Search", accent: "#6366f1" },
@@ -408,6 +470,29 @@ function Home() {
 
 
 
+        {/* Where to go next */}
+        <section id="next-zone">
+          <div className="next-header">
+            <span className="next-star">✦</span>
+            <span className="next-title">WHERE TO GO NEXT</span>
+            <span className="next-sub">Each agent's output is live — pick one to take over.</span>
+          </div>
+          <div className="next-grid">
+            {AGENT_LINKS.map((a) => (
+              <a className="next-card" key={a.name} href={a.url} target="_blank" rel="noopener noreferrer">
+                <div className="next-icon" style={{ background: a.gradient }}>
+                  <a.Icon size={20} strokeWidth={1.75} color="#fff" />
+                </div>
+                <div className="next-body">
+                  <div className="next-name">{a.name}</div>
+                  <div className="next-desc">{a.desc}</div>
+                  <div className="next-cta" style={{ color: a.accent }}>{a.cta}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+
         {/* Dock */}
         <div id="dock-row">
           <div id="dock-wrap">
@@ -503,7 +588,7 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
   position:absolute;inset:0;pointer-events:none;z-index:1;mix-blend-mode:multiply;opacity:.5;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
-#sb,#search-zone,#recent-zone,#pipeline-band,#telem,#dock-row{position:relative;z-index:2}
+#sb,#search-zone,#recent-zone,#pipeline-band,#next-zone,#telem,#dock-row{position:relative;z-index:2}
 
 
 /* Status bar */
@@ -799,6 +884,22 @@ html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--i
 }
 
 /* Dock */
+/* Where to go next */
+#next-zone{padding:10px 24px 4px;flex-shrink:0}
+.next-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.next-star{color:var(--ink-3);font-size:11px}
+.next-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.next-sub{font-size:11px;color:var(--ink-4);margin-left:4px}
+.next-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.next-card{display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;text-decoration:none;transition:border-color .15s,background .15s}
+.next-card:hover{background:var(--surface-2);border-color:var(--border-2)}
+.next-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.next-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.next-name{font-size:12px;font-weight:600;color:var(--ink-1);white-space:nowrap}
+.next-desc{font-size:10.5px;color:var(--ink-3)}
+.next-cta{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+@media(max-width:700px){.next-grid{grid-template-columns:1fr 1fr}}
+
 #dock-row{display:flex;justify-content:center;padding:6px 16px 8px;flex-shrink:0;overflow-x:auto}
 #dock-wrap{display:inline-flex;flex-direction:column;align-items:stretch;gap:6px}
 .dock-label{
