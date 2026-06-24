@@ -376,9 +376,9 @@ COMPLIANCE_RAG_URL = "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streaml
 # Cluster-scoped next-step cards — no cross-contamination between career/GTM/etc.
 CLUSTER_NEXT_STEPS = {
     "career": [
-        {"label": "Job Search",   "url": "https://aylinos.onrender.com/job-search"},
         {"label": "Networking",   "url": "https://aylinos.onrender.com/networking"},
         {"label": "Email Agent",  "url": EMAIL_AGENT_URL},
+        {"label": "Interview Prep", "url": "https://aylinos.onrender.com"},
     ],
     "gtm": [
         {"label": "GTM Modeler",  "url": GTM_TOOL_URL},
