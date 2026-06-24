@@ -465,7 +465,8 @@ def evals_dashboard():
     from evals.run import get_latest_eval_results
     eval_data = get_latest_eval_results()
     api_metrics = db.get_api_call_metrics()
-    return render_evals(eval_data, api_metrics)
+    traces = db.get_traces(20)
+    return render_evals(eval_data, api_metrics, traces)
 
 
 @app.post("/api/evals/run")

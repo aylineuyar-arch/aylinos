@@ -34,33 +34,78 @@ Targeting: AI Strategist, Chief of Staff, Strategy & Ops, GTM Strategy at AI-nat
 Locations: NYC (primary), London (needs UK visa), open to SF.
 """
 
-ROUTER_PROMPT = """You are the AylinOS query router. Classify the user's query into one agent.
+ROUTER_PROMPT = """You are the AylinOS query router. Select ALL relevant agents for this query (1-3 max).
 
 AGENTS:
-- advisor: questions about whether to apply to a company, company fit, job strategy, "should I apply to X", "is X a good fit", "where should I network"
-- interview_prep: preparing for a specific interview, "prep me for X interview", "what to know before interviewing at X", "STAR stories for X"
-- research: general company research without a specific job angle, "tell me about X", "research X", "what does X do"
-- cs_triage: classifying or triaging a support ticket or customer complaint
-- restaurant: booking or finding a restaurant, food, dinner reservations
-- job_search: questions about Aylin's own job pipeline, application stats, "how many applications", "show my pipeline"
-- gtm_tool: GTM strategy, pricing models, revenue forecasting, ARR, NRR, LTV, CAC, go-to-market
-- email_agent: AI email pipeline, job search emails, daily digest, ATS scraping, email automation
-- compliance_rag: compliance questions, financial regulations, policy documents, RAG chatbot
-- general: anything else — answer directly
+- advisor: "should I apply to X", "is X a good fit", career fit, job strategy
+- interview_prep: "prep me for X interview", "STAR stories for X", interview coaching
+- job_search: Aylin's pipeline stats, "how many applications", "show my pipeline"
+- research: general company research, "tell me about X", "what does X do"
+- gtm_tool: GTM strategy, pricing models, ARR, NRR, LTV, CAC, go-to-market, revenue forecasting
+- email_agent: AI email pipeline, job search emails, ATS scraping, email automation
+- cs_triage: support ticket classification, customer complaint triage
+- restaurant: booking or finding restaurants, food, dinner reservations
+- compliance_rag: compliance questions, financial regulations, policy documents
+- general: anything else
+
+ROUTING RULES:
+- Career query (applying to a company): advisor + interview_prep are often both relevant
+- Job pipeline query: job_search only
+- GTM/pricing query: gtm_tool + research are often both relevant
+- Pricing and job search are UNRELATED — never combine them
+- interview_prep is career-only, never with gtm_tool or compliance_rag
+- Pick only agents that genuinely add value — minimum 1, maximum 3
 
 USER QUERY: {query}
 
 Respond with ONLY valid JSON, no markdown:
-{{"agent": "advisor", "reason": "one short phrase", "extract": "the key entity or topic"}}
+{{"agents": ["advisor", "interview_prep"], "reason": "career fit + interview coaching", "extract": "Decagon"}}
 
-extract = the company name for advisor/interview_prep/research, the ticket text for cs_triage, location/details for restaurant, empty string for others."""
+extract = company name for career queries, topic for GTM queries, empty string for pipeline queries."""
+
+
+# Map agent internal name → display label for frontend
+INTERNAL_TO_FRONTEND = {
+    "advisor":        "Career Advisor",
+    "interview_prep": "Interview Prep",
+    "job_search":     "Job Search",
+    "research":       "Research",
+    "gtm_tool":       "GTM Modeler",
+    "email_agent":    "Email Agent",
+    "cs_triage":      "CS Triage",
+    "restaurant":     "Fork Yeah!",
+    "compliance_rag": "Policy Desk",
+    "general":        "AylinOS",
+}
+
+# Cluster grouping — controls colors and next-step cards scoping
+AGENT_CLUSTER = {
+    "advisor":        "career",
+    "interview_prep": "career",
+    "job_search":     "career",
+    "email_agent":    "career",
+    "gtm_tool":       "gtm",
+    "research":       "gtm",
+    "cs_triage":      "support",
+    "restaurant":     "support",
+    "compliance_rag": "compliance",
+    "general":        "general",
+}
+
+CLUSTER_COLOR = {
+    "career":     "#818cf8",   # indigo
+    "gtm":        "#34d399",   # emerald
+    "support":    "#4ade80",   # green
+    "compliance": "#fb923c",   # orange
+    "general":    "#94a3b8",   # slate
+}
 
 
 def classify_query(query: str, client: anthropic.Anthropic) -> dict:
-    """Use Claude Haiku to classify intent. Fast + cheap."""
+    """Use Claude Haiku to pick ALL relevant agents. Fast + cheap."""
     resp = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=120,
+        max_tokens=150,
         messages=[{"role": "user", "content": ROUTER_PROMPT.format(query=query)}]
     )
     raw = resp.content[0].text.strip()
@@ -68,7 +113,61 @@ def classify_query(query: str, client: anthropic.Anthropic) -> dict:
         raw = raw.split("```")[1]
         if raw.startswith("json"):
             raw = raw[4:]
-    return json.loads(raw.strip())
+    result = json.loads(raw.strip())
+    # Backward compat: if Haiku returns single "agent", wrap it
+    if "agent" in result and "agents" not in result:
+        result["agents"] = [result["agent"]]
+    if "agents" not in result:
+        result["agents"] = ["general"]
+    return result
+
+
+def _build_pipeline_steps(agents: list, extract: str, query: str) -> list:
+    """Generate tailored pipeline steps based on the agents selected."""
+    entity = extract or "target"
+    primary = agents[0] if agents else "general"
+
+    if primary in ("advisor", "interview_prep"):
+        steps = [
+            f"Pulling live intel on {entity}",
+            "Scoring fit against Aylin's profile",
+            "Generating career strategy brief",
+        ]
+        if "interview_prep" in agents:
+            steps.append("Building STAR stories + likely questions")
+    elif primary == "job_search":
+        steps = [
+            "Querying job pipeline DB",
+            "Computing conversion metrics",
+            "Generating funnel summary",
+        ]
+    elif primary in ("gtm_tool", "research"):
+        steps = [
+            f"Researching {entity or 'market'}",
+            "Modeling pricing / GTM levers",
+            "Benchmarking against comparables",
+        ]
+        if "research" in agents:
+            steps.append("Pulling live company intel")
+    elif primary == "email_agent":
+        steps = [
+            "Scanning ATS for new postings",
+            "Drafting personalized outreach",
+            "Queuing for review",
+        ]
+    elif primary == "compliance_rag":
+        steps = [
+            f"Searching policy corpus for {entity or 'query'}",
+            "Retrieving relevant clauses",
+            "Synthesizing compliance brief",
+        ]
+    else:
+        steps = [
+            "Classifying intent",
+            "Routing to best agent",
+            "Generating response",
+        ]
+    return steps
 
 
 def _sse(data: dict) -> str:
@@ -269,18 +368,25 @@ GTM_TOOL_URL = "https://web-production-b4e0ad.up.railway.app"
 EMAIL_AGENT_URL = "https://muse-agent-transfer.lovable.app"
 COMPLIANCE_RAG_URL = "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streamlit.app"
 
-# Map each agent to its next-step apps
-AGENT_NEXT_STEPS = {
-    "advisor":       [{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}, {"label": "Networking Operator", "url": "https://aylinos.onrender.com/networking"}],
-    "interview_prep":[{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}],
-    "research":      [{"label": "Compliance RAG Chatbot", "url": COMPLIANCE_RAG_URL}, {"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}],
-    "cs_triage":     [{"label": "CS Triage Agent", "url": "https://github.com/aylineuyar-arch/ai-cs-triage"}],
-    "restaurant":    [{"label": "Fork Yeah! Live Booking", "url": "https://github.com/aylineuyar-arch/restaurant-agent"}],
-    "job_search":    [{"label": "Job Search Dashboard", "url": "https://aylinos.onrender.com/job-search"}, {"label": "Agentic Email Generator", "url": EMAIL_AGENT_URL}],
-    "gtm_tool":      [{"label": "GTM Pricing Tool", "url": GTM_TOOL_URL}],
-    "email_agent":   [{"label": "Agentic Email Generator", "url": EMAIL_AGENT_URL}],
-    "compliance_rag":[{"label": "Compliance RAG Chatbot", "url": COMPLIANCE_RAG_URL}],
-    "general":       [],
+# Cluster-scoped next-step cards — no cross-contamination between career/GTM/etc.
+CLUSTER_NEXT_STEPS = {
+    "career": [
+        {"label": "Job Search",   "url": "https://aylinos.onrender.com/job-search"},
+        {"label": "Networking",   "url": "https://aylinos.onrender.com/networking"},
+        {"label": "Email Agent",  "url": EMAIL_AGENT_URL},
+    ],
+    "gtm": [
+        {"label": "GTM Modeler",  "url": GTM_TOOL_URL},
+        {"label": "Research",     "url": "https://aylinos.onrender.com"},
+    ],
+    "support": [
+        {"label": "CS Triage",    "url": "https://github.com/aylineuyar-arch/ai-cs-triage"},
+        {"label": "Fork Yeah!",   "url": "https://github.com/aylineuyar-arch/restaurant-agent"},
+    ],
+    "compliance": [
+        {"label": "Policy Desk",  "url": COMPLIANCE_RAG_URL},
+    ],
+    "general": [],
 }
 
 def stream_restaurant(query: str, client: anthropic.Anthropic):
@@ -516,16 +622,48 @@ USER: {query}"""
     yield _sse({"type": "done"})
 
 
+# ── Per-agent dispatcher ───────────────────────────────────────────────────────
+
+def _dispatch(agent: str, query: str, extract: str, client: anthropic.Anthropic):
+    """Dispatch to the correct streaming handler for a single agent."""
+    if agent == "advisor":
+        yield from stream_advisor(query, extract or query, client)
+    elif agent == "interview_prep":
+        yield from stream_interview_prep(query, extract or query, client)
+    elif agent == "research":
+        yield from stream_research(query, extract or query, client)
+    elif agent == "cs_triage":
+        yield from stream_cs_triage(query, extract, client)
+    elif agent == "restaurant":
+        yield from stream_restaurant(query, client)
+    elif agent == "job_search":
+        yield from stream_job_search(query, client)
+    elif agent == "gtm_tool":
+        yield from stream_gtm_tool(query, client)
+    elif agent == "email_agent":
+        yield from stream_email_agent(query, client)
+    elif agent == "compliance_rag":
+        yield from stream_compliance_rag(query, client)
+    else:
+        yield from stream_general(query, client)
+
+
 # ── Main entry point ───────────────────────────────────────────────────────────
 
 def stream_query(query: str):
     """
     Generator that yields SSE strings.
-    1. Classifies query with Haiku (fast)
+    1. Haiku classifies query and selects ALL relevant agents (1-3)
     2. Yields route event so frontend can update UI immediately
-    3. Streams the right agent's response
+    3. Fans out to each agent, with section dividers between outputs
+    4. Emits pipeline_steps (tailored checklist) + next_steps cards
     """
     client = anthropic.Anthropic()
+    t_start = time.time()
+    agents_selected = ["general"]
+    cluster = "general"
+    reason = ""
+    extract = ""
 
     try:
         route = classify_query(query, client)
@@ -533,42 +671,50 @@ def stream_query(query: str):
         yield _sse({"type": "error", "message": f"Routing failed: {e}"})
         return
 
-    agent = route.get("agent", "general")
+    agents_selected = route.get("agents", ["general"])
     reason = route.get("reason", "")
     extract = route.get("extract", "")
 
-    # Tell the frontend which agent activated and why
-    yield _sse({"type": "route", "agent": agent, "reason": reason, "extract": extract})
+    # Determine cluster from primary agent
+    primary = agents_selected[0] if agents_selected else "general"
+    cluster = AGENT_CLUSTER.get(primary, "general")
+    color = CLUSTER_COLOR.get(cluster, "#94a3b8")
+    pipeline_steps = _build_pipeline_steps(agents_selected, extract, query)
+
+    # Tell the frontend the full routing decision
+    yield _sse({
+        "type": "route",
+        "agent": primary,
+        "agents": agents_selected,
+        "reason": reason,
+        "extract": extract,
+        "cluster": cluster,
+    })
 
     try:
-        if agent == "advisor":
-            company = extract or query
-            yield from stream_advisor(query, company, client)
-        elif agent == "interview_prep":
-            company = extract or query
-            yield from stream_interview_prep(query, company, client)
-        elif agent == "research":
-            company = extract or query
-            yield from stream_research(query, company, client)
-        elif agent == "cs_triage":
-            yield from stream_cs_triage(query, extract, client)
-        elif agent == "restaurant":
-            yield from stream_restaurant(query, client)
-        elif agent == "job_search":
-            yield from stream_job_search(query, client)
-        elif agent == "gtm_tool":
-            yield from stream_gtm_tool(query, client)
-        elif agent == "email_agent":
-            yield from stream_email_agent(query, client)
-        elif agent == "compliance_rag":
-            yield from stream_compliance_rag(query, client)
-        else:
-            yield from stream_general(query, client)
+        for i, agent in enumerate(agents_selected):
+            label = INTERNAL_TO_FRONTEND.get(agent, agent.replace("_", " ").title())
+            # Divider between agents (not before the first)
+            if i > 0:
+                yield _sse({"type": "section", "label": label, "color": color})
+            yield from _dispatch(agent, query, extract, client)
 
-        # Emit next steps so the frontend can render clickable app cards
-        steps = AGENT_NEXT_STEPS.get(agent, [])
-        if steps:
-            yield _sse({"type": "next_steps", "steps": steps})
+        # Emit pipeline steps + next-step cards for the cluster
+        next_step_items = CLUSTER_NEXT_STEPS.get(cluster, [])
+        yield _sse({
+            "type": "next_steps",
+            "pipeline_steps": pipeline_steps,
+            "items": next_step_items,
+            "color": color,
+        })
 
     except Exception as e:
         yield _sse({"type": "error", "message": str(e)})
+    finally:
+        # Minimal observability — never breaks the stream
+        try:
+            latency_ms = int((time.time() - t_start) * 1000)
+            import db
+            db.save_trace(query, agents_selected, cluster, reason, extract, latency_ms)
+        except Exception:
+            pass

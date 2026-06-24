@@ -92,6 +92,17 @@ def init_db():
                 latency_ms   INTEGER DEFAULT 0,
                 called_at    TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS query_traces (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                query      TEXT NOT NULL,
+                agents     TEXT NOT NULL,
+                cluster    TEXT NOT NULL,
+                reason     TEXT,
+                extract    TEXT,
+                latency_ms INTEGER DEFAULT 0,
+                traced_at  TEXT NOT NULL
+            );
         """)
 
 
@@ -387,6 +398,25 @@ def get_companies_with_contacts() -> list:
             WHERE contact_name IS NOT NULL AND contact_name != ''
             ORDER BY fit_score DESC, researched_at DESC
         """).fetchall()
+        return [dict(r) for r in rows]
+
+
+def save_trace(query: str, agents: list, cluster: str, reason: str, extract: str, latency_ms: int) -> None:
+    """Log a query trace for observability. Called in finally block — must not raise."""
+    now = datetime.utcnow().isoformat()
+    with get_conn() as conn:
+        conn.execute("""
+            INSERT INTO query_traces (query, agents, cluster, reason, extract, latency_ms, traced_at)
+            VALUES (?,?,?,?,?,?,?)
+        """, (query, json.dumps(agents), cluster, reason, extract, latency_ms, now))
+
+
+def get_traces(limit: int = 20) -> list:
+    """Return recent query traces for the evals dashboard."""
+    with get_conn() as conn:
+        rows = conn.execute("""
+            SELECT * FROM query_traces ORDER BY id DESC LIMIT ?
+        """, (limit,)).fetchall()
         return [dict(r) for r in rows]
 
 

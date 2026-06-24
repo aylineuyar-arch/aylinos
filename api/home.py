@@ -825,28 +825,37 @@ tick(); setInterval(tick, 1000);
 const AGENT_COLORS = {{
   advisor:        '{LLM}',
   interview_prep: '{LLM}',
-  research:       '{GATE}',
-  cs_triage:      '{MEM}',
-  restaurant:     '{MEM}',
   job_search:     '{LLM}',
+  email_agent:    '{NOTIFY}',
+  research:       '{GATE}',
+  gtm_tool:       '{MEM}',
+  cs_triage:      '{MEM}',
+  restaurant:     '{ACTION}',
+  compliance_rag: '{ACTION}',
   general:        '{SEARCH}',
 }};
 const AGENT_LABELS = {{
   advisor:        'Career Advisor',
   interview_prep: 'Interview Prep',
+  job_search:     'Job Search',
+  email_agent:    'Email Agent',
   research:       'Research',
+  gtm_tool:       'GTM Modeler',
   cs_triage:      'CS Triage',
   restaurant:     'Fork Yeah!',
-  job_search:     'Job Search',
+  compliance_rag: 'Policy Desk',
   general:        'AylinOS',
 }};
 const AGENT_ICONS = {{
   advisor:        'icon-advisor',
   interview_prep: 'icon-jobs',
+  job_search:     'icon-jobs',
   research:       'icon-research',
+  gtm_tool:       'icon-gtm',
   cs_triage:      'icon-cs-triage',
   restaurant:     'icon-restaurant',
-  job_search:     'icon-jobs',
+  email_agent:    null,
+  compliance_rag: null,
   general:        null,
 }};
 
@@ -952,6 +961,39 @@ async function runQuery() {{
 
         else if (data.type === 'token') {{
           renderToken(data.text);
+        }}
+
+        else if (data.type === 'section') {{
+          // Agent divider between multi-agent outputs
+          const color = data.color || '{LLM}';
+          const divider = document.createElement('div');
+          divider.style.cssText = 'display:flex;align-items:center;gap:10px;margin:16px 0 10px';
+          divider.innerHTML = `<span style="flex:1;height:1px;background:${{color}}33"></span><span style="font-family:var(--mono);font-size:9px;color:${{color}};letter-spacing:0.1em;text-transform:uppercase">${{data.label}}</span><span style="flex:1;height:1px;background:${{color}}33"></span>`;
+          outputBody.appendChild(divider);
+          outputBody._buf = '';
+          highlightIcon(data.agent);
+        }}
+
+        else if (data.type === 'next_steps') {{
+          // Pipeline steps checklist + WHERE TO GO NEXT cards
+          const color = data.color || '{LLM}';
+          const steps = data.pipeline_steps || [];
+          const items = data.items || [];
+          if (steps.length || items.length) {{
+            const ns = document.createElement('div');
+            ns.style.cssText = 'margin-top:24px;border-top:1px solid rgba(255,255,255,0.07);padding-top:18px';
+            let html = '';
+            if (steps.length) {{
+              html += `<div style="font-family:var(--mono);font-size:9px;color:${{color}};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">What happened</div>`;
+              html += steps.map(s => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:12px;color:var(--text-dim)"><span style="color:${{color}}">✓</span> ${{s}}</div>`).join('');
+            }}
+            if (items.length) {{
+              html += `<div style="font-family:var(--mono);font-size:9px;color:${{color}};text-transform:uppercase;letter-spacing:0.1em;margin:14px 0 10px">Where to go next</div>`;
+              html += `<div style="display:flex;gap:8px;flex-wrap:wrap">` + items.map(it => `<a href="${{it.url}}" target="_blank" style="display:inline-block;padding:6px 12px;border-radius:6px;font-size:11px;font-family:var(--mono);border:1px solid ${{color}}44;color:${{color}};text-decoration:none;background:${{color}}11">${{it.label}}</a>`).join('') + `</div>`;
+            }}
+            ns.innerHTML = html;
+            outputBody.appendChild(ns);
+          }}
         }}
 
         else if (data.type === 'done') {{

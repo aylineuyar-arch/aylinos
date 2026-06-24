@@ -8,9 +8,33 @@ Demonstrates: real eval methodology, precision/recall, cost tracking.
 from api.dashboard_html import SHARED_STYLES
 
 
-def render_evals(eval_data: dict, api_metrics: dict) -> str:
+def _traces_rows(traces: list) -> str:
+    if not traces:
+        return '<div style="color:var(--muted);font-size:12px;padding:16px 0">No traces yet — queries will appear here after Render deploys.</div>'
+    cluster_colors = {"career": "#818cf8", "gtm": "#34d399", "support": "#4ade80", "compliance": "#fb923c", "general": "#94a3b8"}
+    rows = []
+    for t in traces:
+        import json as _json
+        agents_list = _json.loads(t.get("agents", "[]")) if isinstance(t.get("agents"), str) else t.get("agents", [])
+        agents_str = " · ".join(agents_list)
+        color = cluster_colors.get(t.get("cluster", "general"), "#94a3b8")
+        ts = (t.get("traced_at") or "")[:16].replace("T", " ")
+        q = (t.get("query") or "")[:60]
+        latency = t.get("latency_ms", 0)
+        rows.append(
+            f'<div style="display:flex;gap:16px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px">'
+            f'<span style="color:var(--muted);font-family:\'JetBrains Mono\',monospace;white-space:nowrap;min-width:120px">{ts}</span>'
+            f'<span style="flex:1;color:var(--text)">{q}</span>'
+            f'<span style="color:{color};font-family:\'JetBrains Mono\',monospace;white-space:nowrap">{agents_str}</span>'
+            f'<span style="color:var(--muted);font-family:\'JetBrains Mono\',monospace;white-space:nowrap">{latency}ms</span>'
+            f'</div>'
+        )
+    return "".join(rows)
+
+
+def render_evals(eval_data: dict, api_metrics: dict, traces=None) -> str:
     if not eval_data:
-        return _render_no_data(api_metrics)
+        return _render_no_data(api_metrics, traces)
 
     v1 = eval_data.get("v1", {})
     v2 = eval_data.get("v2", {})
@@ -290,11 +314,21 @@ def render_evals(eval_data: dict, api_metrics: dict) -> str:
     </div>
   </div>
 
+  <!-- Live Traces -->
+  <div style="margin-top:40px;font-family:'JetBrains Mono',monospace;font-size:10px;
+              color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px">
+    Live Traces
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px">
+    {traces_html}
+  </div>
+
 </div>
 </body>
 </html>""".format(
         len_cases=len(v2.get("results", [])) or 25,
         run_at=(v2 or v1 or {}).get("run_at", "not yet run")[:16].replace("T", " "),
+        traces_html=_traces_rows(traces or []),
     )
 
 
@@ -435,7 +469,7 @@ def _change_card(title: str, before: str, after: str) -> str:
     </div>"""
 
 
-def _render_no_data(api_metrics: dict) -> str:
+def _render_no_data(api_metrics: dict, traces=None) -> str:
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -488,6 +522,15 @@ def _render_no_data(api_metrics: dict) -> str:
       <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600">{api_metrics.get('avg_latency_ms',0)}ms</div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px">avg latency</div>
     </div>
+  </div>
+
+  <!-- Live Traces -->
+  <div style="margin-top:40px;font-family:'JetBrains Mono',monospace;font-size:10px;
+              color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:16px">
+    Live Traces
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px 20px">
+    {_traces_rows(traces or [])}
   </div>
 </div>
 </body>
