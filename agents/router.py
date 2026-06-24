@@ -49,12 +49,13 @@ AGENTS:
 - general: anything else
 
 ROUTING RULES:
-- Career query (applying to a company): advisor + interview_prep are often both relevant
+- Career query (applying to a specific company): advisor + interview_prep are often both relevant
 - Job pipeline query: job_search only
-- GTM/pricing query: gtm_tool + research are often both relevant
+- GTM/pricing query: gtm_tool only — do NOT add research or advisor
+- Compliance query: compliance_rag only
 - Pricing and job search are UNRELATED — never combine them
 - interview_prep is career-only, never with gtm_tool or compliance_rag
-- Pick only agents that genuinely add value — minimum 1, maximum 3
+- Pick only agents that genuinely add value — minimum 1, maximum 2
 
 USER QUERY: {query}
 
@@ -512,23 +513,20 @@ then give 2-3 sentences of insight or recommendation. Use sections if helpful.""
 
 def stream_gtm_tool(query: str, client: anthropic.Anthropic):
     """Stream GTM / pricing intelligence, with link to live tool."""
-    prompt = f"""You are AylinOS GTM Intelligence, connected to a live GTM Pricing Tool.
+    prompt = f"""You are AylinOS GTM Intelligence, a pricing and go-to-market expert.
 
 USER QUERY: {query}
 
-Respond with these sections:
-
-ROUTING TO:
-[GTM Pricing Tool — {GTM_TOOL_URL}]
+Respond with these sections ONLY — no extras, no preamble:
 
 QUICK ANSWER:
 [2-3 sentences directly answering the question using GTM/pricing expertise]
 
 KEY METRICS TO MODEL:
-[3-4 bullet points of the most relevant metrics for this question: ARR, NRR, LTV:CAC, payback period, etc.]
+[3-4 bullet points of the most relevant metrics: ARR, NRR, LTV:CAC, payback period, etc.]
 
-TRY IT LIVE:
-[Direct the user to open {GTM_TOOL_URL} to model this scenario interactively with real inputs and revenue forecasts]"""
+HIGHLIGHT:
+[The single most important insight or risk for this pricing decision]"""
 
     with client.messages.stream(
         model="claude-haiku-4-5-20251001",
@@ -542,23 +540,17 @@ TRY IT LIVE:
 
 def stream_email_agent(query: str, client: anthropic.Anthropic):
     """Stream email agent intelligence, with link to live agent."""
-    prompt = f"""You are AylinOS Email Intelligence, connected to a live Agentic Email Generator.
+    prompt = f"""You are AylinOS Email Intelligence, an AI job search automation expert.
 
 USER QUERY: {query}
 
-Respond with these sections:
-
-ROUTING TO:
-[Agentic Email Generator — {EMAIL_AGENT_URL}]
+Respond with these sections ONLY — no extras, no preamble:
 
 WHAT THE AGENT DOES:
 [2-3 sentences: scrapes 130+ ATS feeds daily, scores fit + conversion likelihood with Claude, emails a ranked digest at 8am ET]
 
 FOR YOUR QUERY:
-[Direct answer to what they asked about AI email pipelines or job search automation]
-
-TRY IT LIVE:
-[Direct the user to {EMAIL_AGENT_URL} to see the live agent in action]"""
+[Direct answer to what they asked about AI email pipelines or job search automation]"""
 
     with client.messages.stream(
         model="claude-haiku-4-5-20251001",
@@ -572,23 +564,17 @@ TRY IT LIVE:
 
 def stream_compliance_rag(query: str, client: anthropic.Anthropic):
     """Stream compliance RAG response, with link to live chatbot."""
-    prompt = f"""You are AylinOS Compliance Intelligence, connected to a live Compliance RAG Chatbot.
+    prompt = f"""You are AylinOS Compliance Intelligence, a financial regulations and policy expert.
 
 USER QUERY: {query}
 
-Respond with these sections:
-
-ROUTING TO:
-[Compliance RAG Chatbot — {COMPLIANCE_RAG_URL}]
+Respond with these sections ONLY — no extras, no preamble:
 
 QUICK ANSWER:
 [2-3 sentences on the compliance/regulatory topic, drawing on financial services knowledge]
 
 HOW THE RAG WORKS:
-[One sentence: policy documents ingested into vector store, Claude answers grounded in source docs with citations]
-
-TRY IT LIVE:
-[Direct the user to {COMPLIANCE_RAG_URL} for full policy Q&A with source citations]"""
+[One sentence: policy documents ingested into vector store, Claude answers grounded in source docs with citations]"""
 
     with client.messages.stream(
         model="claude-haiku-4-5-20251001",
