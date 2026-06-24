@@ -723,6 +723,7 @@ def stream_query(query: str):
         yield _sse({
             "type": "next_steps",
             "pipeline_steps": pipeline_steps,
+            "steps": pipeline_steps,        # alias: aylinos-app bundle reads t.steps
             "items": next_step_items,
             "color": color,
         })
