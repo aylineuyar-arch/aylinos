@@ -2,7 +2,7 @@ services:
   - type: web
     name: aylinos
     runtime: python
-    buildCommand: pip install --no-cache-dir -r requirements.txt
+    buildCommand: /opt/render/project/src/.venv/bin/pip install --no-cache-dir -r requirements.txt
     startCommand: gunicorn api.server:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT --workers 1 --timeout 120
     envVars:
       - key: ANTHROPIC_API_KEY
