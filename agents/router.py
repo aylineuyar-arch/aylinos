@@ -199,6 +199,7 @@ CONTACT RESEARCH: {contact_intel[:600] if contact_intel else "Use your knowledge
 USER QUERY: {query}
 
 Be extremely concise. Each section is 1-2 lines max — digestible, scannable. No paragraphs.
+Output each section header EXACTLY ONCE in this order: FIT SCORE, STRATEGY, AI ANGLE, ROLE FIT, OUTREACH, VERDICT. Never repeat a section.
 
 FIT SCORE:
 [number 0-100 only]
