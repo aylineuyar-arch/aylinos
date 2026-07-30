@@ -543,23 +543,49 @@ HIGHLIGHT:
     yield _sse({"type": "done"})
 
 
-def stream_email_agent(query: str, client: anthropic.Anthropic):
-    """Stream email agent intelligence, with link to live agent."""
-    prompt = f"""You are AylinOS Email Intelligence, an AI job search automation expert.
+def stream_email_agent(query: str, client: anthropic.Anthropic, extract: str = ""):
+    """Draft a personalized outreach email when a company is identified; otherwise describe the pipeline."""
+    company = extract.strip() if extract else ""
+
+    if company:
+        prompt = f"""You are AylinOS Email Intelligence. Draft a concise, personalized outreach email for a job application.
+
+COMPANY: {company}
+CONTEXT: {query}
+SENDER: Aylin Uyar — Tuck MBA 2026, AI deployment strategist, background in engineering and consulting. Built production AI systems including a multi-agent job search scoring pipeline and outreach automation.
+
+Draft the email in this exact format:
+
+OUTREACH DRAFT — {company}:
+Subject: [one line subject]
+
+[3–4 sentence email body. Warm, specific to the company, leads with a relevant insight or shared angle, ends with a low-friction CTA. No fluff.]
+
+ROUTING DECISION:
+[One sentence: why this register — cold intro / warm referral / recruiter tone / founder tone — was chosen based on context.]
+
+NEXT STEP:
+[One sentence: what happens after this draft is approved — queued for review, not auto-sent.]"""
+        model = "claude-sonnet-4-6"
+        max_tokens = 400
+    else:
+        prompt = f"""You are AylinOS Email Intelligence, an AI job search automation expert.
 
 USER QUERY: {query}
 
 Respond with these sections ONLY — no extras, no preamble:
 
 WHAT THE AGENT DOES:
-[2-3 sentences: scrapes 130+ ATS feeds daily, scores fit + conversion likelihood with Claude, emails a ranked digest at 8am ET]
+[2-3 sentences: pulls from 130+ ATS sources daily, scores fit + conversion likelihood with Claude, routes to the right outreach register based on relationship context]
 
 FOR YOUR QUERY:
 [Direct answer to what they asked about AI email pipelines or job search automation]"""
+        model = "claude-haiku-4-5-20251001"
+        max_tokens = 300
 
     with client.messages.stream(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=300,
+        model=model,
+        max_tokens=max_tokens,
         messages=[{"role": "user", "content": prompt}]
     ) as stream:
         for text in stream.text_stream:
@@ -632,7 +658,7 @@ def _dispatch(agent: str, query: str, extract: str, client: anthropic.Anthropic)
     elif agent == "gtm_tool":
         yield from stream_gtm_tool(query, client)
     elif agent == "email_agent":
-        yield from stream_email_agent(query, client)
+        yield from stream_email_agent(query, client, extract)
     elif agent == "compliance_rag":
         yield from stream_compliance_rag(query, client)
     else:
