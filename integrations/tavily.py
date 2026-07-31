@@ -81,22 +81,20 @@ def research_company(company: str) -> str:
 
 def find_hiring_manager(company: str, role: str) -> str:
     """
-    Search for IC-level peer contacts at a company — NOT VPs, heads, or C-suite.
-    Targets Engagement Managers, Solutions Consultants, Strategy & Ops, Deployment Specialists.
-    Returns structured text for Claude to parse into a named outreach target.
+    Search LinkedIn (via Tavily) for real named contacts at a company.
+    Targets the hiring manager for the role AND IC-level peers.
+    Returns structured text for Claude to identify the best outreach target.
     """
     queries = [
-        f"{company} Engagement Manager OR Solutions Consultant OR Strategy Operations OR Deployment Specialist site:linkedin.com",
-        f"{company} team member strategy operations deployment AI 2025 2026",
-        f'"{company}" "Engagement Manager" OR "Solutions Consultant" OR "Strategy" OR "Deployment"',
+        f"{company} VP Product OR Head of GTM OR Chief of Staff OR Head of Strategy OR Head of Customer Success site:linkedin.com",
+        f"{company} Engagement Manager OR Solutions Consultant OR Deployment Specialist OR Strategy Operations site:linkedin.com",
+        f"{company} leadership team product strategy operations 2025 2026",
     ]
 
     all_results = []
     for q in queries:
         results = search(q, max_results=3, search_depth="basic")
         all_results.extend(results)
-        if all_results:
-            break  # stop after first query that returns results
 
     if not all_results:
         return ""
