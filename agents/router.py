@@ -582,7 +582,7 @@ NEXT STEP:
 Draft queued for review. Human approves before send."""
 
         model = "claude-sonnet-4-6"
-        max_tokens = 700
+        max_tokens = 1200
     else:
         prompt = f"""You are AylinOS Email Intelligence, an AI job search automation expert.
 
