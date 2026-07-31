@@ -242,9 +242,10 @@ If no roles visible in live intel, write: No open roles found — check {company
     # Parse and save structured contact + fit data for job dashboard
     try:
         import re, db as _db
-        score_m = re.search(r'FIT SCORE:\s*(\d+)', full_text)
-        strat_m = re.search(r'STRATEGY:\s*(.+)', full_text)
-        out_m   = re.search(r'OUTREACH:\s*(.+?)(?:\n|$)', full_text)
+        clean = full_text.replace("**", "")
+        score_m = re.search(r'FIT SCORE:\s*(\d+)', clean)
+        strat_m = re.search(r'STRATEGY:\s*(.+)', clean)
+        out_m   = re.search(r'OUTREACH:\*?\*?\s*\n?(.+?)(?:\n|$)', clean)
         fit_score = int(score_m.group(1)) if score_m else None
         strategy  = strat_m.group(1).strip() if strat_m else ""
         outreach  = out_m.group(1).strip() if out_m else ""

@@ -114,33 +114,70 @@ def find_hiring_manager(company: str, role: str) -> str:
 
 def find_open_roles(company: str) -> str:
     """
-    Search for live open roles at a specific company.
-    Returns formatted text of role titles and links for Claude to score.
+    Fetch live open roles at a company. Tries direct ATS APIs first
+    (Greenhouse, Lever, Ashby), then falls back to Tavily search.
+    Returns formatted role list for Claude to score.
     """
-    queries = [
-        f"{company} careers open roles jobs 2026 site:{company.lower().replace(' ','')}.com",
-        f"{company} hiring jobs strategy operations AI deployment 2026",
-        f'"{company}" jobs open positions strategy GTM operations AI',
-    ]
+    import re as _re
+    import requests as _req
 
-    all_results = []
-    for q in queries:
-        results = search(q, max_results=4, search_depth="basic")
-        all_results.extend(results)
-        if len(all_results) >= 4:
-            break
+    slug = company.lower().replace(" ", "-").replace(".", "")
+    roles = []
 
-    if not all_results:
-        return ""
+    # Try Greenhouse
+    try:
+        r = _req.get(f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs", timeout=8)
+        for item in r.json().get("jobs", []):
+            roles.append({"title": item.get("title",""), "url": item.get("absolute_url",""), "location": item.get("location",{}).get("name","")})
+    except Exception:
+        pass
+
+    # Try Lever
+    if not roles:
+        try:
+            r = _req.get(f"https://api.lever.co/v0/postings/{slug}?mode=json", timeout=8)
+            for item in r.json() if isinstance(r.json(), list) else []:
+                roles.append({"title": item.get("text",""), "url": item.get("hostedUrl",""), "location": item.get("categories",{}).get("location","")})
+        except Exception:
+            pass
+
+    # Try Ashby
+    if not roles:
+        try:
+            r = _req.get(f"https://api.ashbyhq.com/posting-api/job-board/{slug}", timeout=8)
+            for item in r.json().get("jobPostings", []):
+                roles.append({"title": item.get("title",""), "url": item.get("externalLink",""), "location": item.get("location","")})
+        except Exception:
+            pass
+
+    # Try custom careers page scrape (BeautifulSoup)
+    if not roles:
+        try:
+            from bs4 import BeautifulSoup
+            base = f"https://www.{slug}.com"
+            r = _req.get(f"{base}/careers", timeout=10, headers={"User-Agent": "Mozilla/5.0"})
+            soup = BeautifulSoup(r.text, "html.parser")
+            links = soup.find_all("a", href=_re.compile(r'/careers/[a-f0-9-]{20,}'))
+            for link in links[:10]:
+                title = link.get_text(strip=True)
+                href = link.get("href","")
+                full_url = href if href.startswith("http") else base + href
+                if title:
+                    roles.append({"title": title, "url": full_url, "location": ""})
+        except Exception:
+            pass
+
+    # Fall back to Tavily search
+    if not roles:
+        results = search(f'"{company}" open roles jobs strategy operations AI 2026', max_results=4, search_depth="basic")
+        formatted = f"OPEN ROLES — {company} (via web search)\n\n"
+        for r in results:
+            formatted += f"{r.get('title','')}\n{r.get('content','')[:300]}\n\n"
+        return formatted.strip()
 
     formatted = f"OPEN ROLES — {company}\n\n"
-    seen = set()
-    for r in all_results:
-        url = r.get("url", "")
-        if url in seen:
-            continue
-        seen.add(url)
-        formatted += f"{r.get('title', '')}\n{r.get('content', '')[:300]}\n{url}\n\n"
+    for role in roles[:8]:
+        formatted += f"- {role['title']}{' | ' + role['location'] if role['location'] else ''} | {role['url']}\n"
     return formatted.strip()
 
 
