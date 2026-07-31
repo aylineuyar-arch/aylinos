@@ -112,6 +112,38 @@ def find_hiring_manager(company: str, role: str) -> str:
     return formatted.strip()
 
 
+def find_open_roles(company: str) -> str:
+    """
+    Search for live open roles at a specific company.
+    Returns formatted text of role titles and links for Claude to score.
+    """
+    queries = [
+        f"{company} careers open roles jobs 2026 site:{company.lower().replace(' ','')}.com",
+        f"{company} hiring jobs strategy operations AI deployment 2026",
+        f'"{company}" jobs open positions strategy GTM operations AI',
+    ]
+
+    all_results = []
+    for q in queries:
+        results = search(q, max_results=4, search_depth="basic")
+        all_results.extend(results)
+        if len(all_results) >= 4:
+            break
+
+    if not all_results:
+        return ""
+
+    formatted = f"OPEN ROLES — {company}\n\n"
+    seen = set()
+    for r in all_results:
+        url = r.get("url", "")
+        if url in seen:
+            continue
+        seen.add(url)
+        formatted += f"{r.get('title', '')}\n{r.get('content', '')[:300]}\n{url}\n\n"
+    return formatted.strip()
+
+
 def job_market_intel(role_type: str, location: str) -> str:
     """
     Live market intel for a role type and location.

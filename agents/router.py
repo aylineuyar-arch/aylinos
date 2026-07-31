@@ -179,7 +179,7 @@ def _sse(data: dict) -> str:
 
 def stream_advisor(query: str, company: str, client: anthropic.Anthropic):
     """Stream career intelligence brief for a company."""
-    from integrations.tavily import research_company as tavily_research, find_hiring_manager
+    from integrations.tavily import research_company as tavily_research, find_hiring_manager, find_open_roles
     try:
         live_intel = tavily_research(company)
     except Exception:
@@ -188,6 +188,10 @@ def stream_advisor(query: str, company: str, client: anthropic.Anthropic):
         contact_intel = find_hiring_manager(company, "VP Product GTM Strategy Operations Chief of Staff")
     except Exception:
         contact_intel = ""
+    try:
+        roles_intel = find_open_roles(company)
+    except Exception:
+        roles_intel = ""
 
     prompt = f"""You are AylinOS Career Intelligence. Generate a brief intelligence report.
 
@@ -196,6 +200,7 @@ def stream_advisor(query: str, company: str, client: anthropic.Anthropic):
 COMPANY: {company}
 LIVE INTEL: {live_intel[:1000] if live_intel else "Use your knowledge."}
 CONTACT RESEARCH: {contact_intel[:600] if contact_intel else "Use your knowledge of typical leadership at this company."}
+OPEN ROLES INTEL: {roles_intel[:800] if roles_intel else "Search your knowledge for open roles at this company."}
 USER QUERY: {query}
 
 Be extremely concise. Each section is 1-2 lines max — digestible, scannable. No paragraphs.
@@ -220,9 +225,9 @@ VERDICT:
 [One punchy sentence. Bottom line only.]
 
 LIVE ROLES:
-[List up to 3 open roles at {company} that fit Aylin's profile, formatted exactly as:
+[List up to 3 open roles at {company} relevant to Aylin's profile from the live intel above, formatted exactly as:
 - <Role Title> | <fit score 0-100> | <one reason why it fits or doesn't>
-Use live intel above. If no roles found, write: No open roles found.]"""
+If no roles visible in live intel, write: No open roles found — check {company} careers page directly.]"""
 
     full_text = ""
     with client.messages.stream(
@@ -252,32 +257,60 @@ Use live intel above. If no roles found, write: No open roles found.]"""
     except Exception:
         pass
 
-    # Generate LinkedIn draft using networking workflow as an instance
-    try:
-        import sys, os
-        _nw_path = os.path.join(os.path.dirname(__file__), '..', '.claude', 'worktrees', 'mystifying-gates')
-        if _nw_path not in sys.path:
-            sys.path.insert(0, _nw_path)
-        from scripts.scoring.contact_scorer import Contact, ContactScorer
-        from scripts.outreach.draft_generator import OutreachDraftGenerator
+    # Generate LinkedIn draft using the networking workflow's prompt template and voice
+    LINKEDIN_SYSTEM_PROMPT = """Write a LinkedIn outreach message in Aylin's voice. Use these two examples as the style reference — aim for something in between:
 
-        # Build contact from what the advisor already found
-        contact = Contact(
-            name=c_name or "",
-            title=c_title or "Strategy & Ops",
-            company=company,
-            location="London",
-            connection_type="cold",
-            company_type="ai_startup",
-            notes=c_angle or "",
-        )
-        scorer = ContactScorer()
-        contact = scorer.score(contact)
-        generator = OutreachDraftGenerator()
-        linkedin_draft = generator.generate(contact)
-        yield _sse({"type": "token", "text": f"\n\nLINKEDIN DRAFT:\n{linkedin_draft}"})
-    except Exception as e:
-        print(f"[advisor] networking draft skipped: {e}")
+EXAMPLE 1 (Aylin's actual message, warmer/more personal):
+---
+Hi Andrew,
+
+Hope you are doing well. I came across your profile through the Tuck network and noticed your Business Bridge background as well.
+
+I'm currently a Tuck '26 exploring AI strategy/operator roles and recently applied to the AI Hive Fellowship at TowerBrook. The program stood out to me given my background across engineering, Deloitte, and Silicon Valley startup/AI work.
+
+If you have time, I'd love to hear how you're seeing the AI Hive in action day to day and any perspective you might have on the program.
+
+Best,
+Aylin
+---
+
+EXAMPLE 2 (slightly more direct, still warm):
+---
+Hi Amrita,
+
+Came across your profile while looking into Tabs, your work across solutions and customer-facing execution stood out (also another Deloitte alum here!). I recently applied to the Strategy & Ops role.
+
+I'm an MBA at Dartmouth Tuck with an engineering background, previously in tech strategy at Deloitte and AI product work at a Silicon Valley robotics startup.
+
+Would really value your perspective on how the product is implemented in practice and where teams typically face the most friction.
+
+Thank you!
+---
+
+Aylin's voice is warm, genuine, and direct. Not stiff or corporate. She says "I'd love to hear" and "if you have time." She signs off "Best, Aylin." She references specific things she noticed about the person. She mentions applying to the role naturally, not as the main point."""
+
+    contact_name = c_name or outreach.split("(")[0].strip() if outreach else ""
+    contact_title = c_title or ""
+    contact_hook = c_angle or ""
+
+    linkedin_user_msg = f"""Write a LinkedIn outreach message to {contact_name or 'the relevant contact'}, {contact_title} at {company}.
+
+Notes about this person: {contact_hook}
+Connection type: cold outreach
+
+Sender: MBA at Dartmouth Tuck, engineering background, tech strategy at Deloitte, AI product work at Skild AI (Silicon Valley robotics startup, $14B valuation).
+
+Match the tone and length of the examples exactly. Output only the message."""
+
+    yield _sse({"type": "token", "text": "\n\nLINKEDIN DRAFT:\n"})
+    with client.messages.stream(
+        model="claude-sonnet-4-6",
+        max_tokens=300,
+        system=LINKEDIN_SYSTEM_PROMPT,
+        messages=[{"role": "user", "content": linkedin_user_msg}]
+    ) as stream:
+        for text in stream.text_stream:
+            yield _sse({"type": "token", "text": text})
 
     # Emit fit_score event so stream_query can trigger agentic chaining
     if fit_score is not None:
