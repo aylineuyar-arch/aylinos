@@ -137,7 +137,16 @@ Return ONLY valid JSON (no markdown, no code fences) with EXACTLY this structure
   "strategy_reason": "<1-2 sentences: why this strategy, with specific intel about this company>",
   "ai_angle": "<what this company is actually doing with AI in production — be specific, not vague>",
   "role_fit": "<why Aylin specifically — reference her actual background, not generic MBA praise>",
-  "outreach_target": "<specific title or person to reach out to, e.g. Chief of Staff, Head of Strategy & Ops>",
+  "outreach_contacts": [
+    {
+      "name": "<real person name if known, else title>",
+      "title": "<their title>",
+      "office": "<NYC | London | SF | Remote | etc>",
+      "type": "<hiring_manager | peer_ic | adjacent_team>",
+      "hook": "<1 sentence personalized hook for this specific person>"
+    }
+  ],
+  "outreach_target": "<primary contact name or title — the single best first reach>",
   "outreach_hook": "<1 sentence personalized hook that connects Aylin's experience to their specific challenge>",
   "open_roles": ["<role title 1>", "<role title 2>"],
   "verdict": "<1-2 sentence bold bottom line — is this worth Aylin's time and how should she approach it>"
@@ -148,6 +157,12 @@ Fit score rubric:
 - 60-79: Good match with caveats, worth pursuing
 - 40-59: Partial match, needs more research or networking first
 - 0-39: Poor fit for Aylin's goals/background, skip or deprioritize
+
+For outreach_contacts: list 3-5 real people or roles to contact. Include:
+- The hiring manager for the most relevant open role (type: hiring_manager)
+- 1-2 IC-level peers in the same team (type: peer_ic) — NOT the CEO
+- 1 adjacent team contact in a different office if the company has NYC/London/SF presence (type: adjacent_team)
+Use live intel to find real names where possible. If name unknown, use specific title + office.
 
 For open_roles: list 2-3 roles that likely exist or will open at this company that fit Aylin's profile.
 If no info available, infer from company stage and type.
