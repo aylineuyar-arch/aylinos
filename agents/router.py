@@ -219,7 +219,7 @@ ROLE FIT:
 [One sentence connecting Aylin's Deloitte/Skild background to this specific company.]
 
 OUTREACH:
-[One specific named person (Title) — one-line angle for the first LinkedIn message.]
+[One IC-level peer contact — NOT the CEO, VP, or C-suite. Target: Engagement Manager, Solutions Consultant, Strategy & Ops, or Deployment Specialist at this company. Format: Name (Title) — one-line angle for the first LinkedIn message.]
 
 VERDICT:
 [One punchy sentence. Bottom line only.]
