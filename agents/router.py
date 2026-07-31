@@ -544,30 +544,45 @@ HIGHLIGHT:
 
 
 def stream_email_agent(query: str, client: anthropic.Anthropic, extract: str = ""):
-    """Draft a personalized outreach email when a company is identified; otherwise describe the pipeline."""
+    """
+    When a company is identified: find IC-level contacts, score them, draft outreach.
+    Uses the networking workflow's scoring logic and draft conventions as an instance.
+    When no company: describe the pipeline.
+    """
     company = extract.strip() if extract else ""
 
     if company:
-        prompt = f"""You are AylinOS Email Intelligence. Draft a concise, personalized outreach email for a job application.
+        prompt = f"""You are AylinOS Outreach Intelligence, running the networking workflow for a specific company.
 
 COMPANY: {company}
 CONTEXT: {query}
-SENDER: Aylin Uyar — Tuck MBA 2026, AI deployment strategist, background in engineering and consulting. Built production AI systems including a multi-agent job search scoring pipeline and outreach automation.
 
-Draft the email in this exact format:
+SENDER PROFILE:
+Aylin Uyar — Tuck MBA 2026, engineering background (BS EE), 4 years at Deloitte Tech Strategy, AI Product intern at Skild AI ($14B, NVIDIA/Sequoia-backed). Targeting AI Deployment Strategist, Engagement Manager AI, GTM Strategy roles in London and NYC.
 
-OUTREACH DRAFT — {company}:
-Subject: [one line subject]
+TASK: Complete the outreach workflow in this exact order:
 
-[3–4 sentence email body. Warm, specific to the company, leads with a relevant insight or shared angle, ends with a low-friction CTA. No fluff.]
+CONTACTS — {company}:
+Identify 3 IC-level contacts at {company} who are relevant peers (NOT the CEO). Target: Engagement Managers, Deployment Strategists, AI Operators, Solutions team, or equivalent. For each:
+- Name (if known) or role title
+- Why this is the right level (peer outreach, not exec-level)
+- Connection angle (alumni, shared background, cold)
+- Priority score: HIGH / WARM / RESEARCH
 
-ROUTING DECISION:
-[One sentence: why this register — cold intro / warm referral / recruiter tone / founder tone — was chosen based on context.]
+COMPANY RESEARCH — {company}:
+3 bullet points of specific, relevant intel about {company}'s AI deployment approach, customer base, or recent activity that would inform outreach. Not generic — specific enough to reference in a message.
+
+OUTREACH DRAFT:
+For the highest-priority contact above, write a LinkedIn message:
+Subject: [one line]
+
+[3–4 sentences. Specific to their role and {company}'s work. References one piece of the research above. Ends with a low-friction ask — 20 min call, not "open to opportunities". No generic MBA language.]
 
 NEXT STEP:
-[One sentence: what happens after this draft is approved — queued for review, not auto-sent.]"""
+Draft queued for review. Human approves before send."""
+
         model = "claude-sonnet-4-6"
-        max_tokens = 400
+        max_tokens = 700
     else:
         prompt = f"""You are AylinOS Email Intelligence, an AI job search automation expert.
 
@@ -576,7 +591,7 @@ USER QUERY: {query}
 Respond with these sections ONLY — no extras, no preamble:
 
 WHAT THE AGENT DOES:
-[2-3 sentences: pulls from 130+ ATS sources daily, scores fit + conversion likelihood with Claude, routes to the right outreach register based on relationship context]
+[2-3 sentences: pulls from 130+ ATS sources daily, scores fit + conversion likelihood with Claude, routes to the right outreach register based on relationship context — peer IC level, not exec]
 
 FOR YOUR QUERY:
 [Direct answer to what they asked about AI email pipelines or job search automation]"""
