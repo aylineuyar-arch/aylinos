@@ -7,10 +7,12 @@ Difference: saves results to SQLite via db.schema instead of returning a flat li
 """
 
 import os
+import re
 import json
 import time
 import requests
 import anthropic
+from bs4 import BeautifulSoup
 from datetime import datetime, timezone, timedelta
 
 from db import upsert_job
@@ -30,36 +32,56 @@ Requires UK visa sponsorship or US authorization.
 """
 
 SEARCHES = [
-    ("AI strategist",                        "New York City, NY"),
+    # AI deployment / strategist cluster — highest fit
     ("AI deployment strategist",             "New York City, NY"),
-    ("strategy operations manager tech",     "New York City, NY"),
-    ("chief of staff tech startup",          "New York City, NY"),
-    ("AI outcomes manager",                  "New York City, NY"),
-    ("solutions strategist AI",              "New York City, NY"),
+    ("AI deployment strategist",             "London, UK"),
+    ("engagement manager AI deployment",     "London, UK"),
+    ("engagement manager AI deployment",     "New York City, NY"),
+    ("AI strategist",                        "New York City, NY"),
     ("AI strategist",                        "London, UK"),
-    ("chief of staff tech",                  "London, UK"),
-    ("strategy operations manager tech",     "San Francisco, CA"),
     ("forward deployed AI",                  "New York City, NY"),
+    ("forward deployed AI",                  "London, UK"),
+    ("AI outcomes manager",                  "London, UK"),
+    ("AI outcomes manager",                  "New York City, NY"),
+    # GTM / strategy ops cluster
+    ("GTM strategy operations manager",      "New York City, NY"),
+    ("GTM strategy operations manager",      "London, UK"),
+    ("strategy operations manager tech",     "New York City, NY"),
+    ("strategy operations manager tech",     "London, UK"),
+    ("solutions strategist AI",              "New York City, NY"),
+    ("solutions strategist AI",              "London, UK"),
+    # Chief of Staff / Founder's Associate
+    ("chief of staff tech startup",          "New York City, NY"),
+    ("chief of staff tech startup",          "London, UK"),
+    ("founder associate AI startup",         "London, UK"),
+    # Deployment / implementation
+    ("deployment strategist AI",             "London, UK"),
+    ("deployment strategist AI",             "New York City, NY"),
+    ("technical deployment specialist",      "London, UK"),
+    ("customer success AI deployment",       "London, UK"),
 ]
 
 TARGET_COMPANIES = [
     # AI Labs
     "openai", "anthropic", "mistral", "cohere", "scale ai", "hugging face",
     "perplexity", "glean", "elevenlabs", "harvey", "cognition", "condukt",
-    "cogna", "tenex", "12 labs", "synthesia",
+    "cogna", "tenex", "12 labs", "synthesia", "decagon", "sierra",
+    "normal computing", "hebbia", "cartesia", "serval", "nooks",
+    # CRM / Customer Platform (Planhat competitors = same buyer)
+    "planhat", "gainsight", "totango", "churnzero", "vitally", "catalyst",
     # Fintech
     "ramp", "brex", "plaid", "chime", "carta", "mercury", "deel",
-    "gusto", "klarna", "affirm", "stripe",
+    "gusto", "klarna", "affirm", "stripe", "lendable", "revolut",
     # SaaS
     "rippling", "notion", "figma", "airtable", "miro", "retool",
-    "lattice", "intercom", "linear",
+    "lattice", "intercom", "linear", "attio", "clay",
     # Data / Infra
-    "databricks", "confluent", "dbt labs", "fivetran",
+    "databricks", "confluent", "dbt labs", "fivetran", "nscale",
     # Health Tech
     "hinge health", "lyra health", "spring health", "modern health",
     # London / Europe
     "monzo", "revolut", "wise", "checkout.com", "wayve", "starling bank",
-    "deliveroo", "multiverse",
+    "deliveroo", "multiverse", "cleo", "wolt", "bolt",
     # VC
     "a16z", "sequoia", "general catalyst", "lightspeed", "index ventures",
 ]
@@ -216,6 +238,17 @@ def _fetch_ats(client: anthropic.Anthropic, seen: set) -> list[dict]:
     ]
     ashby_companies = [
         "condukt", "cogna", "wayve", "multiverse", "synthesia",
+        "decagon", "hebbia", "cartesia", "serval", "attio",
+    ]
+
+    # Custom careers pages (non-standard ATS)
+    custom_careers = [
+        {
+            "company": "Planhat",
+            "url": "https://www.planhat.com/careers",
+            "pattern": r'/careers/([a-f0-9-]{36})',
+            "base_url": "https://www.planhat.com",
+        },
     ]
 
     # Greenhouse
@@ -289,6 +322,46 @@ def _fetch_ats(client: anthropic.Anthropic, seen: set) -> list[dict]:
                 time.sleep(0.2)
         except Exception:
             pass
+
+    # Custom careers pages (Planhat etc — not on standard ATS APIs)
+    for co in custom_careers:
+        try:
+            resp = requests.get(co["url"], timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+            soup = BeautifulSoup(resp.text, "html.parser")
+            links = soup.find_all("a", href=re.compile(co["pattern"]))
+            seen_urls = set()
+            for link in links:
+                href = link.get("href", "")
+                full_url = href if href.startswith("http") else co["base_url"] + href
+                if full_url in seen_urls:
+                    continue
+                seen_urls.add(full_url)
+                title = link.get_text(strip=True)
+                if not title or not _is_relevant(title):
+                    continue
+                uid = f"custom_{co['company'].lower()}_{re.search(co['pattern'], href).group(1)}"
+                if uid in seen:
+                    continue
+                seen.add(uid)
+                job = {
+                    "id": uid,
+                    "title": title,
+                    "company": co["company"],
+                    "company_type": _classify(co["company"]),
+                    "location": "",
+                    "url": full_url,
+                    "source": "custom",
+                    "description": "",
+                    "posted_date": "",
+                }
+                scores = _score_job(job, client)
+                job.update(scores)
+                jobs.append(job)
+                flag = "✓" if scores["apply"] else " "
+                print(f"  {flag} {title} @ {co['company']}  fit={scores['fit_score']} conv={scores['conversion_score']}")
+                time.sleep(0.2)
+        except Exception as e:
+            print(f"  [discovery] Custom careers error for {co['company']}: {e}")
 
     return jobs
 
