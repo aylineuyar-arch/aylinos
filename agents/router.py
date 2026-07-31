@@ -545,44 +545,55 @@ HIGHLIGHT:
 
 def stream_email_agent(query: str, client: anthropic.Anthropic, extract: str = ""):
     """
-    When a company is identified: find IC-level contacts, score them, draft outreach.
-    Uses the networking workflow's scoring logic and draft conventions as an instance.
+    When a company is identified: pull advisor intel (real named contact via Tavily),
+    then draft outreach using that actual person and company context.
     When no company: describe the pipeline.
     """
     company = extract.strip() if extract else ""
 
     if company:
-        prompt = f"""You are AylinOS Outreach Intelligence, running the networking workflow for a specific company.
+        # Pull live advisor intel — real named contact + company research via Tavily
+        try:
+            from agents.advisor import run as advisor_run
+            intel = advisor_run(company)
+        except Exception as e:
+            intel = {}
+            print(f"[email_agent] advisor.run failed: {e}")
+
+        outreach_target = intel.get("outreach_target", f"relevant IC at {company}")
+        outreach_hook   = intel.get("outreach_hook", "")
+        ai_angle        = intel.get("ai_angle", "")
+        role_fit        = intel.get("role_fit", "")
+        strategy        = intel.get("strategy", "network_first")
+        fit_score       = intel.get("fit_score", "")
+
+        prompt = f"""You are AylinOS Outreach Intelligence. Draft a personalized LinkedIn outreach message.
 
 COMPANY: {company}
-CONTEXT: {query}
+OUTREACH TARGET: {outreach_target}
+OUTREACH HOOK: {outreach_hook}
+COMPANY AI ANGLE: {ai_angle}
+ROLE FIT REASON: {role_fit}
+STRATEGY: {strategy} (fit score: {fit_score}/100)
 
-SENDER PROFILE:
-Aylin Uyar — Tuck MBA 2026, engineering background (BS EE), 4 years at Deloitte Tech Strategy, AI Product intern at Skild AI ($14B, NVIDIA/Sequoia-backed). Targeting AI Deployment Strategist, Engagement Manager AI, GTM Strategy roles in London and NYC.
+SENDER: Aylin Uyar — Tuck MBA 2026, BS EE, 4 years Deloitte Tech Strategy, AI Product intern at Skild AI ($14B, NVIDIA/Sequoia-backed). Targeting AI Deployment / Engagement Manager roles in London and NYC.
 
-TASK: Complete the outreach workflow in this exact order:
+Output in this exact format — no preamble:
 
-CONTACTS — {company}:
-Identify 3 IC-level contacts at {company} who are relevant peers (NOT the CEO). Target: Engagement Managers, Deployment Strategists, AI Operators, Solutions team, or equivalent. For each:
-- Name (if known) or role title
-- Why this is the right level (peer outreach, not exec-level)
-- Connection angle (alumni, shared background, cold)
-- Priority score: HIGH / WARM / RESEARCH
+OUTREACH TARGET — {company}:
+{outreach_target}
 
-COMPANY RESEARCH — {company}:
-3 bullet points of specific, relevant intel about {company}'s AI deployment approach, customer base, or recent activity that would inform outreach. Not generic — specific enough to reference in a message.
+SUBJECT:
+[one line subject]
 
-OUTREACH DRAFT:
-For the highest-priority contact above, write a LinkedIn message:
-Subject: [one line]
-
-[3–4 sentences. Specific to their role and {company}'s work. References one piece of the research above. Ends with a low-friction ask — 20 min call, not "open to opportunities". No generic MBA language.]
+MESSAGE:
+[3-4 sentences. Use the hook above. Reference the AI angle specifically. End with a 20-min ask. No generic language.]
 
 NEXT STEP:
-Draft queued for review. Human approves before send."""
+Draft queued for review — human approves before send."""
 
         model = "claude-sonnet-4-6"
-        max_tokens = 1200
+        max_tokens = 500
     else:
         prompt = f"""You are AylinOS Email Intelligence, an AI job search automation expert.
 
@@ -591,7 +602,7 @@ USER QUERY: {query}
 Respond with these sections ONLY — no extras, no preamble:
 
 WHAT THE AGENT DOES:
-[2-3 sentences: pulls from 130+ ATS sources daily, scores fit + conversion likelihood with Claude, routes to the right outreach register based on relationship context — peer IC level, not exec]
+[2-3 sentences: pulls from 130+ ATS sources daily, scores fit + conversion likelihood with Claude, routes outreach to the right named contact at IC level — not exec]
 
 FOR YOUR QUERY:
 [Direct answer to what they asked about AI email pipelines or job search automation]"""
