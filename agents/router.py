@@ -214,10 +214,15 @@ ROLE FIT:
 [One sentence connecting Aylin's Deloitte/Skild background to this specific company.]
 
 OUTREACH:
-[One specific named person (Title) — one-line angle for the first message.]
+[One specific named person (Title) — one-line angle for the first LinkedIn message.]
 
 VERDICT:
-[One punchy sentence. Bottom line only.]"""
+[One punchy sentence. Bottom line only.]
+
+LIVE ROLES:
+[List up to 3 open roles at {company} that fit Aylin's profile, formatted exactly as:
+- <Role Title> | <fit score 0-100> | <one reason why it fits or doesn't>
+Use live intel above. If no roles found, write: No open roles found.]"""
 
     full_text = ""
     with client.messages.stream(
@@ -246,6 +251,33 @@ VERDICT:
         _db.save_advisor_result(company, fit_score, strategy, c_name, c_title, c_angle)
     except Exception:
         pass
+
+    # Generate LinkedIn draft using networking workflow as an instance
+    try:
+        import sys, os
+        _nw_path = os.path.join(os.path.dirname(__file__), '..', '.claude', 'worktrees', 'mystifying-gates')
+        if _nw_path not in sys.path:
+            sys.path.insert(0, _nw_path)
+        from scripts.scoring.contact_scorer import Contact, ContactScorer
+        from scripts.outreach.draft_generator import OutreachDraftGenerator
+
+        # Build contact from what the advisor already found
+        contact = Contact(
+            name=c_name or "",
+            title=c_title or "Strategy & Ops",
+            company=company,
+            location="London",
+            connection_type="cold",
+            company_type="ai_startup",
+            notes=c_angle or "",
+        )
+        scorer = ContactScorer()
+        contact = scorer.score(contact)
+        generator = OutreachDraftGenerator()
+        linkedin_draft = generator.generate(contact)
+        yield _sse({"type": "token", "text": f"\n\nLINKEDIN DRAFT:\n{linkedin_draft}"})
+    except Exception as e:
+        print(f"[advisor] networking draft skipped: {e}")
 
     # Emit fit_score event so stream_query can trigger agentic chaining
     if fit_score is not None:
