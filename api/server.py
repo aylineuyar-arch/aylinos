@@ -20,6 +20,20 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# Load .env from repo root if present
+try:
+    _env = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+    if os.path.exists(_env):
+        for _line in open(_env):
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _k, _v = _line.split("=", 1)
+                _k, _v = _k.strip(), _v.strip()
+                if _v:  # only set if value is non-empty
+                    os.environ[_k] = _v
+except Exception:
+    pass
+
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -118,13 +132,90 @@ def os_stream(body: QueryRequest):
     )
 
 
+# ── Networking Contacts ────────────────────────────────────────────────────────
+
+@app.post("/api/contacts/start")
+def start_contact_scan(company: str):
+    """
+    Spawn Claude CLI subprocess to find IC-level peers at the target company via web search,
+    then write contacts to networking_contacts in aylinos.db.
+
+    The Chrome MCP extension is session-bound and NOT available in subprocesses.
+    Use WebSearch (Tavily) instead — it's available to all Claude CLI subprocesses.
+    """
+    import subprocess, shlex
+    prompt = (
+        f"Use WebSearch to find IC-level employees at {company} on LinkedIn. "
+        f"Search for: site:linkedin.com/in '{company}' (Engagement Manager OR 'Solutions Consultant' OR 'Implementation Manager' OR 'Customer Success' OR 'Strategy'). "
+        f"Also search: '{company}' employee MBA consulting site:linkedin.com. "
+        f"Prioritize people with LBS, Tuck/Dartmouth, Deloitte/McKinsey/BCG/Bain, or AI startup background — these are warm targets for Aylin. "
+        f"Find up to 3 contacts. For each one, run a Bash command to insert a row into the networking_contacts table "
+        f"in /Users/aylinuyar/claudecode/aylinos.db using sqlite3: "
+        f"INSERT INTO networking_contacts (company, name, title, linkedin_url, score, draft, created_at) VALUES (...). "
+        f"score = 0-100 based on warmth (shared MBA/consulting background = high). "
+        f"draft = a 3-sentence personalized LinkedIn message from Aylin Uyar (Tuck MBA 2026, Deloitte tech strategy, Skild AI) "
+        f"referencing the specific shared background. "
+        f"created_at = current UTC ISO timestamp. "
+        f"Do this now — use WebSearch then Bash to insert the rows."
+    )
+    claude_bin = os.path.expanduser("~/.local/bin/claude")
+    log_path = os.path.expanduser("~/claudecode/data/networking_agent.log")
+    # Pass prompt as CLI argument — stdin redirect silently fails when daemonized
+    subprocess.Popen(
+        [claude_bin, "--print", "--dangerously-skip-permissions", prompt],
+        stdout=open(log_path, "a"),
+        stderr=subprocess.STDOUT,
+        cwd=os.path.expanduser("~/claudecode"),
+        start_new_session=True,
+    )
+    return {"status": "started", "company": company}
+
+
+
+
+@app.get("/api/contacts/results")
+def get_contact_results(company: str, after: str = ""):
+    """Return networking contacts written to SQLite by the Claude Code session."""
+    import db
+    try:
+        from api.networking_export import export_new_contacts
+        export_new_contacts()  # push any new rows to Supabase + append to Excel export
+    except Exception as e:
+        print(f"[contacts/results] export step failed: {e}")
+    with db.get_conn() as conn:
+        if after:
+            rows = conn.execute(
+                "SELECT * FROM networking_contacts WHERE company=? AND created_at > ? ORDER BY score DESC",
+                (company, after)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM networking_contacts WHERE company=? ORDER BY score DESC",
+                (company,)
+            ).fetchall()
+    if not rows:
+        return {"status": "pending", "contacts": []}
+    return {"status": "ready", "contacts": [dict(r) for r in rows]}
+
+
 # ── Job Search ─────────────────────────────────────────────────────────────────
 
 @app.get("/job-search", response_class=HTMLResponse)
 def dashboard():
-    jobs = db.get_all_jobs()
+    # Curated demo pipeline — 6 hand-picked applications across fit tiers
+    DEMO_JOBS = [
+        # HIGH FIT — active / warm
+        {"id": "planhat_em_ai_deployment",   "company": "Planhat",     "title": "Engagement Manager — AI Deployment",      "fit_score": 88, "company_type": "ai-startup", "status": "interviewing", "url": "https://www.planhat.com/careers/0fe62a67-fbec-483b-8d7b-f4c7ca6cb847", "posted_date": "2026-07-01", "notes": "Sahil forwarded to recruiting · case study next"},
+        {"id": "mistral_ai_deployment_emea", "company": "Mistral AI",  "title": "AI Deployment Strategist — EMEA",         "fit_score": 85, "company_type": "top-ai-lab", "status": "interviewing", "url": "", "posted_date": "2026-07-10", "notes": "Screen scheduled"},
+        {"id": "elevenlabs_deployment",      "company": "ElevenLabs",  "title": "Deployment Strategist",                   "fit_score": 82, "company_type": "ai-startup", "status": "no_reply",     "url": "", "posted_date": "2026-07-05", "notes": ""},
+        # MEDIUM FIT
+        {"id": "databricks_fde",             "company": "Databricks",  "title": "AI Engineer — Forward Deployed",          "fit_score": 74, "company_type": "ai-startup", "status": "no_reply",     "url": "https://databricks.com/company/careers/open-positions/job?gh_jid=8593713002", "posted_date": "2026-07-05", "notes": ""},
+        {"id": "multiverse_ai_enablement",   "company": "Multiverse",  "title": "AI Enablement Lead",                      "fit_score": 70, "company_type": "ai-startup", "status": "no_reply",     "url": "", "posted_date": "2026-06-20", "notes": ""},
+        # LOW FIT / REACH
+        {"id": "junior_ai_deployment",       "company": "Junior",      "title": "AI Deployment",                           "fit_score": 55, "company_type": "ai-startup", "status": "no_reply",     "url": "", "posted_date": "2026-06-10", "notes": "UK sponsor confirmed · reach role"},
+    ]
     metrics = db.get_metrics()
-    return render_dashboard(jobs, metrics)
+    return render_dashboard(DEMO_JOBS, metrics)
 
 
 @app.get("/analytics", response_class=HTMLResponse)
@@ -460,6 +551,12 @@ code{{background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-f
 
 # ── Evals ──────────────────────────────────────────────────────────────────────
 
+@app.get("/architecture", response_class=HTMLResponse)
+def architecture_deck():
+    from api.architecture_html import render_architecture
+    return render_architecture()
+
+
 @app.get("/evals", response_class=HTMLResponse)
 def evals_dashboard():
     from evals.run import get_latest_eval_results
@@ -544,6 +641,78 @@ def make_webhook(body: WebhookRequest):
         },
         "dashboard_url": "https://aylinos.onrender.com/job-search",
     }
+
+
+# ── Watchlist ──────────────────────────────────────────────────────────────────
+
+@app.get("/api/watchlist")
+def get_watchlist():
+    """Return frozen 6-company watchlist, overlaid with latest SQLite scores where available."""
+    import json as _json
+    from pathlib import Path
+    wl_path = Path(__file__).resolve().parent.parent / "data" / "watchlist.json"
+    with open(wl_path) as f:
+        watchlist = _json.load(f)
+    # Overlay live SQLite fit_score if we have a fresher scan for this company
+    conn = db.get_conn()
+    for entry in watchlist:
+        try:
+            row = conn.execute(
+                "SELECT fit_score, conversion_score, title, fetched_at FROM jobs WHERE company=? ORDER BY fit_score DESC LIMIT 1",
+                (entry["company"],)
+            ).fetchone()
+            if row and row["fit_score"] is not None:
+                entry["fit_score"] = row["fit_score"]
+                entry["conversion_score"] = row["conversion_score"]
+                # Clean malformed titles: dedupe doubled strings, strip location suffixes after "|"
+                raw_title = row["title"] or ""
+                mid = len(raw_title) // 2
+                if mid and raw_title[:mid] == raw_title[mid:]:
+                    raw_title = raw_title[:mid]
+                raw_title = raw_title.split("|")[0].strip()
+                entry["top_role"] = raw_title
+                entry["last_scanned"] = row["fetched_at"]
+                entry["live"] = True
+        except Exception:
+            pass
+    conn.close()
+    return watchlist
+
+
+@app.get("/api/watchlist/{company}/roles")
+def get_company_roles(company: str):
+    """All scored roles for a company — drill-down from the watchlist row."""
+    conn = db.get_conn()
+    rows = conn.execute(
+        """SELECT id, title, location, url, source, fit_score,
+                  conversion_score, reasons, apply_flag, company_type,
+                  posted_date, fetched_at
+           FROM jobs
+           WHERE LOWER(company) = LOWER(?)
+           ORDER BY fit_score DESC
+           LIMIT 15""",
+        (company,)
+    ).fetchall()
+    conn.close()
+    if not rows:
+        return {"company": company, "roles": [], "count": 0}
+    roles = []
+    for r in rows:
+        title = (r["title"] or "").split("|")[0].strip()
+        roles.append({
+            "id": r["id"],
+            "title": title,
+            "location": r["location"],
+            "url": r["url"],
+            "source": r["source"],
+            "fit_score": r["fit_score"],
+            "conversion_score": r["conversion_score"],
+            "reasons": r["reasons"],
+            "apply": bool(r["apply_flag"] or 0),
+            "posted_date": r["posted_date"],
+            "fetched_at": r["fetched_at"],
+        })
+    return {"company": company, "roles": roles, "count": len(roles)}
 
 
 # ── Health ─────────────────────────────────────────────────────────────────────

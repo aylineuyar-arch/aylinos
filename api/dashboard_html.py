@@ -178,338 +178,191 @@ def _contact_card(c: dict) -> str:
 
 
 def render_dashboard(jobs: list, metrics: dict) -> str:
-    import db as _db
-    m = metrics
-
-    # OS-found contacts (from advisor runs)
-    os_contacts = _db.get_companies_with_contacts()
-
     interviewing = [j for j in jobs if j.get("status") == "interviewing"]
-    eliminated   = [j for j in jobs if j.get("status") == "rejected_interview"]
-    rejected     = [j for j in jobs if j.get("status") == "rejected_early"]
     no_reply     = [j for j in jobs if j.get("status") == "no_reply"]
     offers       = [j for j in jobs if j.get("status") == "offer"]
 
-    def lane(title, items, accent, collapsed=False):
-        count = len(items)
-        cards = "".join(_mini_card(j) for j in items)
-        caret = "▸" if collapsed else "▾"
-        return f"""<div class="lane">
-  <div class="lane-header" onclick="toggleLane(this)" style="--lane-accent:{accent}">
-    <div class="lane-left">
-      <span class="lane-caret">{caret}</span>
-      <span class="lane-title">{title}</span>
+    TYPE_COLORS = {
+        "ai-startup":  ("#6366f1", "rgba(99,102,241,0.1)"),
+        "top-ai-lab":  ("#f472b6", "rgba(244,114,182,0.1)"),
+        "big-tech":    ("#60a5fa", "rgba(96,165,250,0.1)"),
+        "fintech":     ("#fb923c", "rgba(251,146,60,0.1)"),
+        "vc-firm":     ("#a78bfa", "rgba(167,139,250,0.1)"),
+        "mid-tech":    ("#34d399", "rgba(52,211,153,0.1)"),
+    }
+
+    STATUS_COLOR = {
+        "interviewing":       ("#fbbf24", "rgba(251,191,36,0.1)",  "● Active Interview"),
+        "no_reply":           ("#94a3b8", "rgba(148,163,184,0.1)", "◎ Applied"),
+        "offer":              ("#34d399", "rgba(52,211,153,0.1)",  "✓ Offer"),
+        "rejected_interview": ("#9ca3af", "rgba(156,163,175,0.1)", "✗ Eliminated"),
+        "rejected_early":     ("#f87171", "rgba(248,113,113,0.1)", "✗ Rejected"),
+    }
+
+    def job_row(j):
+        ct = j.get("company_type") or "ai-startup"
+        fg, bg = TYPE_COLORS.get(ct, ("#94a3b8", "rgba(148,163,184,0.1)"))
+        label = BADGE_LABELS.get(ct, ct.replace("-"," ").title())
+        status = j.get("status") or "no_reply"
+        sc, sbg, slabel = STATUS_COLOR.get(status, ("#94a3b8", "rgba(148,163,184,0.1)", status))
+        fit = j.get("fit_score")
+        notes = j.get("notes") or ""
+        url = j.get("url") or ""
+        company = j.get("company", "")
+        apply_btn = f'<a href="{url}" target="_blank" class="apply-btn">Apply →</a>' if url else ""
+        notes_html = f'<div class="job-notes">{notes}</div>' if notes else ""
+        fit_color = "#6366f1" if (fit or 0) >= 75 else "#fbbf24" if (fit or 0) >= 60 else "#94a3b8"
+        return f"""<div class="job-row" data-type="{ct}">
+  <div class="job-main">
+    <div class="job-top">
+      <span class="job-company">{company}</span>
+      <span class="type-badge" style="color:{fg};background:{bg}">{label}</span>
+      <span class="status-badge" style="color:{sc};background:{sbg}">{slabel}</span>
     </div>
-    <span class="lane-count" style="color:{accent}">{count}</span>
+    <div class="job-title">{j.get("title","")}</div>
+    {notes_html}
+    <div class="job-actions">
+      <a href="#" class="rerun-btn" onclick="rerunAnalysis('{company}');return false;">⟳ Rerun Analysis</a>
+      {apply_btn}
+    </div>
   </div>
-  <div class="lane-body" {"style='display:none'" if collapsed else ""}>
-    {cards if cards else '<div class="lane-empty">None yet</div>'}
+  <div class="job-right">
+    {f'<span class="fit-score" style="color:{fit_color}">{fit}</span><span class="fit-label">fit</span>' if fit else '<span class="fit-score no-fit">—</span>'}
   </div>
 </div>"""
 
-    def stat_cell(value, label, accent=None):
-        color = accent or "var(--ink)"
-        return f"""<div class="stat-cell">
-  <span class="stat-value" style="color:{color}">{value}</span>
-  <span class="stat-label">{label}</span>
-</div>"""
+    # Fit tiers
+    high_fit   = [j for j in no_reply if (j.get("fit_score") or 0) >= 78]
+    medium_fit = [j for j in no_reply if 60 <= (j.get("fit_score") or 0) < 78]
+    low_fit    = [j for j in no_reply if (j.get("fit_score") or 0) < 60]
 
-    # OS contacts section — shown at top if any exist
-    if os_contacts:
-        contact_cards = "".join(_contact_card(c) for c in os_contacts)
-        os_section = f"""<div class="lane">
-  <div class="lane-header" style="--lane-accent:#818cf8">
-    <div class="lane-left">
-      <span class="lane-caret">▾</span>
-      <span class="lane-title">⚡ AylinOS Found — Contacts Identified</span>
-    </div>
-    <span class="lane-count" style="color:#818cf8">{len(os_contacts)}</span>
-  </div>
-  <div class="lane-body">{contact_cards}</div>
-</div>"""
-    else:
-        os_section = f"""<div class="lane">
-  <div class="lane-header" style="--lane-accent:#818cf8">
-    <div class="lane-left">
-      <span class="lane-caret">▾</span>
-      <span class="lane-title">⚡ AylinOS Found — Contacts Identified</span>
-    </div>
-    <span class="lane-count" style="color:#818cf8">0</span>
-  </div>
-  <div class="lane-body"><div class="lane-empty">Ask the OS "should I apply to [company]?" to populate contacts here</div></div>
-</div>"""
-
-    offer_lane     = lane("Offers", offers, "#34d399") if offers else ""
-    interview_lane = lane("Active Interviews", interviewing, "#fbbf24")
-    elim_lane      = lane("Eliminated After Interviews", eliminated, "#9ca3af", collapsed=True)
-    rejected_lane  = lane("Rejected (Early / Email)", rejected, "#f87171", collapsed=True)
-    noreply_lane   = lane("No Reply", no_reply, "#4b5563", collapsed=True)
+    active_rows      = "".join(job_row(j) for j in interviewing)
+    high_fit_rows    = "".join(job_row(j) for j in high_fit)
+    medium_fit_rows  = "".join(job_row(j) for j in medium_fit)
+    low_fit_rows     = "".join(job_row(j) for j in low_fit)
+    offer_rows       = "".join(job_row(j) for j in offers)
 
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AylinOS · Pipeline</title>
-{SHARED_STYLES}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Stats bar */
-.stats-bar {{
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 16px 32px;
-  display: flex;
-  gap: 0;
+*{{box-sizing:border-box;margin:0;padding:0}}
+:root{{
+  --bg:#f8f7f4;--surface:#ffffff;--border:rgba(0,0,0,.08);
+  --border2:rgba(0,0,0,.14);--ink:#111116;--ink-2:#4a5568;--ink-3:#94a3b8;
+  --accent:#6366f1;--mono:'JetBrains Mono',monospace;
 }}
-.stat-cell {{
-  flex: 1;
-  padding: 0 24px;
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}}
-.stat-cell:first-child {{ padding-left: 0; }}
-.stat-cell:last-child {{ border-right: none; }}
-.stat-value {{
-  font-family: var(--mono);
-  font-size: 22px;
-  font-weight: 500;
-  color: var(--ink);
-  line-height: 1;
-}}
-.stat-label {{
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--ink-3);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}}
-
-/* Toolbar */
-.toolbar {{
-  padding: 20px 32px 0;
-  max-width: 860px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}}
-.filter-chips {{ display: flex; gap: 6px; flex-wrap: wrap; }}
-.fchip {{
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 5px 12px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--ink-3);
-  cursor: pointer;
-  transition: all 150ms;
-}}
-.fchip:hover {{ color: var(--ink); border-color: var(--border2); }}
-.fchip.active {{ color: var(--ink); border-color: rgba(129,140,248,0.5); background: rgba(129,140,248,0.08); }}
-.refresh-btn {{
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 6px 14px;
-  background: rgba(129,140,248,0.1);
-  color: var(--accent);
-  border: 1px solid rgba(129,140,248,0.25);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 150ms;
-  white-space: nowrap;
-}}
-.refresh-btn:hover {{ background: rgba(129,140,248,0.18); }}
-
-/* Pipeline */
-.pipeline {{
-  padding: 20px 32px 60px;
-  max-width: 860px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-}}
-
-/* Lane */
-.lane {{
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}}
-.lane-header {{
-  padding: 13px 18px;
-  cursor: pointer;
-  user-select: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-left: 2px solid var(--lane-accent, var(--border2));
-  transition: background 150ms;
-}}
-.lane-header:hover {{ background: var(--surface2); }}
-.lane-left {{ display: flex; align-items: center; gap: 10px; }}
-.lane-caret {{ font-size: 10px; color: var(--ink-3); width: 12px; }}
-.lane-title {{ font-size: 12px; font-weight: 500; color: var(--ink-2); font-family: var(--mono); }}
-.lane-count {{ font-family: var(--mono); font-size: 12px; font-weight: 500; }}
-.lane-body {{ padding: 0 14px 14px; display: flex; flex-direction: column; gap: 6px; }}
-.lane-empty {{ padding: 20px 0; text-align: center; color: var(--ink-3); font-size: 12px; font-family: var(--mono); }}
-
-/* Card */
-.kcard {{
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px 14px;
-  transition: border-color 150ms;
-}}
-.kcard:hover {{ border-color: var(--border2); }}
-.contact-card {{ border-color: rgba(129,140,248,0.25); }}
-.contact-row {{ display:flex; gap:8px; align-items:baseline; margin:6px 0 4px; }}
-.contact-name {{ font-size:13px; font-weight:600; color:#818cf8; }}
-.contact-title {{ font-size:11px; color:var(--ink-3); font-family:var(--mono); }}
-.contact-angle {{ font-size:12px; color:var(--ink-2); line-height:1.5; margin-bottom:6px; }}
-.contact-strat {{ font-size:10px; font-family:var(--mono); letter-spacing:.04em; }}
-.kcard-top {{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 4px;
-  gap: 8px;
-}}
-.kcard-company {{ font-size: 13px; font-weight: 600; color: var(--ink); }}
-.kbadge {{
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 500;
-  padding: 2px 7px;
-  border-radius: 4px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}}
-.kcard-title {{ font-size: 12px; color: var(--ink-3); margin-bottom: 10px; }}
-.kcard-footer {{ display: flex; flex-direction: column; gap: 6px; }}
-.kcard-actions {{ display: flex; gap: 6px; align-items: center; }}
-.kselect {{
-  font-family: var(--mono);
-  font-size: 11px;
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  color: var(--ink-2);
-  background: var(--surface);
-  cursor: pointer;
-  flex: 1;
-}}
-.klink {{
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--ink-3);
-  text-decoration: none;
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  transition: color 150ms;
-}}
-.klink:hover {{ color: var(--ink); }}
-.kcard-note {{ font-size: 11px; color: var(--ink-3); line-height: 1.5; font-family: var(--mono); }}
-.kdate {{ font-family: var(--mono); font-size: 10px; color: var(--ink-3); }}
+body{{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,sans-serif;min-height:100vh;font-size:18px;-webkit-font-smoothing:antialiased}}
+.topbar{{display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid var(--border);background:var(--surface)}}
+.logo{{font-size:20px;font-weight:700;color:var(--ink);text-decoration:none}}
+.logo span{{color:var(--accent)}}
+nav a{{font-size:15px;color:var(--ink-3);text-decoration:none;margin-left:28px;font-family:var(--mono)}}
+nav a:hover,nav a.active{{color:var(--ink)}}
+.stats{{display:flex;gap:1px;border-bottom:1px solid var(--border);background:var(--border)}}
+.stat{{background:var(--surface);flex:1;padding:28px 32px}}
+.stat-val{{font-size:42px;font-weight:800;font-family:var(--mono)}}
+.stat-label{{font-size:14px;color:var(--ink-3);margin-top:6px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;font-weight:600}}
+.main{{max-width:960px;margin:0 auto;padding:36px 32px}}
+.section-hdr{{display:flex;align-items:center;gap:10px;margin-bottom:16px;margin-top:28px}}
+.section-hdr:first-child{{margin-top:0}}
+.section-title{{font-size:15px;font-weight:600;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono)}}
+.section-count{{font-size:15px;font-weight:700;color:var(--ink-3);font-family:var(--mono)}}
+.section-tag{{font-size:13px;font-family:var(--mono);font-weight:600;letter-spacing:.04em}}
+.job-row{{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:12px;display:flex;align-items:center;gap:20px;transition:border-color .15s}}
+.job-row:hover{{border-color:var(--border2)}}
+.job-main{{flex:1;min-width:0}}
+.job-top{{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}}
+.job-company{{font-size:21px;font-weight:700;color:var(--ink)}}
+.type-badge{{font-size:13px;font-weight:600;padding:4px 11px;border-radius:20px;font-family:var(--mono)}}
+.status-badge{{font-size:13px;font-weight:600;padding:4px 11px;border-radius:20px;font-family:var(--mono)}}
+.job-title{{font-size:16px;color:var(--ink-2);font-weight:500;line-height:1.4}}
+.job-notes{{font-size:15px;color:var(--ink-3);font-family:var(--mono);margin-top:6px}}
+.job-right{{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}}
+.fit-score{{font-size:36px;font-weight:800;font-family:var(--mono);color:var(--accent)}}
+.job-actions{{display:flex;align-items:center;gap:10px;margin-top:12px}}
+.rerun-btn{{font-size:13px;font-weight:600;font-family:var(--mono);color:var(--accent);text-decoration:none;padding:6px 14px;border:1px solid rgba(99,102,241,0.3);border-radius:7px;transition:background .13s}}
+.rerun-btn:hover{{background:rgba(99,102,241,0.07)}}
+.apply-btn{{font-size:13px;font-weight:700;font-family:var(--mono);color:#fff;background:var(--accent);padding:7px 16px;border-radius:7px;text-decoration:none;letter-spacing:.04em;white-space:nowrap}}
+.apply-btn:hover{{background:#4f46e5}}
+.fit-label{{font-size:13px;color:var(--ink-3);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;text-align:center}}
+.no-fit{{color:var(--ink-3) !important}}
 </style>
 </head>
 <body>
-
-<header class="topbar">
-  <a href="/" class="logo">AylinOS</a>
+<div class="topbar">
+  <a href="/" class="logo">Aylin<span>OS</span></a>
   <nav>
     <a href="/job-search" class="active">Pipeline</a>
-    <a href="/analytics">Analytics</a>
+    <a href="/networking">Networking</a>
+    <a href="/evals">Evals</a>
   </nav>
-</header>
-
-<div class="stats-bar">
-  {stat_cell(m.get('applied', 0), 'Total Applied')}
-  {stat_cell(m.get('engaged', 0), 'Got Response', 'var(--accent)')}
-  {stat_cell(len(interviewing), 'Active Interviews', '#fbbf24')}
-  {stat_cell(m.get('rejected_interview', 0), 'Eliminated', '#9ca3af')}
-  {stat_cell(m.get('offers', 0), 'Offers', '#34d399')}
-  {stat_cell(f"{m.get('response_rate', 0)}%", 'Response Rate', 'var(--accent)')}
 </div>
 
-<div class="toolbar">
-  <div class="filter-chips">
-    <button class="fchip active" onclick="filterType('all',this)">All</button>
-    <button class="fchip" onclick="filterType('top-ai-lab',this)">Top AI Labs</button>
-    <button class="fchip" onclick="filterType('ai-startup',this)">AI Startups</button>
-    <button class="fchip" onclick="filterType('big-tech',this)">Big Tech</button>
-    <button class="fchip" onclick="filterType('fintech',this)">Fintech</button>
-    <button class="fchip" onclick="filterType('vc-firm',this)">VC / PE</button>
+<div class="stats">
+  <div class="stat">
+    <div class="stat-val">{len(jobs)}</div>
+    <div class="stat-label">Applications</div>
   </div>
-  <button class="refresh-btn" onclick="triggerRefresh()">↻ Refresh</button>
+  <div class="stat">
+    <div class="stat-val" style="color:#fbbf24">{len(interviewing)}</div>
+    <div class="stat-label">Active Interviews</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" style="color:#94a3b8">{len(no_reply)}</div>
+    <div class="stat-label">Pending Reply</div>
+  </div>
+  <div class="stat">
+    <div class="stat-val" style="color:#34d399">{len(offers)}</div>
+    <div class="stat-label">Offers</div>
+  </div>
 </div>
 
-<div class="pipeline" id="pipeline">
-  {os_section}
-  {offer_lane}
-  {interview_lane}
-  {elim_lane}
-  {rejected_lane}
-  {noreply_lane}
+<div class="main">
+  {f'''<div class="section-hdr">
+    <span class="section-title">Offers</span>
+    <span class="section-count">{len(offers)}</span>
+  </div>
+  {offer_rows}''' if offers else ""}
+
+  {f'''<div class="section-hdr">
+    <span class="section-title">Active Interviews</span>
+    <span class="section-count">{len(interviewing)}</span>
+  </div>
+  {active_rows}''' if interviewing else ""}
+
+  {f'''<div class="section-hdr">
+    <span class="section-title">High Fit</span>
+    <span class="section-count">{len(high_fit)}</span>
+    <span class="section-tag" style="color:#6366f1">≥ 78</span>
+  </div>
+  {high_fit_rows}''' if high_fit else ""}
+
+  {f'''<div class="section-hdr">
+    <span class="section-title">Medium Fit</span>
+    <span class="section-count">{len(medium_fit)}</span>
+    <span class="section-tag" style="color:#fbbf24">60 – 77</span>
+  </div>
+  {medium_fit_rows}''' if medium_fit else ""}
+
+  {f'''<div class="section-hdr">
+    <span class="section-title">Low Fit / Reach</span>
+    <span class="section-count">{len(low_fit)}</span>
+    <span class="section-tag" style="color:#94a3b8">&lt; 60</span>
+  </div>
+  {low_fit_rows}''' if low_fit else ""}
 </div>
-
-<div class="toast" id="toast"></div>
-
 <script>
-function toggleLane(header) {{
-  const body = header.nextElementSibling;
-  const caret = header.querySelector('.lane-caret');
-  const hidden = body.style.display === 'none';
-  body.style.display = hidden ? '' : 'none';
-  caret.textContent = hidden ? '▾' : '▸';
-}}
-
-function filterType(type, btn) {{
-  document.querySelectorAll('.fchip').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.kcard').forEach(card => {{
-    card.style.display = (type === 'all' || card.dataset.type === type) ? '' : 'none';
-  }});
-}}
-
-async function updateStatus(jobId, status) {{
-  const resp = await fetch(`/api/jobs/${{jobId}}/status`, {{
-    method: 'POST',
-    headers: {{'Content-Type': 'application/json'}},
-    body: JSON.stringify({{ status }})
-  }});
-  if (resp.ok) {{
-    showToast(`→ ${{status.replace(/_/g, ' ')}}`);
-    setTimeout(() => location.reload(), 800);
-  }}
-}}
-
-async function triggerRefresh() {{
-  if (!confirm('Run discovery agent? (~3–5 min)')) return;
-  showToast('Running…');
-  const resp = await fetch('/api/jobs/refresh', {{
-    method: 'POST',
-    headers: {{'Content-Type': 'application/json'}},
-    body: JSON.stringify({{ confirmed: true }})
-  }});
-  const data = await resp.json();
-  showToast(`Found ${{data.jobs_found}} jobs`);
-  setTimeout(() => location.reload(), 2000);
-}}
-
-function showToast(msg) {{
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+function rerunAnalysis(company) {{
+  const frontendBase = window.location.hostname === 'localhost'
+    ? 'http://localhost:8080'
+    : window.location.origin;
+  const q = encodeURIComponent('should I apply to ' + company);
+  window.open(frontendBase + '?q=' + q, '_blank');
 }}
 </script>
 </body>

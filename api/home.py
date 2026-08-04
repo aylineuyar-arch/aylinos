@@ -62,7 +62,7 @@ APPS = [
     },
     {
         "id": "restaurant",
-        "name": "Fork Yeah!",
+        "name": "Restaurant Agent",
         "gradient": "linear-gradient(145deg,#052e16,#065f46)",
         "accent": MEM,
         "url": "http://localhost:5173",
@@ -132,6 +132,7 @@ APPS = [
         "accent": SEARCH,
         "url": "/networking",
         "new_tab": False,
+        "direct": True,
         "icon_svg": f"""
 <svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg" width="64" height="45">
   <!-- Linear 4-node pipeline with human gate -->
@@ -274,6 +275,14 @@ def render_home(metrics: dict = None, api_metrics: dict = None, eval_metrics: di
     calls_str = str(am.get("total_calls", 0))
 
     def icon_card(app):
+        if app.get("direct"):
+            target = "_blank" if app.get("new_tab") else "_self"
+            return f"""<a class="icon-cell" href="{app['url']}" target="{target}" style="text-decoration:none">
+  <div class="app-icon" style="background:{app['gradient']}">
+    {app['icon_svg']}
+  </div>
+  <div class="app-label">{app['name']}</div>
+</a>"""
         return f"""<div class="icon-cell" onclick="showSheet('{app['id']}')">
   <div class="app-icon" style="background:{app['gradient']}">
     {app['icon_svg']}
@@ -321,6 +330,11 @@ def render_home(metrics: dict = None, api_metrics: dict = None, eval_metrics: di
 
     def _dock_icon(a):
         inner = a["icon_svg"].split("<svg")[1].split(">", 1)[1].rsplit("</svg>", 1)[0]
+        if a.get("direct"):
+            target = "_blank" if a.get("new_tab") else "_self"
+            return (f'<a class="di" id="icon-{a["id"]}" style="background:{a["gradient"]};text-decoration:none;cursor:pointer" '
+                    f'href="{a["url"]}" target="{target}" title="{a["name"]}">'
+                    f'<svg viewBox="0 0 80 56" width="42" height="30">{inner}</svg></a>')
         return (f'<div class="di" id="icon-{a["id"]}" style="background:{a["gradient"]}" '
                 f'onclick="showSheet(\'{a["id"]}\')" title="{a["name"]}">'
                 f'<svg viewBox="0 0 80 56" width="42" height="30">{inner}</svg></div>')
@@ -804,7 +818,11 @@ html, body {{
 const IDS = {all_ids};
 
 // ── Sheet controls ──
-function showSheet(id) {{ document.getElementById('sheet-'+id).classList.add('open'); }}
+const DIRECT_LINKS = {{ 'networking': '/networking' }};
+function showSheet(id) {{
+  if (DIRECT_LINKS[id]) {{ window.location.href = DIRECT_LINKS[id]; return; }}
+  document.getElementById('sheet-'+id).classList.add('open');
+}}
 function hideSheet(id) {{ document.getElementById('sheet-'+id).classList.remove('open'); }}
 document.addEventListener('keydown', e => {{
   if (e.key === 'Escape') IDS.forEach(hideSheet);
@@ -842,7 +860,7 @@ const AGENT_LABELS = {{
   research:       'Research',
   gtm_tool:       'GTM Modeler',
   cs_triage:      'CS Triage',
-  restaurant:     'Fork Yeah!',
+  restaurant:     'Restaurant Agent',
   compliance_rag: 'Policy Desk',
   general:        'AylinOS',
 }};

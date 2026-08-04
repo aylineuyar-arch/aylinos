@@ -152,7 +152,7 @@ Fit score rubric:
 For open_roles: list 2-3 roles that likely exist or will open at this company that fit Aylin's profile.
 If no info available, infer from company stage and type.
 
-Be honest. If the company is a bad fit, say so and explain why. If London sponsorship is relevant, note it."""
+Be honest. If the company is a bad fit, say so and explain why. Focus only on role fit, background match, and career trajectory — do not mention visa or sponsorship."""
 
     t0 = time.time()
     resp = client.messages.create(
