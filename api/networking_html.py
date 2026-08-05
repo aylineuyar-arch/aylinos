@@ -8,14 +8,16 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
     airtable_contacts = airtable_contacts or []
     # Real P1/P2 targets — IC-level peers only, from actual pipeline
     demo_targets = [
+        {"company": "Planhat",      "contact_name": "—",  "contact_title": "Engagement Manager (peer)",            "fit_score": 88,
+         "strategy": "APPLY NOW",    "contact_angle": "Sahil (HM) forwarded to recruiting · peer EM with Deloitte/consulting background = warm intro path · same deployment motion as your Skild AI GTM work", "status": "queued"},
         {"company": "Mistral AI",   "contact_name": "—",  "contact_title": "AI Deployment Strategist (peer)",      "fit_score": 85,
-         "strategy": "APPLY NOW",    "contact_angle": "EMEA AI deployment role — strong fit with Deloitte enterprise + Skild AI background", "status": "queued"},
+         "strategy": "APPLY NOW",    "contact_angle": "EMEA deployment role hiring now · peer with MBA + enterprise consulting overlap · Deloitte clients are Mistral's exact buyer profile", "status": "queued"},
         {"company": "ElevenLabs",   "contact_name": "—",  "contact_title": "Deployment Strategist (peer)",         "fit_score": 82,
-         "strategy": "NETWORK FIRST","contact_angle": "Find IC deployment peers via Tuck/consulting network — voice AI deployment is adjacent to Skild AI infra work", "status": "queued"},
+         "strategy": "NETWORK FIRST","contact_angle": "Tuck/consulting alum on deployment team = warm intro · voice AI deployment mirrors Skild AI enterprise adoption playbook · HM likely owns IC deployment hiring", "status": "queued"},
         {"company": "Multiverse",   "contact_name": "—",  "contact_title": "AI Enablement Lead (peer)",            "fit_score": 70,
-         "strategy": "NETWORK FIRST","contact_angle": "Enterprise AI enablement angle — Deloitte L&D clients are Multiverse's exact buyer", "status": "queued"},
+         "strategy": "NETWORK FIRST","contact_angle": "Deloitte L&D enterprise clients = Multiverse's exact buyer · peer EM with consulting background can intro to hiring manager · AI enablement angle matches your profile", "status": "queued"},
         {"company": "Junior",       "contact_name": "—",  "contact_title": "AI Deployment (peer)",                 "fit_score": 55,
-         "strategy": "RESEARCH MORE","contact_angle": "UK sponsor confirmed · research IC team structure before outreach", "status": "researching"},
+         "strategy": "RESEARCH MORE","contact_angle": "IC deployment peer with MBA background · research team structure before outreach · identify HM via LinkedIn before cold reach", "status": "researching"},
     ]
 
     # Merge: OS-found first, then Airtable, then real targets (skip if OS already found that company)
@@ -75,7 +77,7 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
       {name_html}
       <span class="ctitle">{t.get('contact_title','')}</span>
     </div>
-    <div class="angle">{t.get('contact_angle','')[:160]}</div>
+    <div class="angle"><span class="angle-label">COMMON ANGLE</span>{t.get('contact_angle','')[:200]}</div>
     <div class="strat" style="color:{sc}">{t.get('strategy','')}</div>
   </div>
   <div class="score-col">
@@ -147,11 +149,24 @@ nav a:hover{{color:var(--ink)}}
 .badge{{font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;font-family:var(--mono)}}
 .os-tag{{font-size:12px;color:var(--accent);font-family:var(--mono)}}
 .contact-line{{display:flex;gap:10px;align-items:baseline;margin-bottom:10px}}
-.angle{{font-size:15px;color:var(--ink-2);line-height:1.65;margin-bottom:10px;font-weight:500}}
-.strat{{font-size:13px;font-family:var(--mono);letter-spacing:.04em;font-weight:700}}
-.company{{font-size:19px;font-weight:700;color:var(--ink)}}
-.cname{{font-size:16px;font-weight:700;color:#6366f1}}
-.ctitle{{font-size:14px;color:var(--ink-3);font-family:var(--mono);font-weight:500}}
+.angle{{
+  font-size:17px;line-height:1.6;margin-bottom:12px;font-weight:600;
+  color:#1e1b4b;
+  background:rgba(99,102,241,.07);
+  border-left:3px solid #6366f1;
+  border-radius:0 8px 8px 0;
+  padding:10px 14px;
+}}
+.angle-label{{
+  display:block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:#6366f1;margin-bottom:5px;
+}}
+.strat{{font-size:14px;font-family:var(--mono);letter-spacing:.04em;font-weight:700}}
+.company{{font-size:21px;font-weight:700;color:var(--ink)}}
+.cname{{font-size:17px;font-weight:700;color:#6366f1}}
+.ctitle{{font-size:15px;color:var(--ink-3);font-family:var(--mono);font-weight:500}}
 .stat-val{{font-size:36px;font-weight:800;font-family:var(--mono)}}
 .stat-label{{font-size:12px;color:var(--ink-3);margin-top:6px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;font-weight:600}}
 .score-col{{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:56px}}
@@ -194,7 +209,7 @@ nav a:hover{{color:var(--ink)}}
 </div>
 
 <div id="scan-zone" style="max-width:980px;margin:0 auto;padding:36px 32px 0">
-  <div id="scan-log" style="font-family:'JetBrains Mono',monospace;font-size:15px;color:#4a5568;display:flex;flex-direction:column;gap:10px"></div>
+  <div id="scan-log" style="font-family:'JetBrains Mono',monospace;font-size:17px;color:#4a5568;display:flex;flex-direction:column;gap:14px"></div>
 </div>
 
 <div class="main" id="contacts-zone" style="display:none;opacity:0;transition:opacity .4s ease">
@@ -220,10 +235,10 @@ const zone = document.getElementById("contacts-zone");
 
 async function runScan() {{
   for (const step of steps) {{
-    await new Promise(r => setTimeout(r, 750));
+    await new Promise(r => setTimeout(r, 1100));
     const line = document.createElement("div");
-    line.style.cssText = "display:flex;align-items:baseline;gap:10px;animation:fadeIn .3s ease";
-    line.innerHTML = `<span style="color:#6366f1;font-weight:700">✓</span><span>${{step}}</span>`;
+    line.style.cssText = "display:flex;align-items:baseline;gap:12px;animation:fadeIn .35s ease";
+    line.innerHTML = `<span style="color:#6366f1;font-weight:700;font-size:18px">✓</span><span>${{step}}</span>`;
     log.appendChild(line);
   }}
   await new Promise(r => setTimeout(r, 400));
