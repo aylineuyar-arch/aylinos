@@ -330,9 +330,15 @@ def render_home(metrics: dict = None, api_metrics: dict = None, eval_metrics: di
 
     def _dock_icon(a):
         inner = a["icon_svg"].split("<svg")[1].split(">", 1)[1].rsplit("</svg>", 1)[0]
+        svg = f'<svg viewBox="0 0 80 56" width="42" height="30">{inner}</svg>'
+        if a.get("direct"):
+            target = "_blank" if a.get("new_tab") else "_self"
+            return (f'<a href="{a["url"]}" target="{target}" class="di" id="icon-{a["id"]}" '
+                    f'style="background:{a["gradient"]};text-decoration:none" title="{a["name"]}">'
+                    f'{svg}</a>')
         return (f'<div class="di" id="icon-{a["id"]}" style="background:{a["gradient"]}" '
                 f'onclick="showSheet(\'{a["id"]}\')" title="{a["name"]}">'
-                f'<svg viewBox="0 0 80 56" width="42" height="30">{inner}</svg></div>')
+                f'{svg}</div>')
 
     dock_html = "".join(_dock_icon(a) for a in APPS)
 
