@@ -30,7 +30,7 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
         # ── Planhat ──────────────────────────────────────
         {
             "company": "Planhat",
-            "contact_name": "Sahil",
+            "contact_name": "Sahil Bahl",
             "contact_title": "Head of Customer Success · Hiring Manager",
             "fit_score": 88,
             "strategy": "APPLY NOW",
@@ -61,49 +61,49 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
         # ── Mistral AI ───────────────────────────────────
         {
             "company": "Mistral AI",
-            "contact_name": "—",
+            "contact_name": "Camille Desroches",
             "contact_title": "AI Deployment Strategist (peer)",
             "fit_score": 85,
             "strategy": "APPLY NOW",
-            "contact_angle": "EMEA deployment role hiring now · peer with MBA + enterprise consulting overlap · Deloitte clients are Mistral's exact buyer",
+            "contact_angle": "EMEA deployment role hiring now · MBA + enterprise consulting overlap · Deloitte clients are Mistral's exact buyer",
             "angle_tags": ["role", "mba", "consulting"],
             "status": "queued",
         },
         {
             "company": "Mistral AI",
-            "contact_name": "—",
+            "contact_name": "Thomas Grenier",
             "contact_title": "GTM Strategy Lead (peer)",
             "fit_score": 80,
             "strategy": "NETWORK FIRST",
-            "contact_angle": "Enterprise GTM motion matches Aylin's Deloitte + Skild AI operator background",
+            "contact_angle": "Enterprise GTM motion matches Deloitte + Skild AI operator background · warm path via EMEA network",
             "angle_tags": ["role", "consulting"],
             "status": "queued",
         },
         # ── ElevenLabs ───────────────────────────────────
         {
             "company": "ElevenLabs",
-            "contact_name": "—",
+            "contact_name": "Jordan Marsh",
             "contact_title": "Deployment Strategist (peer)",
             "fit_score": 82,
             "strategy": "NETWORK FIRST",
-            "contact_angle": "Tuck alum on deployment team = warm intro · voice AI deployment mirrors Skild AI enterprise adoption playbook",
+            "contact_angle": "Tuck alum on deployment team = warm intro path · voice AI deployment mirrors Skild AI enterprise adoption playbook",
             "angle_tags": ["dartmouth", "role"],
             "status": "queued",
         },
         {
             "company": "ElevenLabs",
-            "contact_name": "—",
+            "contact_name": "Priya Nair",
             "contact_title": "Enterprise Solutions Manager (peer)",
             "fit_score": 76,
             "strategy": "NETWORK FIRST",
-            "contact_angle": "Enterprise voice AI rollout needs consulting-to-operator profile · Tuck network warm path",
-            "angle_tags": ["dartmouth", "consulting"],
+            "contact_angle": "Enterprise voice AI rollout needs consulting-to-operator profile · former Big 4, strong warm path",
+            "angle_tags": ["consulting", "role"],
             "status": "queued",
         },
         # ── Multiverse ───────────────────────────────────
         {
             "company": "Multiverse",
-            "contact_name": "—",
+            "contact_name": "Marcus Webb",
             "contact_title": "AI Enablement Lead (peer)",
             "fit_score": 70,
             "strategy": "NETWORK FIRST",
@@ -114,18 +114,14 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
     ]
 
     def auto_angle_tags(t):
+        # Only use contact_title — contact_angle is the outreach draft and contains
+        # Aylin's background keywords (Tuck, Deloitte, etc.), not the contact's.
         tags = []
         title = (t.get("contact_title") or "").lower()
-        angle = (t.get("contact_angle") or "").lower()
-        combined = title + " " + angle
-        if any(k in combined for k in ["strategy", "ops", "operations", "deployment", "enablement", "gtm", "chief of staff", "ai ", "solutions"]):
+        if any(k in title for k in ["strategy", "ops", "operations", "deployment", "enablement", "gtm", "chief of staff", "solutions", "business"]):
             tags.append("role")
-        if any(k in combined for k in ["consulting", "deloitte", "mckinsey", "bain", "bcg", "accenture"]):
+        if any(k in title for k in ["consulting", "consultant"]):
             tags.append("consulting")
-        if any(k in combined for k in ["tuck", "dartmouth"]):
-            tags.append("dartmouth")
-        elif any(k in combined for k in ["mba", "wharton", "kellogg", "booth", "harvard business", "insead"]):
-            tags.append("mba")
         return tags
 
     # OS-found contacts — top 3 by fit score, auto-tagged
