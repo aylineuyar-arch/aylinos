@@ -113,11 +113,17 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
         },
     ]
 
+    KNOWN_CONTACT_TAGS = {
+        "trang le":     ["dartmouth", "role"],
+        "aavriti arora": ["consulting", "role"],
+    }
+
     def auto_angle_tags(t):
-        # Only use contact_title — contact_angle is the outreach draft and contains
-        # Aylin's background keywords (Tuck, Deloitte, etc.), not the contact's.
-        tags = []
+        name = (t.get("contact_name") or "").lower().strip()
+        if name in KNOWN_CONTACT_TAGS:
+            return KNOWN_CONTACT_TAGS[name]
         title = (t.get("contact_title") or "").lower()
+        tags = []
         if any(k in title for k in ["strategy", "ops", "operations", "deployment", "enablement", "gtm", "chief of staff", "solutions", "business"]):
             tags.append("role")
         if any(k in title for k in ["consulting", "consultant"]):
