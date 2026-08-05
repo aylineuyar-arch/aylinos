@@ -33,7 +33,7 @@ PM intern at Skild AI ($14B, NVIDIA/Sequoia-backed) — owned GTM for humanoid r
 Targeting: AI Deployment Strategist, Engagement Manager (AI), Forward Deployed Engineer,
            Business Value Consultant, Solutions Consultant, Implementation Consultant,
            Chief of Staff (AI-native), Founder's Associate.
-Locations: NYC, London, SF.
+Open to remote and in-person roles.
 NOT targeting: sales, recruiting, engineering, traditional consulting, government.
 """
 

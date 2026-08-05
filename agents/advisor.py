@@ -33,7 +33,7 @@ CANDIDATE: Aylin Uyar
 - Target roles: AI Strategist, AI Deployment Lead, Chief of Staff, Strategy & Operations,
   GTM Strategy — at AI-native or AI-first companies.
 - NOT targeting: pure consulting, software engineering, VP+ executive roles, traditional finance.
-- Target locations: NYC, London, SF.
+- Open to remote and in-person roles.
 - Strengths: translating AI capabilities into enterprise adoption, operator GTM motion,
   structured problem-solving, cross-functional leadership, stakeholder management.
 - Differentiator: rare combo of enterprise consulting rigor (Deloitte) + frontier AI startup
