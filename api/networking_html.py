@@ -3,14 +3,13 @@ AylinOS — Networking Operator Dashboard
 Shows OS-found contacts, scoring, outreach queue, and pipeline stats.
 """
 
-# Per-company pastel card backgrounds
+# Per-company pastel card backgrounds (pipeline queue only — OS-found rows use indigo OS style)
 COMPANY_BG = {
     "Planhat":    ("rgba(99,102,241,.08)",  "rgba(99,102,241,.25)"),   # indigo
     "Mistral AI": ("rgba(124,58,237,.08)",  "rgba(124,58,237,.25)"),   # violet
     "ElevenLabs": ("rgba(220,38,38,.07)",   "rgba(220,38,38,.22)"),    # red
     "Multiverse": ("rgba(217,119,6,.07)",   "rgba(217,119,6,.22)"),    # amber
     "Junior":     ("rgba(13,148,136,.07)",  "rgba(13,148,136,.22)"),   # teal
-    "Databricks": ("rgba(225,29,72,.07)",   "rgba(225,29,72,.22)"),    # rose
 }
 
 TAG_DEFS = {
@@ -26,8 +25,9 @@ TAG_DEFS = {
 def render_networking(contacts: list, airtable_contacts: list = None) -> str:
     airtable_contacts = airtable_contacts or []
 
-    # Pipeline queue — hardcoded P1/P2 targets with angle tags
+    # Pipeline queue — P1/P2 targets grouped by company, 2-3 contacts each
     pipeline_queue = [
+        # ── Planhat ──────────────────────────────────────
         {
             "company": "Planhat",
             "contact_name": "Sahil",
@@ -39,6 +39,27 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
             "status": "queued",
         },
         {
+            "company": "Planhat",
+            "contact_name": "Viktor Ek",
+            "contact_title": "Solutions Consultant (peer)",
+            "fit_score": 79,
+            "strategy": "NETWORK FIRST",
+            "contact_angle": "Solutions-to-strategy path mirrors Aylin's consulting background · warm intro route via CS team",
+            "angle_tags": ["role", "consulting"],
+            "status": "queued",
+        },
+        {
+            "company": "Planhat",
+            "contact_name": "Emma Landau",
+            "contact_title": "Customer Success Manager (peer)",
+            "fit_score": 74,
+            "strategy": "NETWORK FIRST",
+            "contact_angle": "MBA + enterprise SaaS CS overlap · can validate team culture and intro to HM",
+            "angle_tags": ["mba", "role"],
+            "status": "queued",
+        },
+        # ── Mistral AI ───────────────────────────────────
+        {
             "company": "Mistral AI",
             "contact_name": "—",
             "contact_title": "AI Deployment Strategist (peer)",
@@ -48,6 +69,17 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
             "angle_tags": ["role", "mba", "consulting"],
             "status": "queued",
         },
+        {
+            "company": "Mistral AI",
+            "contact_name": "—",
+            "contact_title": "GTM Strategy Lead (peer)",
+            "fit_score": 80,
+            "strategy": "NETWORK FIRST",
+            "contact_angle": "Enterprise GTM motion matches Aylin's Deloitte + Skild AI operator background",
+            "angle_tags": ["role", "consulting"],
+            "status": "queued",
+        },
+        # ── ElevenLabs ───────────────────────────────────
         {
             "company": "ElevenLabs",
             "contact_name": "—",
@@ -59,6 +91,17 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
             "status": "queued",
         },
         {
+            "company": "ElevenLabs",
+            "contact_name": "—",
+            "contact_title": "Enterprise Solutions Manager (peer)",
+            "fit_score": 76,
+            "strategy": "NETWORK FIRST",
+            "contact_angle": "Enterprise voice AI rollout needs consulting-to-operator profile · Tuck network warm path",
+            "angle_tags": ["dartmouth", "consulting"],
+            "status": "queued",
+        },
+        # ── Multiverse ───────────────────────────────────
+        {
             "company": "Multiverse",
             "contact_name": "—",
             "contact_title": "AI Enablement Lead (peer)",
@@ -68,22 +111,30 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
             "angle_tags": ["consulting", "role"],
             "status": "queued",
         },
-        {
-            "company": "Junior",
-            "contact_name": "—",
-            "contact_title": "AI Deployment (peer)",
-            "fit_score": 55,
-            "strategy": "RESEARCH MORE",
-            "contact_angle": "IC deployment peer with MBA background · identify HM via LinkedIn before cold reach",
-            "angle_tags": ["mba", "role"],
-            "status": "researching",
-        },
     ]
 
-    # OS-found contacts go in new-scan section; skip any also in pipeline queue
+    def auto_angle_tags(t):
+        tags = []
+        title = (t.get("contact_title") or "").lower()
+        angle = (t.get("contact_angle") or "").lower()
+        combined = title + " " + angle
+        if any(k in combined for k in ["strategy", "ops", "operations", "deployment", "enablement", "gtm", "chief of staff", "ai ", "solutions"]):
+            tags.append("role")
+        if any(k in combined for k in ["consulting", "deloitte", "mckinsey", "bain", "bcg", "accenture"]):
+            tags.append("consulting")
+        if any(k in combined for k in ["tuck", "dartmouth"]):
+            tags.append("dartmouth")
+        elif any(k in combined for k in ["mba", "wharton", "kellogg", "booth", "harvard business", "insead"]):
+            tags.append("mba")
+        return tags
+
+    # OS-found contacts — top 3 by fit score, auto-tagged
     queue_companies = {t["company"] for t in pipeline_queue}
     at_companies    = {c["company"] for c in airtable_contacts}
-    scan_contacts   = [{**c, "status": "os-found", "source": "AylinOS"} for c in contacts]
+    raw_scan = [{**c, "status": "os-found", "source": "AylinOS"} for c in contacts]
+    raw_scan = sorted(raw_scan, key=lambda x: x.get("fit_score") or 0, reverse=True)
+    raw_scan = [c for c in raw_scan if (c.get("fit_score") or 0) >= 55][:3]
+    scan_contacts = [{**c, "angle_tags": auto_angle_tags(c)} for c in raw_scan]
 
     # Stats
     all_targets = scan_contacts + list(airtable_contacts) + pipeline_queue
@@ -130,7 +181,11 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
         fit        = t.get("fit_score")
         fit_color  = "#6366f1" if (fit or 0) >= 75 else "#fbbf24" if (fit or 0) >= 50 else "#94a3b8"
         company    = t.get("company", "")
-        co_bg, co_border = COMPANY_BG.get(company, ("var(--surface)", "var(--border)"))
+        is_os      = t.get("source") == "AylinOS"
+        if is_os:
+            co_bg, co_border = "rgba(129,140,248,.04)", "rgba(129,140,248,.3)"
+        else:
+            co_bg, co_border = COMPANY_BG.get(company, ("var(--surface)", "var(--border)"))
         linkedin   = t.get("linkedin_url", "")
         name       = t.get("contact_name", "—")
         name_html  = (
@@ -140,7 +195,6 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
         )
         tags_col   = angle_tags_col(t.get("angle_tags", []))
         angle_text = t.get("contact_angle", "")[:220]
-        is_os      = t.get("source") == "AylinOS"
 
         return f"""<div class="target-row{' os-row' if is_os else ''}" style="background:{co_bg};border-color:{co_border}">
   <div class="target-main">
@@ -176,17 +230,24 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
 </div>
 {rows_html}"""
 
+    def grouped_queue(items):
+        """Render pipeline queue grouped by company with mini company headers."""
+        from itertools import groupby
+        html = ""
+        for company, group in groupby(items, key=lambda x: x["company"]):
+            group_list = list(group)
+            html += f'<div class="co-group-hdr">{company}</div>'
+            html += "".join(target_row(t) for t in group_list)
+        return html
+
     scan_section  = named_section(
         "New Scan — AylinOS Found",
         "Contacts surfaced from this query",
         scan_contacts,
     )
-    queue_section = named_section(
-        "Pipeline Queue",
-        "Active targets · sorted by fit",
-        pipeline_queue,
-    )
-    rows = scan_section + ('<div class="section-sep">Pipeline Queue</div>' if scan_section and queue_section else "") + queue_section
+    queue_html = grouped_queue(pipeline_queue) if pipeline_queue else ""
+    sep = '<div class="section-sep">Previous Query</div>' if scan_section and queue_html else ""
+    rows = scan_section + sep + queue_html
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -217,14 +278,15 @@ nav a:hover{{color:var(--ink)}}
 .os-hint{{font-size:13px;color:var(--ink-3);font-family:var(--mono)}}
 .os-hint span{{color:var(--accent)}}
 .named-hdr{{display:flex;align-items:baseline;justify-content:space-between;margin:32px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--border2)}}
-.named-title{{font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;font-family:var(--mono)}}
-.named-count{{font-size:12px;font-weight:700;color:var(--ink-3);font-family:var(--mono);margin-left:8px}}
-.named-sub{{font-size:12px;color:var(--ink-3);font-family:var(--mono)}}
+.named-title{{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:.04em;text-transform:uppercase;font-family:var(--mono)}}
+.named-count{{font-size:14px;font-weight:600;color:var(--ink-3);font-family:var(--mono);margin-left:8px}}
+.named-sub{{font-size:13px;color:var(--ink-3);font-family:var(--mono)}}
+.co-group-hdr{{font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono);margin:20px 0 8px;padding-left:4px}}
 .section-sep{{
   display:flex;align-items:center;gap:14px;
-  margin:36px 0 0;
-  font-family:var(--mono);font-size:10px;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  margin:40px 0 8px;
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
 }}
 .section-sep::before,.section-sep::after{{
   content:'';flex:1;height:1px;background:var(--border2);
@@ -237,7 +299,7 @@ nav a:hover{{color:var(--ink)}}
 .badge{{font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;font-family:var(--mono)}}
 .os-tag{{font-size:12px;color:var(--accent);font-family:var(--mono)}}
 .contact-line{{display:flex;gap:10px;align-items:baseline;margin-bottom:10px}}
-.cname{{font-size:17px;font-weight:700;color:#6366f1}}
+.cname{{font-size:17px;font-weight:700;color:var(--ink)}}
 .ctitle{{font-size:15px;color:var(--ink-2);font-family:var(--mono);font-weight:500}}
 .atag{{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;font-family:var(--mono);white-space:nowrap}}
 .tag-col{{display:flex;flex-direction:column;gap:5px;margin-top:10px;align-items:center}}
