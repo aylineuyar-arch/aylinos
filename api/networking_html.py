@@ -3,35 +3,94 @@ AylinOS — Networking Operator Dashboard
 Shows OS-found contacts, scoring, outreach queue, and pipeline stats.
 """
 
+# Per-company pastel card backgrounds
+COMPANY_BG = {
+    "Planhat":    ("rgba(99,102,241,.08)",  "rgba(99,102,241,.25)"),   # indigo
+    "Mistral AI": ("rgba(124,58,237,.08)",  "rgba(124,58,237,.25)"),   # violet
+    "ElevenLabs": ("rgba(220,38,38,.07)",   "rgba(220,38,38,.22)"),    # red
+    "Multiverse": ("rgba(217,119,6,.07)",   "rgba(217,119,6,.22)"),    # amber
+    "Junior":     ("rgba(13,148,136,.07)",  "rgba(13,148,136,.22)"),   # teal
+    "Databricks": ("rgba(225,29,72,.07)",   "rgba(225,29,72,.22)"),    # rose
+}
+
+TAG_DEFS = {
+    "hm":          ("#4f46e5", "rgba(99,102,241,.13)",   "👤 Hiring Manager"),
+    "role":        ("#059669", "rgba(16,185,129,.13)",   "🎯 Role Match"),
+    "mba":         ("#7c3aed", "rgba(124,58,237,.13)",   "🎓 MBA"),
+    "dartmouth":   ("#047857", "rgba(5,150,105,.13)",    "🌲 Tuck / Dartmouth"),
+    "lbs":         ("#1d4ed8", "rgba(59,130,246,.13)",   "🏛 LBS"),
+    "consulting":  ("#b45309", "rgba(217,119,6,.13)",    "💼 Consulting"),
+}
+
 
 def render_networking(contacts: list, airtable_contacts: list = None) -> str:
     airtable_contacts = airtable_contacts or []
-    # Real P1/P2 targets — IC-level peers only, from actual pipeline
-    demo_targets = [
-        {"company": "Planhat",      "contact_name": "—",  "contact_title": "Engagement Manager (peer)",            "fit_score": 88,
-         "strategy": "APPLY NOW",    "contact_angle": "Sahil (HM) forwarded to recruiting · peer EM with Deloitte/consulting background = warm intro path · same deployment motion as your Skild AI GTM work", "status": "queued"},
-        {"company": "Mistral AI",   "contact_name": "—",  "contact_title": "AI Deployment Strategist (peer)",      "fit_score": 85,
-         "strategy": "APPLY NOW",    "contact_angle": "EMEA deployment role hiring now · peer with MBA + enterprise consulting overlap · Deloitte clients are Mistral's exact buyer profile", "status": "queued"},
-        {"company": "ElevenLabs",   "contact_name": "—",  "contact_title": "Deployment Strategist (peer)",         "fit_score": 82,
-         "strategy": "NETWORK FIRST","contact_angle": "Tuck/consulting alum on deployment team = warm intro · voice AI deployment mirrors Skild AI enterprise adoption playbook · HM likely owns IC deployment hiring", "status": "queued"},
-        {"company": "Multiverse",   "contact_name": "—",  "contact_title": "AI Enablement Lead (peer)",            "fit_score": 70,
-         "strategy": "NETWORK FIRST","contact_angle": "Deloitte L&D enterprise clients = Multiverse's exact buyer · peer EM with consulting background can intro to hiring manager · AI enablement angle matches your profile", "status": "queued"},
-        {"company": "Junior",       "contact_name": "—",  "contact_title": "AI Deployment (peer)",                 "fit_score": 55,
-         "strategy": "RESEARCH MORE","contact_angle": "IC deployment peer with MBA background · research team structure before outreach · identify HM via LinkedIn before cold reach", "status": "researching"},
+
+    # Pipeline queue — hardcoded P1/P2 targets with angle tags
+    pipeline_queue = [
+        {
+            "company": "Planhat",
+            "contact_name": "Sahil",
+            "contact_title": "Head of Customer Success · Hiring Manager",
+            "fit_score": 88,
+            "strategy": "APPLY NOW",
+            "contact_angle": "Forwarded application to recruiting · case study next · same deployment motion as Skild AI GTM work",
+            "angle_tags": ["hm", "role", "consulting"],
+            "status": "queued",
+        },
+        {
+            "company": "Mistral AI",
+            "contact_name": "—",
+            "contact_title": "AI Deployment Strategist (peer)",
+            "fit_score": 85,
+            "strategy": "APPLY NOW",
+            "contact_angle": "EMEA deployment role hiring now · peer with MBA + enterprise consulting overlap · Deloitte clients are Mistral's exact buyer",
+            "angle_tags": ["role", "mba", "consulting"],
+            "status": "queued",
+        },
+        {
+            "company": "ElevenLabs",
+            "contact_name": "—",
+            "contact_title": "Deployment Strategist (peer)",
+            "fit_score": 82,
+            "strategy": "NETWORK FIRST",
+            "contact_angle": "Tuck alum on deployment team = warm intro · voice AI deployment mirrors Skild AI enterprise adoption playbook",
+            "angle_tags": ["dartmouth", "role"],
+            "status": "queued",
+        },
+        {
+            "company": "Multiverse",
+            "contact_name": "—",
+            "contact_title": "AI Enablement Lead (peer)",
+            "fit_score": 70,
+            "strategy": "NETWORK FIRST",
+            "contact_angle": "Deloitte L&D enterprise clients = Multiverse's exact buyer · peer EM can intro to HM",
+            "angle_tags": ["consulting", "role"],
+            "status": "queued",
+        },
+        {
+            "company": "Junior",
+            "contact_name": "—",
+            "contact_title": "AI Deployment (peer)",
+            "fit_score": 55,
+            "strategy": "RESEARCH MORE",
+            "contact_angle": "IC deployment peer with MBA background · identify HM via LinkedIn before cold reach",
+            "angle_tags": ["mba", "role"],
+            "status": "researching",
+        },
     ]
 
-    # Merge: OS-found first, then Airtable, then real targets (skip if OS already found that company)
-    all_targets = []
-    os_companies = {c["company"] for c in contacts}
-    at_companies = {c["company"] for c in airtable_contacts}
+    # OS-found contacts go in new-scan section; skip any also in pipeline queue
+    queue_companies = {t["company"] for t in pipeline_queue}
+    at_companies    = {c["company"] for c in airtable_contacts}
+    scan_contacts   = [{**c, "status": "os-found", "source": "AylinOS"} for c in contacts]
 
-    for c in contacts:
-        all_targets.append({**c, "status": "os-found", "source": "AylinOS"})
-    for c in airtable_contacts:
-        all_targets.append({**c})
-    for t in demo_targets:
-        if t["company"] not in os_companies and t["company"] not in at_companies:
-            all_targets.append({**t, "source": "seed"})
+    # Stats
+    all_targets = scan_contacts + list(airtable_contacts) + pipeline_queue
+    sent     = sum(1 for t in all_targets if t.get("status") in ("sent", "message-sent"))
+    drafted  = sum(1 for t in all_targets if t.get("status") == "drafted")
+    queued   = sum(1 for t in all_targets if t.get("status") in ("queued", "not-started"))
+    os_found = len(scan_contacts)
 
     def status_badge(status):
         colors = {
@@ -56,62 +115,78 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
         if "RESEARCH" in s: return "#f472b6"
         return "#9ca3af"
 
+    def angle_tags_col(tags):
+        if not tags:
+            return ""
+        chips = ""
+        for tag in tags:
+            if tag in TAG_DEFS:
+                color, bg, label = TAG_DEFS[tag]
+                chips += f'<span class="atag" style="color:{color};background:{bg}">{label}</span>'
+        return chips
+
     def target_row(t):
-        sc = strat_color(t.get("strategy", ""))
-        fit = t.get("fit_score")
-        fit_color = "#6366f1" if (fit or 0) >= 75 else "#fbbf24" if (fit or 0) >= 50 else "#94a3b8"
-        linkedin = t.get("linkedin_url", "")
-        name_html = (
-            f'<a href="{linkedin}" target="_blank" rel="noopener" class="cname">{t.get("contact_name","—")}</a>'
+        sc         = strat_color(t.get("strategy", ""))
+        fit        = t.get("fit_score")
+        fit_color  = "#6366f1" if (fit or 0) >= 75 else "#fbbf24" if (fit or 0) >= 50 else "#94a3b8"
+        company    = t.get("company", "")
+        co_bg, co_border = COMPANY_BG.get(company, ("var(--surface)", "var(--border)"))
+        linkedin   = t.get("linkedin_url", "")
+        name       = t.get("contact_name", "—")
+        name_html  = (
+            f'<a href="{linkedin}" target="_blank" rel="noopener" class="cname">{name}</a>'
             if linkedin else
-            f'<span class="cname">{t.get("contact_name","—")}</span>'
+            f'<span class="cname">{name}</span>'
         )
-        return f"""<div class="target-row {'os-row' if t.get('source')=='AylinOS' else ''}">
+        tags_col   = angle_tags_col(t.get("angle_tags", []))
+        angle_text = t.get("contact_angle", "")[:220]
+        is_os      = t.get("source") == "AylinOS"
+
+        return f"""<div class="target-row{' os-row' if is_os else ''}" style="background:{co_bg};border-color:{co_border}">
   <div class="target-main">
     <div class="target-top">
-      <span class="company">{t['company']}</span>
-      {status_badge(t.get('status','queued'))}
-      {"<span class='os-tag'>⚡ via AylinOS</span>" if t.get('source')=='AylinOS' else ''}
+      <span class="company">{company}</span>
+      {status_badge(t.get('status', 'queued'))}
+      {"<span class='os-tag'>⚡ via AylinOS</span>" if is_os else ''}
     </div>
     <div class="contact-line">
       {name_html}
-      <span class="ctitle">{t.get('contact_title','')}</span>
+      <span class="ctitle">{t.get('contact_title', '')}</span>
     </div>
-    <div class="angle"><span class="angle-label">COMMON ANGLE</span>{t.get('contact_angle','')[:200]}</div>
-    <div class="strat" style="color:{sc}">{t.get('strategy','')}</div>
+    {f'<div class="angle">{angle_text}</div>' if angle_text else ''}
+    <div class="strat" style="color:{sc}">{t.get('strategy', '')}</div>
   </div>
   <div class="score-col">
     <span class="score" style="color:{fit_color}">{fit or '—'}</span>
     <span class="score-label">fit</span>
+    {f'<div class="tag-col">{tags_col}</div>' if tags_col else ''}
   </div>
 </div>"""
 
-    sent     = sum(1 for t in all_targets if t.get("status") in ("sent","message-sent"))
-    drafted  = sum(1 for t in all_targets if t.get("status") == "drafted")
-    queued   = sum(1 for t in all_targets if t.get("status") in ("queued","not-started"))
-    os_found = sum(1 for t in all_targets if t.get("source") == "AylinOS")
-
-    def tier_section(title, items, score_color):
+    def named_section(title, subtitle, items):
         if not items:
             return ""
         rows_html = "".join(target_row(t) for t in items)
-        return f"""<div class="tier-hdr">
-  <span class="tier-title">{title}</span>
-  <span class="tier-count">{len(items)}</span>
+        return f"""<div class="named-hdr">
+  <div>
+    <span class="named-title">{title}</span>
+    <span class="named-count">{len(items)}</span>
+  </div>
+  <span class="named-sub">{subtitle}</span>
 </div>
 {rows_html}"""
 
-    high   = [t for t in all_targets if (t.get("fit_score") or 0) >= 75]
-    medium = [t for t in all_targets if 50 <= (t.get("fit_score") or 0) < 75]
-    low    = [t for t in all_targets if (t.get("fit_score") or 0) < 50 and t.get("fit_score") is not None]
-    unscored = [t for t in all_targets if t.get("fit_score") is None]
-
-    rows = (
-        tier_section("High Fit  ≥ 75", high, "#6366f1") +
-        tier_section("Medium Fit  50 – 74", medium, "#fbbf24") +
-        (tier_section("Low Fit / Reach  < 50", low, "#94a3b8") if low else "") +
-        (tier_section("Unscored", unscored, "#94a3b8") if unscored else "")
+    scan_section  = named_section(
+        "New Scan — AylinOS Found",
+        "Contacts surfaced from this query",
+        scan_contacts,
     )
+    queue_section = named_section(
+        "Pipeline Queue",
+        "Active targets · sorted by fit",
+        pipeline_queue,
+    )
+    rows = scan_section + ('<div class="section-sep">Pipeline Queue</div>' if scan_section and queue_section else "") + queue_section
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -123,53 +198,53 @@ def render_networking(contacts: list, airtable_contacts: list = None) -> str:
 *{{box-sizing:border-box;margin:0;padding:0}}
 :root{{
   --bg:#f8f7f4;--surface:#ffffff;--border:rgba(0,0,0,.08);
-  --border2:rgba(0,0,0,.14);--ink:#111116;--ink-2:#4a5568;--ink-3:#94a3b8;
+  --border2:rgba(0,0,0,.14);--ink:#111116;--ink-2:#374151;--ink-3:#94a3b8;
   --accent:#6366f1;--mono:'JetBrains Mono',monospace;
 }}
 body{{background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,sans-serif;min-height:100vh;font-size:17px;-webkit-font-smoothing:antialiased}}
-.topbar{{display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid var(--border);background:var(--surface);}}
-.logo{{font-size:18px;font-weight:700;color:var(--ink);text-decoration:none;}}
+.topbar{{display:flex;align-items:center;justify-content:space-between;padding:18px 40px;border-bottom:1px solid var(--border);background:var(--surface)}}
+.logo{{font-size:18px;font-weight:700;color:var(--ink);text-decoration:none}}
 .logo span{{color:var(--accent)}}
 nav a{{font-size:14px;color:var(--ink-3);text-decoration:none;margin-left:28px;font-family:var(--mono)}}
 nav a:hover{{color:var(--ink)}}
 .stats{{display:flex;gap:1px;border-bottom:1px solid var(--border);background:var(--border)}}
-.stat{{background:var(--surface);flex:1;padding:28px 32px;}}
+.stat{{background:var(--surface);flex:1;padding:28px 32px}}
+.stat-val{{font-size:36px;font-weight:800;font-family:var(--mono)}}
+.stat-label{{font-size:12px;color:var(--ink-3);margin-top:6px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;font-weight:600}}
 .main{{max-width:980px;margin:0 auto;padding:36px 32px}}
 .section-header{{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}}
 .section-title{{font-size:13px;font-weight:600;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono)}}
 .os-hint{{font-size:13px;color:var(--ink-3);font-family:var(--mono)}}
 .os-hint span{{color:var(--accent)}}
-.tier-hdr{{display:flex;align-items:center;gap:10px;margin:28px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--border)}}
-.tier-title{{font-size:13px;font-weight:700;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;font-family:var(--mono)}}
-.tier-count{{font-size:13px;font-weight:700;color:var(--ink-3);font-family:var(--mono)}}
-.target-row{{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 26px;margin-bottom:12px;display:flex;gap:22px;align-items:flex-start}}
+.named-hdr{{display:flex;align-items:baseline;justify-content:space-between;margin:32px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--border2)}}
+.named-title{{font-size:12px;font-weight:700;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;font-family:var(--mono)}}
+.named-count{{font-size:12px;font-weight:700;color:var(--ink-3);font-family:var(--mono);margin-left:8px}}
+.named-sub{{font-size:12px;color:var(--ink-3);font-family:var(--mono)}}
+.section-sep{{
+  display:flex;align-items:center;gap:14px;
+  margin:36px 0 0;
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+}}
+.section-sep::before,.section-sep::after{{
+  content:'';flex:1;height:1px;background:var(--border2);
+}}
+.target-row{{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin-bottom:10px;display:flex;gap:20px;align-items:flex-start}}
 .os-row{{border-color:rgba(129,140,248,.3);background:rgba(129,140,248,.04)}}
 .target-main{{flex:1;min-width:0}}
-.target-top{{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}}
+.target-top{{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}}
+.company{{font-size:21px;font-weight:700}}
 .badge{{font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;font-family:var(--mono)}}
 .os-tag{{font-size:12px;color:var(--accent);font-family:var(--mono)}}
 .contact-line{{display:flex;gap:10px;align-items:baseline;margin-bottom:10px}}
-.angle{{
-  font-size:17px;line-height:1.6;margin-bottom:12px;font-weight:600;
-  color:#1e1b4b;
-  background:rgba(99,102,241,.07);
-  border-left:3px solid #6366f1;
-  border-radius:0 8px 8px 0;
-  padding:10px 14px;
-}}
-.angle-label{{
-  display:block;
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;font-weight:700;letter-spacing:.14em;
-  text-transform:uppercase;color:#6366f1;margin-bottom:5px;
-}}
-.strat{{font-size:14px;font-family:var(--mono);letter-spacing:.04em;font-weight:700}}
-.company{{font-size:21px;font-weight:700;color:var(--ink)}}
 .cname{{font-size:17px;font-weight:700;color:#6366f1}}
-.ctitle{{font-size:15px;color:var(--ink-3);font-family:var(--mono);font-weight:500}}
-.stat-val{{font-size:36px;font-weight:800;font-family:var(--mono)}}
-.stat-label{{font-size:12px;color:var(--ink-3);margin-top:6px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;font-weight:600}}
-.score-col{{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:56px}}
+.ctitle{{font-size:15px;color:var(--ink-2);font-family:var(--mono);font-weight:500}}
+.atag{{font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;font-family:var(--mono);white-space:nowrap}}
+.tag-col{{display:flex;flex-direction:column;gap:5px;margin-top:10px;align-items:center}}
+.angle{{font-size:15px;color:var(--ink-2);line-height:1.6;margin-bottom:10px;font-weight:400;
+  border-left:2px solid rgba(99,102,241,.3);padding-left:12px}}
+.strat{{font-size:13px;font-family:var(--mono);letter-spacing:.04em;font-weight:700}}
+.score-col{{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:72px}}
 .score{{font-size:30px;font-weight:700;font-family:var(--mono)}}
 .score-label{{font-size:11px;color:var(--ink-3);font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase}}
 .empty{{text-align:center;padding:60px;color:var(--ink-3);font-family:var(--mono);font-size:15px}}
@@ -238,7 +313,7 @@ async function runScan() {{
     await new Promise(r => setTimeout(r, 1100));
     const line = document.createElement("div");
     line.style.cssText = "display:flex;align-items:baseline;gap:12px;animation:fadeIn .35s ease";
-    line.innerHTML = `<span style="color:#6366f1;font-weight:700;font-size:18px">✓</span><span>${{step}}</span>`;
+    line.innerHTML = `<span style="color:#10b981;font-weight:700;font-size:18px">✓</span><span>${{step}}</span>`;
     log.appendChild(line);
   }}
   await new Promise(r => setTimeout(r, 400));
