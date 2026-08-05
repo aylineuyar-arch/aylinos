@@ -30,13 +30,18 @@ AYLIN_PROFILE = """
 Aylin Uyar — Tuck MBA 2026 (Dartmouth), BS Electrical Engineering.
 Ex-Deloitte Tech Strategy Senior Consultant (4 years).
 PM intern at Skild AI ($14B, NVIDIA/Sequoia-backed) — owned GTM for humanoid robotics AI.
-Targeting: AI Strategist, Chief of Staff, Strategy & Ops, GTM Strategy at AI-native companies.
-Locations: NYC (primary), London (needs UK visa), open to SF.
+Targeting: AI Deployment Strategist, Engagement Manager (AI), Forward Deployed Engineer,
+           Business Value Consultant, Solutions Consultant, Implementation Consultant,
+           Chief of Staff (AI-native), Founder's Associate.
+Locations: NYC (primary), London, open to SF.
+NOT targeting: sales, recruiting, engineering, traditional consulting, government.
 """
 
 ROUTER_PROMPT = """You are the AylinOS query router. Select ALL relevant agents for this query (1-3 max).
 
 AGENTS:
+- job_scan_single: scan one specific company only — "scan Ramp", "check Clay jobs", "what's open at Glean", "refresh Planhat"
+- job_scan: find jobs, scan for roles, populate my pipeline, generate jobs I should apply to, search openings, run job search
 - advisor: "should I apply to X", "is X a good fit", career fit, job strategy
 - interview_prep: "prep me for X interview", "STAR stories for X", interview coaching
 - job_search: Aylin's pipeline stats, "how many applications", "show my pipeline"
@@ -48,14 +53,14 @@ AGENTS:
 - compliance_rag: compliance questions, financial regulations, policy documents
 - general: anything else
 
-ROUTING RULES:
-- Career query (applying to a specific company): advisor + interview_prep are often both relevant
-- Job pipeline query: job_search only
-- GTM/pricing query: gtm_tool only — do NOT add research or advisor
-- Compliance query: compliance_rag only
-- Pricing and job search are UNRELATED — never combine them
-- interview_prep is career-only, never with gtm_tool or compliance_rag
-- Pick only agents that genuinely add value — minimum 1, maximum 2
+ROUTING RULES — apply in order, first match wins:
+1. ANY company-specific career query — "should I apply to X", "is X a good fit", "tell me about X", "research X for me as a job target", "scan X", "check X jobs", "what's open at X" → ["job_scan_single", "advisor"] IN THAT ORDER. Scan runs first to populate SQLite, then advisor reads fresh data. Extract company name into `extract`. This is the full agentic cadence — always both, always in order.
+2. "find jobs", "generate jobs", "scan for roles", "search openings", "populate pipeline", "what jobs should I apply to", "find me roles" → job_scan ONLY. No company specified.
+3. "show my pipeline", "how many applications", "my stats" → job_search only.
+4. GTM/pricing query → gtm_tool only.
+5. Compliance query → compliance_rag only.
+6. "prep me for X interview", "STAR stories for X" → advisor + interview_prep.
+- Pick only agents that genuinely add value — minimum 1, maximum 3.
 
 USER QUERY: {query}
 
@@ -67,6 +72,7 @@ extract = company name for career queries, topic for GTM queries, empty string f
 
 # Map agent internal name → display label for frontend
 INTERNAL_TO_FRONTEND = {
+    "job_scan":       "Job Scanner",
     "advisor":        "Career Advisor",
     "interview_prep": "Interview Prep",
     "job_search":     "Job Search",
@@ -74,13 +80,14 @@ INTERNAL_TO_FRONTEND = {
     "gtm_tool":       "GTM Modeler",
     "email_agent":    "Email Agent",
     "cs_triage":      "CS Triage",
-    "restaurant":     "Fork Yeah!",
+    "restaurant":     "Restaurant Agent",
     "compliance_rag": "Policy Desk",
     "general":        "AylinOS",
 }
 
 # Cluster grouping — controls colors and next-step cards scoping
 AGENT_CLUSTER = {
+    "job_scan":       "career",
     "advisor":        "career",
     "interview_prep": "career",
     "job_search":     "career",
@@ -128,7 +135,23 @@ def _build_pipeline_steps(agents: list, extract: str, query: str) -> list:
     entity = extract or "target"
     primary = agents[0] if agents else "general"
 
-    if primary in ("advisor", "interview_prep"):
+    if primary == "job_scan_single":
+        steps = [
+            f"Scanning {entity} ATS board (Greenhouse · Lever · Ashby)",
+            "Geo-filtering to NYC · London · SF · Remote",
+            "Scoring roles with Haiku",
+            "Saved to pipeline DB",
+            f"Advisor reading fresh {entity} data",
+        ]
+    elif primary == "job_scan":
+        steps = [
+            "Querying JSearch (LinkedIn / Indeed / Glassdoor)",
+            "Scraping ATS boards (Greenhouse / Lever / Ashby)",
+            "Filtering: NYC / London / SF only",
+            "Scoring fit + conversion likelihood",
+            "Saving to pipeline DB",
+        ]
+    elif primary in ("advisor", "interview_prep"):
         steps = [
             f"Pulling live intel on {entity}",
             "Scoring fit against Aylin's profile",
@@ -188,10 +211,28 @@ def stream_advisor(query: str, company: str, client: anthropic.Anthropic):
         contact_intel = find_hiring_manager(company, "VP Product GTM Strategy Operations Chief of Staff")
     except Exception:
         contact_intel = ""
+    # L3 architecture: read scored roles from SQLite first (already geo/title filtered by L1)
+    roles_intel = ""
     try:
-        roles_intel = find_open_roles(company)
+        import db as _db
+        conn = _db.get_conn()
+        rows = conn.execute(
+            "SELECT title, location, fit_score, reasons, url FROM jobs WHERE LOWER(company) = LOWER(?) ORDER BY fit_score DESC LIMIT 5",
+            (company,)
+        ).fetchall()
+        conn.close()
+        if rows:
+            roles_intel = f"SCORED ROLES from pipeline DB — {company}\n\n"
+            for row in rows:
+                roles_intel += f"- {row[0]} | {row[1] or 'location unknown'} | {row[2]} | {(row[3] or '')[:60]} | {row[4] or ''}\n"
     except Exception:
-        roles_intel = ""
+        pass
+    # Fall back to live ATS/Tavily only if company isn't in pipeline yet
+    if not roles_intel:
+        try:
+            roles_intel = find_open_roles(company)
+        except Exception:
+            roles_intel = ""
 
     prompt = f"""You are AylinOS Career Intelligence. Generate a brief intelligence report.
 
@@ -200,11 +241,11 @@ def stream_advisor(query: str, company: str, client: anthropic.Anthropic):
 COMPANY: {company}
 LIVE INTEL: {live_intel[:1000] if live_intel else "Use your knowledge."}
 CONTACT RESEARCH: {contact_intel[:600] if contact_intel else "Use your knowledge of typical leadership at this company."}
-OPEN ROLES INTEL: {roles_intel[:800] if roles_intel else "Search your knowledge for open roles at this company."}
+OPEN ROLES INTEL: {roles_intel[:800] if roles_intel else "No live role data found. Do NOT invent roles. Write: No open roles found — check careers page directly."}
 USER QUERY: {query}
 
-Be extremely concise. Each section is 1-2 lines max — digestible, scannable. No paragraphs.
-Output each section header EXACTLY ONCE in this order: FIT SCORE, STRATEGY, AI ANGLE, ROLE FIT, OUTREACH, VERDICT. Never repeat a section.
+Be extremely concise. Each section is 1-2 lines max. No paragraphs.
+Output each section header EXACTLY ONCE in this order: FIT SCORE, STRATEGY, AI ANGLE, ROLE FIT, VERDICT. Never repeat a section. Do NOT add any other sections.
 
 FIT SCORE:
 [number 0-100 only]
@@ -218,16 +259,13 @@ AI ANGLE:
 ROLE FIT:
 [One sentence connecting Aylin's Deloitte/Skild background to this specific company.]
 
-OUTREACH:
-[One IC-level peer contact — NOT the CEO, VP, or C-suite. Target: Engagement Manager, Solutions Consultant, Strategy & Ops, or Deployment Specialist at this company. Format: Name (Title) — one-line angle for the first LinkedIn message.]
-
 VERDICT:
 [One punchy sentence. Bottom line only.]
 
 LIVE ROLES:
-[List up to 3 open roles at {company} relevant to Aylin's profile from the live intel above, formatted exactly as:
-- <Role Title> | <fit score 0-100> | <one reason why it fits or doesn't>
-If no roles visible in live intel, write: No open roles found — check {company} careers page directly.]"""
+[List up to 4 open roles from the OPEN ROLES INTEL above. Use this exact pipe-delimited format, one role per line — do NOT add any text before or after:
+- <Role Title> | <Location> | <fit score> | <one reason focused on role fit only, max 8 words, never mention visa or sponsorship> | <url from intel>
+If no roles in intel, write exactly: No open roles found.]"""
 
     full_text = ""
     with client.messages.stream(
@@ -240,6 +278,7 @@ If no roles visible in live intel, write: No open roles found — check {company
             yield _sse({"type": "token", "text": text})
 
     # Parse and save structured contact + fit data for job dashboard
+    fit_score = None
     try:
         import re, db as _db
         clean = full_text.replace("**", "")
@@ -257,61 +296,6 @@ If no roles visible in live intel, write: No open roles found — check {company
         _db.save_advisor_result(company, fit_score, strategy, c_name, c_title, c_angle)
     except Exception:
         pass
-
-    # Generate LinkedIn draft using the networking workflow's prompt template and voice
-    LINKEDIN_SYSTEM_PROMPT = """Write a LinkedIn outreach message in Aylin's voice. Use these two examples as the style reference — aim for something in between:
-
-EXAMPLE 1 (Aylin's actual message, warmer/more personal):
----
-Hi Andrew,
-
-Hope you are doing well. I came across your profile through the Tuck network and noticed your Business Bridge background as well.
-
-I'm currently a Tuck '26 exploring AI strategy/operator roles and recently applied to the AI Hive Fellowship at TowerBrook. The program stood out to me given my background across engineering, Deloitte, and Silicon Valley startup/AI work.
-
-If you have time, I'd love to hear how you're seeing the AI Hive in action day to day and any perspective you might have on the program.
-
-Best,
-Aylin
----
-
-EXAMPLE 2 (slightly more direct, still warm):
----
-Hi Amrita,
-
-Came across your profile while looking into Tabs, your work across solutions and customer-facing execution stood out (also another Deloitte alum here!). I recently applied to the Strategy & Ops role.
-
-I'm an MBA at Dartmouth Tuck with an engineering background, previously in tech strategy at Deloitte and AI product work at a Silicon Valley robotics startup.
-
-Would really value your perspective on how the product is implemented in practice and where teams typically face the most friction.
-
-Thank you!
----
-
-Aylin's voice is warm, genuine, and direct. Not stiff or corporate. She says "I'd love to hear" and "if you have time." She signs off "Best, Aylin." She references specific things she noticed about the person. She mentions applying to the role naturally, not as the main point."""
-
-    contact_name = c_name or outreach.split("(")[0].strip() if outreach else ""
-    contact_title = c_title or ""
-    contact_hook = c_angle or ""
-
-    linkedin_user_msg = f"""Write a LinkedIn outreach message to {contact_name or 'the relevant contact'}, {contact_title} at {company}.
-
-Notes about this person: {contact_hook}
-Connection type: cold outreach
-
-Sender: MBA at Dartmouth Tuck, engineering background, tech strategy at Deloitte, AI product work at Skild AI (Silicon Valley robotics startup, $14B valuation).
-
-Match the tone and length of the examples exactly. Output only the message."""
-
-    yield _sse({"type": "token", "text": "\n\nLINKEDIN DRAFT:\n"})
-    with client.messages.stream(
-        model="claude-sonnet-4-6",
-        max_tokens=300,
-        system=LINKEDIN_SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": linkedin_user_msg}]
-    ) as stream:
-        for text in stream.text_stream:
-            yield _sse({"type": "token", "text": text})
 
     # Emit fit_score event so stream_query can trigger agentic chaining
     if fit_score is not None:
@@ -433,7 +417,7 @@ ESCALATE:
     yield _sse({"type": "done"})
 
 
-FORK_YEAH_URL = os.environ.get("FORK_YEAH_URL", "http://localhost:5173")
+RESTAURANT_AGENT_URL = os.environ.get("RESTAURANT_AGENT_URL", "http://localhost:5173")
 
 # Live app URLs for portfolio projects
 GTM_TOOL_URL = "https://web-production-b4e0ad.up.railway.app"
@@ -453,7 +437,7 @@ CLUSTER_NEXT_STEPS = {
     ],
     "support": [
         {"label": "CS Triage",    "url": "https://github.com/aylineuyar-arch/ai-cs-triage"},
-        {"label": "Fork Yeah!",   "url": "https://github.com/aylineuyar-arch/restaurant-agent"},
+        {"label": "Restaurant Agent",   "url": "https://github.com/aylineuyar-arch/restaurant-agent"},
     ],
     "compliance": [
         {"label": "Policy Desk",  "url": COMPLIANCE_RAG_URL},
@@ -463,20 +447,20 @@ CLUSTER_NEXT_STEPS = {
 
 def stream_restaurant(query: str, client: anthropic.Anthropic):
     """
-    Stream restaurant results. Tries to proxy through Fork Yeah! LangGraph agent
+    Stream restaurant results. Tries to proxy through Restaurant Agent LangGraph agent
     (localhost:5173) first. Falls back to Claude-only response if not running.
     """
     import urllib.request
     import urllib.parse
 
-    # Try Fork Yeah! agent first
+    # Try Restaurant Agent first
     try:
         encoded = urllib.parse.quote(query)
-        url = f"{FORK_YEAH_URL}/find-restaurant-stream?q={encoded}"
+        url = f"{RESTAURANT_AGENT_URL}/find-restaurant-stream?q={encoded}"
         req = urllib.request.Request(url, headers={"Accept": "text/event-stream"})
         with urllib.request.urlopen(req, timeout=3) as resp:
             # Agent is running — proxy its SSE stream through
-            yield _sse({"type": "token", "text": "🍴 Fork Yeah! agent connected — searching...\n\n"})
+            yield _sse({"type": "token", "text": "🍴 Restaurant Agent connected — searching...\n\n"})
             buffer = b""
             while True:
                 chunk = resp.read(256)
@@ -504,10 +488,10 @@ def stream_restaurant(query: str, client: anthropic.Anthropic):
             yield _sse({"type": "done"})
             return
     except Exception:
-        pass  # Fork Yeah! not running — fall through to Claude
+        pass  # Restaurant Agent not running — fall through to Claude
 
     # Fallback: Claude-only response
-    prompt = f"""You are AylinOS Fork Yeah! restaurant assistant.
+    prompt = f"""You are AylinOS Restaurant Agent assistant.
 
 USER REQUEST: {query}
 
@@ -528,7 +512,7 @@ BOOKING:
 PRO TIP:
 [One insider tip about the top pick or area]
 
-Note at the end: "For live booking with Playwright + ChromaDB memory, start the Fork Yeah! agent."
+Note at the end: "For live booking with Playwright + ChromaDB memory, start the Restaurant Agent."
 """
 
     with client.messages.stream(
@@ -538,6 +522,124 @@ Note at the end: "For live booking with Playwright + ChromaDB memory, start the 
     ) as stream:
         for text in stream.text_stream:
             yield _sse({"type": "token", "text": text})
+
+    yield _sse({"type": "done"})
+
+
+def stream_job_scan_single(company: str, client: anthropic.Anthropic):
+    """Demo fast path — scan one company only. Target <90s."""
+    import threading
+    import time
+    from pathlib import Path
+
+    activity_log = Path(__file__).resolve().parent.parent / "data" / "claude_activity.log"
+    start_pos = activity_log.stat().st_size if activity_log.exists() else 0
+    result = {}
+    done_event = threading.Event()
+
+    def _run():
+        try:
+            from agents.discovery import run_single
+            jobs = run_single(company, save_to_db=True)
+            result["count"] = len(jobs)
+        except Exception as e:
+            result["error"] = str(e)
+        finally:
+            done_event.set()
+
+    threading.Thread(target=_run, daemon=True).start()
+
+    pos = start_pos
+    while not done_event.is_set():
+        if activity_log.exists():
+            with open(activity_log) as f:
+                f.seek(pos)
+                chunk = f.read()
+                if chunk:
+                    for line in chunk.splitlines():
+                        if line.strip():
+                            yield _sse({"type": "token", "text": line + "\n"})
+                pos = f.tell()
+        time.sleep(0.5)
+
+    if activity_log.exists():
+        with open(activity_log) as f:
+            f.seek(pos)
+            for line in f.read().splitlines():
+                if line.strip():
+                    yield _sse({"type": "token", "text": line + "\n"})
+
+    if "error" in result:
+        yield _sse({"type": "token", "text": f"\nError: {result['error']}\n"})
+    else:
+        count = result.get("count", 0)
+        if count == 0:
+            yield _sse({"type": "token", "text": f"\nNo matching roles at {company} right now — board may be quiet or no NYC/London openings.\n"})
+        else:
+            yield _sse({"type": "token", "text": f"\n✓ {count} roles found at {company} — advisor brief below.\n"})
+            yield _sse({"type": "token", "text": "See advisor output below.\n"})
+
+    yield _sse({"type": "done"})
+
+
+def stream_job_scan(client: anthropic.Anthropic):
+    """Run discovery.run() in a thread, stream activity log pings as SSE tokens."""
+    import threading
+    import time
+    from pathlib import Path
+
+    activity_log = Path(__file__).resolve().parent.parent / "data" / "claude_activity.log"
+    start_pos = activity_log.stat().st_size if activity_log.exists() else 0
+
+    result = {}
+    done_event = threading.Event()
+
+    def _run():
+        try:
+            from agents.discovery import run
+            jobs = run(save_to_db=True)
+            result["count"] = len(jobs)
+        except Exception as e:
+            result["error"] = str(e)
+        finally:
+            done_event.set()
+
+    threading.Thread(target=_run, daemon=True).start()
+    yield _sse({"type": "token", "text": "Kicking things off — connecting to job boards now.\n\n"})
+
+    pos = start_pos
+    while not done_event.is_set():
+        if activity_log.exists():
+            with open(activity_log) as f:
+                f.seek(pos)
+                chunk = f.read()
+                if chunk:
+                    for line in chunk.splitlines():
+                        if line.strip():
+                            yield _sse({"type": "token", "text": line + "\n"})
+                pos = f.tell()
+        time.sleep(0.5)
+
+    # Drain any final lines written after done_event fires
+    if activity_log.exists():
+        with open(activity_log) as f:
+            f.seek(pos)
+            for line in f.read().splitlines():
+                if line.strip():
+                    yield _sse({"type": "token", "text": line + "\n"})
+
+    if "error" in result:
+        yield _sse({"type": "token", "text": f"\nError: {result['error']}\n"})
+    else:
+        count = result.get("count", 0)
+        yield _sse({"type": "token", "text": f"\nDone — {count} roles found and saved to pipeline.\n"})
+        # Wake Cursor agents — filesystem event, zero LLM cost until file appears
+        try:
+            wake = Path(__file__).resolve().parent.parent / "prospecting-signal" / "data" / "artifacts" / "CURSOR_WAKE"
+            wake.write_text("wake")
+            yield _sse({"type": "token", "text": "Signalling Cursor agents to start enrichment...\n"})
+        except Exception:
+            pass
 
     yield _sse({"type": "done"})
 
@@ -735,7 +837,11 @@ USER: {query}"""
 
 def _dispatch(agent: str, query: str, extract: str, client: anthropic.Anthropic):
     """Dispatch to the correct streaming handler for a single agent."""
-    if agent == "advisor":
+    if agent == "job_scan_single":
+        yield from stream_job_scan_single(extract or "unknown", client)
+    elif agent == "job_scan":
+        yield from stream_job_scan(client)
+    elif agent == "advisor":
         yield from stream_advisor(query, extract or query, client)
     elif agent == "interview_prep":
         yield from stream_interview_prep(query, extract or query, client)
@@ -790,7 +896,7 @@ def stream_query(query: str):
     color = CLUSTER_COLOR.get(cluster, "#94a3b8")
     pipeline_steps = _build_pipeline_steps(agents_selected, extract, query)
 
-    # Tell the frontend the full routing decision
+    # Tell the frontend the full routing decision (include pipeline_steps for immediate display)
     yield _sse({
         "type": "route",
         "agent": primary,
@@ -798,6 +904,7 @@ def stream_query(query: str):
         "reason": reason,
         "extract": extract,
         "cluster": cluster,
+        "pipeline_steps": pipeline_steps,
     })
 
     try:
@@ -808,34 +915,7 @@ def stream_query(query: str):
             if i > 0:
                 yield _sse({"type": "section", "label": label, "color": color})
 
-            if agent == "advisor":
-                # Intercept advisor stream to capture fit_score for agentic chaining
-                fit_score_captured = None
-                for sse_str in _dispatch(agent, query, extract, client):
-                    if '"type": "fit_score"' in sse_str:
-                        try:
-                            data = json.loads(sse_str[6:].strip())
-                            fit_score_captured = data.get("score")
-                        except Exception:
-                            pass
-                    yield sse_str
-                # Auto-trigger interview_prep if score >= 75 and not already queued
-                if (
-                    fit_score_captured is not None
-                    and fit_score_captured >= 75
-                    and "interview_prep" not in agents_selected
-                    and not auto_chained
-                ):
-                    auto_chained = True
-                    yield _sse({
-                        "type": "section",
-                        "label": f"AUTO-TRIGGERED → Interview Prep  (fit {fit_score_captured}/100)",
-                        "color": color,
-                        "auto": True,
-                    })
-                    yield from _dispatch("interview_prep", query, extract, client)
-            else:
-                yield from _dispatch(agent, query, extract, client)
+            yield from _dispatch(agent, query, extract, client)
 
         # Emit pipeline steps + next-step cards for the cluster
         next_step_items = CLUSTER_NEXT_STEPS.get(cluster, [])
