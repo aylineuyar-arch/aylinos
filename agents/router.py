@@ -437,7 +437,7 @@ CLUSTER_NEXT_STEPS = {
     ],
     "support": [
         {"label": "CS Triage",    "url": "https://github.com/aylineuyar-arch/ai-cs-triage"},
-        {"label": "Restaurant Agent",   "url": "https://github.com/aylineuyar-arch/restaurant-agent"},
+        {"label": "Restaurant Agent",   "url": "https://github.com/aylineuyar-arch/fork-yea"},
     ],
     "compliance": [
         {"label": "Policy Desk",  "url": COMPLIANCE_RAG_URL},
