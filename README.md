@@ -1,5 +1,7 @@
 # AylinOS
 
+AylinOS is the personal AI operating system across six live agents (job search, outreach, policy desk, support triage, GTM pricing, reservations). This repository is the job-search and orchestration spine (discovery → research → scoring → interview prep, human-in-the-loop). The other agents live in sibling repos; the product narrative and live demos are on [the portfolio](https://aylin-uyar-portfolio.lovable.app).
+
 An AI operating system for end-to-end job search management.
 
 Multi-agent pipeline covering discovery → research → scoring → interview prep → outcome tracking, with persistent memory and human-in-the-loop approval gates.
