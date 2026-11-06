@@ -639,7 +639,7 @@ def make_webhook(body: WebhookRequest):
             "response_rate": metrics["response_rate"],
             "interview_rate": metrics["interview_rate"],
         },
-        "dashboard_url": "https://aylinos.onrender.com/job-search",
+        "dashboard_url": f"{os.environ.get('BASE_URL', 'http://localhost:8000')}/job-search",
     }
 
 

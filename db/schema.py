@@ -11,7 +11,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-DB_PATH = Path(__file__).parent.parent / "aylinos.db"
+import os
+_data_dir = Path(os.environ.get("DATA_DIR", str(Path(__file__).parent.parent)))
+DB_PATH = _data_dir / "aylinos.db"
 
 
 def get_conn() -> sqlite3.Connection:
@@ -103,7 +105,30 @@ def init_db():
                 latency_ms INTEGER DEFAULT 0,
                 traced_at  TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS networking_contacts (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                company      TEXT NOT NULL,
+                name         TEXT NOT NULL,
+                title        TEXT,
+                linkedin_url TEXT,
+                score        INTEGER,
+                draft        TEXT,
+                created_at   TEXT NOT NULL
+            );
         """)
+    _ensure_networking_export_column()
+
+
+def _ensure_networking_export_column():
+    """Additive only — tracks whether a contact row has already been pushed
+    to Supabase + appended to the Excel export, so re-polling never double-exports."""
+    try:
+        with get_conn() as conn:
+            conn.execute("ALTER TABLE networking_contacts ADD COLUMN exported INTEGER DEFAULT 0")
+            conn.commit()
+    except Exception:
+        pass  # column already exists
 
 
 def upsert_job(job: dict) -> str:
@@ -390,15 +415,35 @@ def save_advisor_result(company: str, fit_score: int, strategy: str,
 
 
 def get_companies_with_contacts() -> list:
-    """Return companies where the OS found a specific contact."""
+    """Return contacts from both networking_contacts (Claude LinkedIn scan) and company_research."""
     with get_conn() as conn:
-        rows = conn.execute("""
-            SELECT company, fit_score, strategy, contact_name, contact_title, contact_angle, researched_at
+        # Primary: rows written by the networking agent to networking_contacts
+        net_rows = conn.execute("""
+            SELECT company, name AS contact_name, title AS contact_title,
+                   linkedin_url, score AS fit_score, draft AS contact_angle,
+                   created_at AS researched_at, 'AylinOS' AS source
+            FROM networking_contacts
+            ORDER BY score DESC, created_at DESC
+        """).fetchall()
+        # Secondary: advisor-written company_research rows that have a contact
+        res_rows = conn.execute("""
+            SELECT company, contact_name, contact_title,
+                   NULL AS linkedin_url, fit_score, contact_angle,
+                   researched_at, 'advisor' AS source
             FROM company_research
             WHERE contact_name IS NOT NULL AND contact_name != ''
             ORDER BY fit_score DESC, researched_at DESC
         """).fetchall()
-        return [dict(r) for r in rows]
+        # Deduplicate: networking_contacts takes priority over advisor rows for same company
+        seen = set()
+        results = []
+        for r in list(net_rows) + list(res_rows):
+            d = dict(r)
+            key = (d["company"].lower(), (d["contact_name"] or "").lower())
+            if key not in seen:
+                seen.add(key)
+                results.append(d)
+        return results
 
 
 def save_trace(query: str, agents: list, cluster: str, reason: str, extract: str, latency_ms: int) -> None:

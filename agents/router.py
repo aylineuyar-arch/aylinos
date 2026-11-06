@@ -420,6 +420,7 @@ ESCALATE:
 RESTAURANT_AGENT_URL = os.environ.get("RESTAURANT_AGENT_URL", "http://localhost:5173")
 
 # Live app URLs for portfolio projects
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
 GTM_TOOL_URL = "https://web-production-b4e0ad.up.railway.app"
 EMAIL_AGENT_URL = "https://muse-agent-transfer.lovable.app"
 COMPLIANCE_RAG_URL = "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streamlit.app"
@@ -427,13 +428,13 @@ COMPLIANCE_RAG_URL = "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streaml
 # Cluster-scoped next-step cards — no cross-contamination between career/GTM/etc.
 CLUSTER_NEXT_STEPS = {
     "career": [
-        {"label": "Networking",   "url": "https://aylinos.onrender.com/networking"},
+        {"label": "Networking",   "url": f"{BASE_URL}/networking"},
         {"label": "Email Agent",  "url": EMAIL_AGENT_URL},
-        {"label": "Interview Prep", "url": "https://aylinos.onrender.com"},
+        {"label": "Interview Prep", "url": BASE_URL},
     ],
     "gtm": [
         {"label": "GTM Modeler",  "url": GTM_TOOL_URL},
-        {"label": "Research",     "url": "https://aylinos.onrender.com"},
+        {"label": "Research",     "url": BASE_URL},
     ],
     "support": [
         {"label": "CS Triage",    "url": "https://github.com/aylineuyar-arch/ai-cs-triage"},
