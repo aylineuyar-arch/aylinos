@@ -94,7 +94,16 @@ def seed_on_startup():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://aylinuyar.com",
+        "https://www.aylinuyar.com",
+        "https://aylin-uyar-portfolio.lovable.app",
+        "https://aylinos.lovable.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "http://localhost:8000",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -651,6 +660,8 @@ def get_watchlist():
     import json as _json
     from pathlib import Path
     wl_path = Path(__file__).resolve().parent.parent / "data" / "watchlist.json"
+    if not wl_path.exists():
+        return []
     with open(wl_path) as f:
         watchlist = _json.load(f)
     # Overlay live SQLite fit_score if we have a fresher scan for this company
@@ -718,9 +729,10 @@ def get_company_roles(company: str):
 # ── Health ─────────────────────────────────────────────────────────────────────
 
 @app.get("/health")
+@app.get("/api/health")
 def health():
     metrics = db.get_metrics()
-    return {"status": "ok", "jobs_in_db": metrics["total_jobs"]}
+    return {"status": "healthy", "jobs_in_db": metrics["total_jobs"]}
 
 
 if __name__ == "__main__":

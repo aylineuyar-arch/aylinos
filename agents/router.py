@@ -421,20 +421,20 @@ RESTAURANT_AGENT_URL = os.environ.get("RESTAURANT_AGENT_URL", "http://localhost:
 
 # Live app URLs for portfolio projects
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
-GTM_TOOL_URL = "https://web-production-b4e0ad.up.railway.app"
+GTM_TOOL_URL = "https://aylinos.lovable.app/aylinos-app"
 EMAIL_AGENT_URL = "https://muse-agent-transfer.lovable.app"
-COMPLIANCE_RAG_URL = "https://compliance-rag-demo-mrwtbs4k7gvdvmiuck8mdn.streamlit.app"
+COMPLIANCE_RAG_URL = "https://github.com/aylineuyar-arch/compliance-rag-chatbot"
 
 # Cluster-scoped next-step cards — no cross-contamination between career/GTM/etc.
 CLUSTER_NEXT_STEPS = {
     "career": [
-        {"label": "Networking",   "url": f"{BASE_URL}/networking"},
+        {"label": "Networking",   "url": "#search-zone"},
         {"label": "Email Agent",  "url": EMAIL_AGENT_URL},
-        {"label": "Interview Prep", "url": BASE_URL},
+        {"label": "Interview Prep", "url": "#search-zone"},
     ],
     "gtm": [
         {"label": "GTM Modeler",  "url": GTM_TOOL_URL},
-        {"label": "Research",     "url": BASE_URL},
+        {"label": "Research",     "url": "#search-zone"},
     ],
     "support": [
         {"label": "CS Triage",    "url": "https://github.com/aylineuyar-arch/ai-cs-triage"},
@@ -764,7 +764,31 @@ Draft queued for review — human approves before send."""
         model = "claude-sonnet-4-6"
         max_tokens = 500
     else:
-        prompt = f"""You are AylinOS Email Intelligence, an AI job search automation expert.
+        # Distinguish draft requests from capability questions
+        draft_keywords = ["draft", "write", "compose", "introduction", "intro", "outreach", "reach out", "cold email", "send an email", "write an email"]
+        is_draft_request = any(kw in query.lower() for kw in draft_keywords)
+        if is_draft_request:
+            prompt = f"""You are AylinOS Outreach Intelligence. Draft a personalized introduction email.
+
+USER REQUEST: {query}
+
+SENDER: Aylin Uyar — Tuck MBA 2026, BS EE, 4 years Deloitte Tech Strategy, AI Product intern at Skild AI ($14B, NVIDIA/Sequoia-backed). Targeting AI Deployment / Engagement Manager roles in London and NYC.
+
+Use [COMPANY NAME], [HIRING MANAGER NAME], [ROLE TITLE] as placeholders where specific details are unknown.
+Output in this exact format — no preamble:
+
+SUBJECT:
+[one line subject]
+
+MESSAGE:
+[3-4 sentences. Lead with a specific hook about the company's AI work. Reference Aylin's background. End with a 20-min ask. No generic language.]
+
+NEXT STEP:
+Review draft and add specific company/contact details before sending."""
+            model = "claude-haiku-4-5-20251001"
+            max_tokens = 400
+        else:
+            prompt = f"""You are AylinOS Email Intelligence, an AI job search automation expert.
 
 USER QUERY: {query}
 
@@ -775,8 +799,8 @@ WHAT THE AGENT DOES:
 
 FOR YOUR QUERY:
 [Direct answer to what they asked about AI email pipelines or job search automation]"""
-        model = "claude-haiku-4-5-20251001"
-        max_tokens = 300
+            model = "claude-haiku-4-5-20251001"
+            max_tokens = 300
 
     with client.messages.stream(
         model=model,
