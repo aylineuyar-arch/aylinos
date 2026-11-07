@@ -422,7 +422,7 @@ RESTAURANT_AGENT_URL = os.environ.get("RESTAURANT_AGENT_URL", "http://localhost:
 # Live app URLs for portfolio projects
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
 GTM_TOOL_URL = "https://aylinos.lovable.app/aylinos-app"
-EMAIL_AGENT_URL = "https://muse-agent-transfer.lovable.app"
+EMAIL_AGENT_URL = "https://aylinos.lovable.app/aylinos-app"
 COMPLIANCE_RAG_URL = "https://github.com/aylineuyar-arch/compliance-rag-chatbot"
 
 # Cluster-scoped next-step cards — no cross-contamination between career/GTM/etc.

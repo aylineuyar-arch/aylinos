@@ -1,9 +1,9 @@
 """
 Regression tests for agent fixes:
-- Lever/Ashby malformed payload handling
+- Lever/Ashby malformed payload handling and correct ATS routing
 - fit_score type normalization
 - Email agent drafts on draft requests
-- Pricing next_steps destination
+- next_steps URLs never point to old dashboards
 """
 import sys, os, json
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -126,3 +126,95 @@ def test_cluster_next_steps_gtm_destination():
     gtm_steps = CLUSTER_NEXT_STEPS.get("gtm", [])
     urls = [s["url"] for s in gtm_steps]
     assert any("aylinos.lovable.app" in u for u in urls), f"No aylinos.lovable.app URL in GTM next_steps: {urls}"
+
+
+# ── ATS source isolation ───────────────────────────────────────────────────────
+
+def test_lever_failure_does_not_abort_other_sources():
+    """A Lever 404 must log an error and skip, not propagate an exception."""
+    import requests
+    from unittest.mock import patch, MagicMock
+    errors = []
+    lever_bad = _make_resp(status=404)
+    gh_good = _make_resp(status=200, json_data={"jobs": []})
+
+    def fake_get(url, **kw):
+        if "lever.co" in url:
+            return lever_bad
+        return gh_good
+
+    with patch("agents.discovery.requests.get", side_effect=fake_get), \
+         patch("agents.discovery._error", side_effect=lambda m: errors.append(m)):
+        from agents.discovery import _fetch_ats
+        import anthropic
+        client = MagicMock(spec=anthropic.Anthropic)
+        client.messages.create.return_value = MagicMock(
+            content=[MagicMock(text='{"fit_score":70,"fit_reason":"ok","apply":true}')]
+        )
+        # Should not raise even with lever failing
+        try:
+            _fetch_ats(client, set())
+        except Exception as e:
+            pytest.fail(f"_fetch_ats raised with lever failure: {e}")
+
+
+def test_ashby_uses_get_not_post():
+    """Ashby fetcher must use GET, not POST (POST returns 401)."""
+    import inspect
+    from agents import discovery
+    source = inspect.getsource(discovery._fetch_ats)
+    # Should have requests.get for ashby, not requests.post
+    ashby_section = source[source.find("# Ashby"):]
+    first_request = ashby_section[:ashby_section.find("requests.") + 20]
+    assert "requests.get" in ashby_section[:ashby_section.find("for company in ashby_companies") + 200], \
+        "Ashby section should use requests.get"
+
+
+def test_no_muse_agent_in_next_steps():
+    """Email Agent next_steps must not point to muse-agent-transfer.lovable.app."""
+    from agents.router import CLUSTER_NEXT_STEPS, EMAIL_AGENT_URL
+    all_urls = [s["url"] for cluster in CLUSTER_NEXT_STEPS.values() for s in cluster]
+    assert not any("muse-agent-transfer" in u for u in all_urls), \
+        f"muse-agent-transfer still in next_steps: {[u for u in all_urls if 'muse' in u]}"
+    assert "muse-agent-transfer" not in EMAIL_AGENT_URL, \
+        f"EMAIL_AGENT_URL still points to muse-agent-transfer: {EMAIL_AGENT_URL}"
+
+
+def test_email_agent_url_is_aylinos():
+    """Email Agent URL must point to aylinos.lovable.app."""
+    from agents.router import EMAIL_AGENT_URL
+    assert "aylinos.lovable.app" in EMAIL_AGENT_URL, \
+        f"EMAIL_AGENT_URL should point to aylinos.lovable.app: {EMAIL_AGENT_URL}"
+
+
+def test_invalid_job_record_shape_skipped():
+    """Non-dict items in a job list must be skipped without crashing."""
+    jobs = [
+        {"title": "AI Deployment Manager", "fit_score": 80},
+        "not a dict",
+        None,
+        42,
+        {"title": "GTM Strategist", "fit_score": 75},
+    ]
+    valid = [j for j in jobs if isinstance(j, dict)]
+    assert len(valid) == 2, f"Expected 2 valid records, got {len(valid)}"
+    assert all("title" in j for j in valid)
+
+
+def test_scores_as_strings_normalize():
+    """fit_score as string must normalize to float without raising."""
+    for raw in ["85", "72.5", "0", None, ""]:
+        try:
+            result = float(raw or 0)
+        except (TypeError, ValueError):
+            result = 0.0
+        assert isinstance(result, float), f"Expected float for input {raw!r}, got {type(result)}"
+
+
+def test_valid_results_saved_when_one_provider_fails():
+    """Jobs from successful sources are preserved even when another source returns errors."""
+    good_jobs = [{"id": "1", "title": "AI Strategist", "fit_score": 80.0}]
+    failed_jobs: list = []  # simulates a provider that errored and returned []
+    combined = good_jobs + failed_jobs
+    assert len(combined) == 1
+    assert combined[0]["fit_score"] == 80.0

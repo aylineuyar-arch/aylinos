@@ -368,21 +368,22 @@ def _fetch_ats(client: anthropic.Anthropic, seen: set) -> list[dict]:
         "openai", "anthropic", "scale", "cohere", "ramp", "brex", "rippling",
         "notion", "figma", "airtable", "databricks", "glean", "perplexity",
         "hinge-health", "lyra-health", "spring-health", "a16z",
-        # new additions
+        # verified additions
         "handshake", "zip", "celonis", "assembled", "pylon",
         "actively-ai", "happyrobot",
+        # migrated from Lever (verified 2026-11)
+        "mercury", "gusto", "intercom", "lattice",
     ]
-    lever_companies = [
-        "mistral", "elevenlabs", "harvey", "cognition-labs", "linear",
-        "mercury", "deel", "gusto", "intercom", "lattice",
-        # new additions
-        "omnea", "reflect", "solve-intelligence",
-    ]
+    # Lever boards verified unavailable 2026-11; companies have migrated to Greenhouse/Ashby.
+    lever_companies: list[str] = []
     ashby_companies = [
+        # verified GET https://api.ashbyhq.com/posting-api/job-board/{slug}
         "condukt", "cogna", "wayve", "multiverse", "synthesia",
-        "decagon", "hebbia", "cartesia", "serval", "attio",
-        # new additions
-        "profound", "glimpse", "distyl-ai", "clay", "nooks",
+        "decagon", "hebbia-ai", "cartesia", "serval", "attio",
+        "profound", "glimpse", "distyl", "nooks",
+        "cognition", "solveintelligence",
+        # migrated from Lever (verified 2026-11)
+        "elevenlabs", "harvey", "linear", "deel", "omnea",
     ]
 
     # Custom careers pages (non-standard ATS)
@@ -523,14 +524,13 @@ def _fetch_ats(client: anthropic.Anthropic, seen: set) -> list[dict]:
         except Exception as e:
             print(f"  [discovery] Custom careers error for {co['company']}: {e}")
 
-    # Ashby
+    # Ashby — public job board API uses GET (POST returns 401)
     _ping(f"ashby: scanning {len(ashby_companies)} companies...")
     ab_found = 0
     for company in ashby_companies:
         try:
-            resp = requests.post(
+            resp = requests.get(
                 f"https://api.ashbyhq.com/posting-api/job-board/{company}",
-                json={},
                 timeout=10
             )
             if resp.status_code != 200:
@@ -627,17 +627,19 @@ COMPANY_ATS_MAP = {
     "perplexity":  ("greenhouse", "perplexity"),
     "scale":       ("greenhouse", "scale"),
     "brex":        ("greenhouse", "brex"),
-    # Ashby
-    "clay":        ("ashby", "clay"),
-    "hebbia":      ("ashby", "hebbia"),
+    "mercury":     ("greenhouse", "mercury"),
+    "gusto":       ("greenhouse", "gusto"),
+    "intercom":    ("greenhouse", "intercom"),
+    "lattice":     ("greenhouse", "lattice"),
+    # Ashby — public GET endpoint, verified slugs 2026-11
+    "hebbia":      ("ashby", "hebbia-ai"),
     "decagon":     ("ashby", "decagon"),
     "attio":       ("ashby", "attio"),
     "cartesia":    ("ashby", "cartesia"),
-    # Lever
-    "elevenlabs":  ("lever", "elevenlabs"),
-    "harvey":      ("lever", "harvey"),
-    "linear":      ("lever", "linear"),
-    "mercury":     ("lever", "mercury"),
+    "elevenlabs":  ("ashby", "elevenlabs"),
+    "harvey":      ("ashby", "harvey"),
+    "linear":      ("ashby", "linear"),
+    "cognition":   ("ashby", "cognition"),
     # Custom
     "planhat":     ("custom", "planhat"),
 }
@@ -723,12 +725,11 @@ def run_single(company: str, save_to_db: bool = True) -> list[dict]:
                 })
 
         elif ats == "ashby":
-            resp = requests.post(
-                f"https://api.ashbyhq.com/posting-api/job-board/{slug}", json={}, timeout=10
+            resp = requests.get(
+                f"https://api.ashbyhq.com/posting-api/job-board/{slug}", timeout=10
             )
             if resp.status_code != 200:
                 _error(f"ashby/{slug}: HTTP {resp.status_code}")
-                jobs = []
                 resp_jobs = []
             else:
                 ct = resp.headers.get("content-type", "")
